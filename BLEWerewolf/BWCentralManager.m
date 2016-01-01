@@ -23,6 +23,7 @@
 
 
 @implementation BWCentralManager
+@synthesize delegate = _delegate;
 
 #pragma mark - Singleton
 + (instancetype)sharedInstance
@@ -39,6 +40,11 @@
     });
     
     return sharedInstance;
+}
+
+-(void)sendMessageFromClient:(NSString*)message {
+    NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
+    [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithoutResponse];
 }
 
 // --------------------------------
@@ -193,6 +199,7 @@
             for(CBCharacteristic *characteristic in service.characteristics) {
                 if([characteristic.UUID isEqual:[CBUUID UUIDWithString:TRANSFER_CHARACTERISTIC_UUID]]) {
                     NSLog(@"characteristics is found!");
+                    self.interestingCharacteristic = characteristic;
                     [peripheral readValueForCharacteristic:characteristic];
                     [peripheral setNotifyValue:YES forCharacteristic:characteristic];
                 }
@@ -222,6 +229,8 @@
         NSString *receivedString = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
         
         NSLog(@"[data] %@",receivedString);
+        
+        [_delegate didReceivedMessage:receivedString];
         
     }
 }

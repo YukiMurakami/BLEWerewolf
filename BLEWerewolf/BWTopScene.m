@@ -37,7 +37,7 @@
     
     if([BWUtility wasSetting]) {
         for(NSInteger i=0;i<3;i++) {
-            SKSpriteNode *buttonNode = [BWUtility makeButton:buttons[i][@"title"] size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:buttons[i][@"name"] position:CGPointMake(0, self.size.width*0.7*0.2*(1-i))];
+            SKSpriteNode *buttonNode = [BWUtility makeButton:buttons[i][@"title"] size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:buttons[i][@"name"] position:CGPointMake(0, self.size.width*0.7*0.3*(1-i))];
             [backgroundNode addChild:buttonNode];
         }
     } else {

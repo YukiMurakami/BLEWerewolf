@@ -10,6 +10,6 @@
 
 #import "BWCentralManager.h"
 
-@interface BWMainScene : SKScene <UITableViewDelegate,UITableViewDataSource>
+@interface BWMainScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWCentralManagerDelegate>
 
 @end

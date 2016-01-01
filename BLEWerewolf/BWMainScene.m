@@ -25,6 +25,9 @@
     [self initBackground];
     
     centralManager = [BWCentralManager sharedInstance];
+    centralManager.delegate = self;
+    
+    gameIdArray = [NSMutableArray array];
     
     return self;
 }
@@ -79,6 +82,29 @@
     cell.textLabel.text = name;
     
     return cell;
+}
+
+#pragma mark - BWCentralManagerDelegate
+
+-(void)didReceivedMessage:(NSString *)message {
+    NSLog(@"catch:%@",message);
+    BOOL isFound = NO;
+    NSString *gameId = @"";
+    if(message.length == 14) {
+        isFound = YES;
+        gameId = [message substringWithRange:NSMakeRange(8, 6)];
+    }
+    BOOL isNew = YES;
+    for(NSInteger i=0;i<gameIdArray.count;i++) {
+        if([gameIdArray[i] isEqualToString:gameId]) {
+            isNew = NO;
+            break;
+        }
+    }
+    if(isNew) {
+        [gameIdArray addObject:gameId];
+        [table reloadData];
+    }
 }
 
 

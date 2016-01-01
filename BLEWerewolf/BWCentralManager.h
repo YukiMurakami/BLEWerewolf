@@ -9,13 +9,23 @@
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 
-@interface BWCentralManager : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
+@protocol BWCentralManagerDelegate
+- (void)didReceivedMessage:(NSString*)message;
+@end
+
+@interface BWCentralManager : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate> {
+    id<BWCentralManagerDelegate> _delegate;
+}
+
+@property (nonatomic) id<BWCentralManagerDelegate> delegate;
 
 @property (strong, nonatomic) CBCentralManager *centralManager;
+@property (strong, nonatomic) CBCharacteristic *interestingCharacteristic;
 @property (strong, nonatomic) CBPeripheral *peripheral;
 @property (nonatomic, strong) NSMutableData *data;
 
 + (instancetype)sharedInstance;
+-(void)sendMessageFromClient:(NSString*)message;
 
 // --------------------------------
 // CBCentralManagerDelegate
