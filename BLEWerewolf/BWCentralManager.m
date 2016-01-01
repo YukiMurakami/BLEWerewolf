@@ -44,7 +44,9 @@
 
 -(void)sendMessageFromClient:(NSString*)message {
     NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
-    [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithoutResponse];
+    NSLog(@"send message :%@",message);
+    [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithResponse];
+    
 }
 
 // --------------------------------
@@ -247,6 +249,12 @@
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(nonnull CBCharacteristic *)characteristic error:(nullable NSError *)error
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+    NSLog(@"Did write characteristic value : %@ with ID %@", characteristic.value, characteristic.UUID);
+    if (error) {
+        NSLog(@"Error writing characteristic value: %@",[error localizedDescription]);
+    } else {
+        NSLog(@"Successful writing !!!!!!!!!!!!!!!!!");
+    }
 }
 
 // Invoked when you write data to a characteristic descriptor's value

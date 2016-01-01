@@ -67,5 +67,12 @@
     return YES;
 }
 
++ (NSString*)getUserName {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *userData = [ud objectForKey:@"userData"];
+    if(!userData) return @"no_name";
+    return userData[@"name"];
+}
+
 
 @end

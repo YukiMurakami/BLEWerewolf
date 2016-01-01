@@ -38,5 +38,6 @@ typedef NS_ENUM(NSUInteger, Roll) {
 + (NSString*)getIdentificationString;
 //ユーザデータを設定していたかどうか
 + (BOOL)wasSetting;
++ (NSString*)getUserName;
 
 @end

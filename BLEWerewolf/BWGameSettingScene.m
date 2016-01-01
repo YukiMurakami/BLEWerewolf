@@ -31,6 +31,8 @@
     
     manager = [BWPeripheralManager sharedInstance];
     
+    manager.delegate = self;
+    
     registeredPlayersArray = [NSMutableArray array];
     
     [self initBackground];
@@ -67,12 +69,22 @@
     tableView.dataSource = self;
     tableView.rowHeight = tableView.frame.size.height/6;
     
-    NSString *message = [NSString stringWithFormat:@"receive:%06ld",(long)gameId];
+    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
     [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":message} repeats:YES];
 }
 
 -(void)sendMessage:(NSTimer*)timer {
     [[BWPeripheralManager sharedInstance] updateSendMessage:[timer userInfo][@"message"]];
+}
+
+-(void)willMoveFromView:(SKView *)view {
+    [tableView removeFromSuperview];
+}
+
+-(void)didMoveToView:(SKView *)view {
+    
+    [self.view addSubview:tableView];
+    [tableView reloadData];
 }
 
 #pragma mark - tableViewDelegate
@@ -92,6 +104,33 @@
     cell.textLabel.text = name;
     
     return cell;
+}
+
+#pragma mark - BWPeripheralManagerDelegate
+-(void)didReceiveMessage:(NSString *)message {
+    //participateRequest:NNNNNN/A..A(32)/S...S
+    if(message.length >= 18 && [[message substringToIndex:18] isEqualToString:@"participateRequest"]) {
+        NSString *identificationIdString = [message substringWithRange:NSMakeRange(26,32)];
+        NSString *gameIdString = [message substringWithRange:NSMakeRange(19,6)];
+        NSString *userNameString = [message substringFromIndex:59];
+        
+        if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
+            NSLog(@"接続要求:%@,%@",identificationIdString,userNameString);
+            
+            BOOL isNew = YES;
+            for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
+                if([registeredPlayersArray[i][@"identificationId"] isEqualToString:identificationIdString]) {
+                    isNew = NO;
+                    break;
+                }
+            }
+            if(isNew) {
+                NSMutableDictionary *dic = [@{@"identificationId":identificationIdString,@"name":userNameString}mutableCopy];
+                [registeredPlayersArray addObject:dic];
+                [tableView reloadData];
+            }
+        }
+    }
 }
 
 @end

@@ -9,9 +9,15 @@
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 
+@protocol BWPeripheralManagerDelegate
+-(void)didReceiveMessage:(NSString*)message;
+@end
 
-@interface BWPeripheralManager : NSObject <CBPeripheralManagerDelegate>
+@interface BWPeripheralManager : NSObject <CBPeripheralManagerDelegate> {
+    id<BWPeripheralManagerDelegate> _delegate;
+}
 
+@property (nonatomic) id<BWPeripheralManagerDelegate> delegate;
 
 + (instancetype)sharedInstance;
 

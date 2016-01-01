@@ -16,7 +16,7 @@
 @end
 
 @implementation BWPeripheralManager
-
+@synthesize delegate = _delegate;
 
 #pragma mark - Singleton
 + (instancetype)sharedInstance
@@ -66,10 +66,10 @@
     // Creates the characteristic
     //self.characteristic = [[CBMutableCharacteristic alloc] initWithType:characteristicUUID properties:CBCharacteristicPropertyNotify value:nil permissions:CBAttributePermissionsReadable];
     
-    NSString *sendMessage = @"first_message";
-    NSData *data = [sendMessage dataUsingEncoding:NSUTF8StringEncoding];
+    //NSString *sendMessage = @"first_message";
+    //NSData *data = [sendMessage dataUsingEncoding:NSUTF8StringEncoding];
     
-    self.characteristic = [[CBMutableCharacteristic alloc] initWithType:characteristicUUID properties:CBCharacteristicPropertyRead | CBCharacteristicPropertyNotify | CBCharacteristicPropertyWrite | CBCharacteristicPropertyWriteWithoutResponse value:nil permissions:CBAttributePermissionsReadable];
+    self.characteristic = [[CBMutableCharacteristic alloc] initWithType:characteristicUUID properties:(CBCharacteristicPropertyRead | CBCharacteristicPropertyNotify | CBCharacteristicPropertyWrite) value:nil permissions:CBAttributePermissionsReadable | CBAttributePermissionsWriteable | CBAttributePermissionsWriteEncryptionRequired];
     
     
     // Creates the service UUID
@@ -200,6 +200,15 @@
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray *)requests
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+    NSLog(@"request:%@",requests);
+    
+    for(CBATTRequest *request in requests) {
+        NSString *message = [[NSString alloc]initWithData:request.value encoding:NSUTF8StringEncoding];
+        NSLog(@"written data:%@",message);
+        [_delegate didReceiveMessage:message];
+    }
+    
+    [self.peripheralManager respondToRequest:[requests objectAtIndex:0] withResult:CBATTErrorSuccess];
 }
 
 

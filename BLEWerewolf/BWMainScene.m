@@ -84,25 +84,33 @@
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSString *touchedGameId = [gameIdArray[indexPath.row] substringToIndex:6];
+    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
+    [centralManager sendMessageFromClient:sendMessage];
+}
+
 #pragma mark - BWCentralManagerDelegate
 
 -(void)didReceivedMessage:(NSString *)message {
     NSLog(@"catch:%@",message);
     BOOL isFound = NO;
     NSString *gameId = @"";
-    if(message.length == 14) {
+    NSString *hostName = @"";
+    if(message.length >= 15) {
         isFound = YES;
         gameId = [message substringWithRange:NSMakeRange(8, 6)];
+        hostName = [message substringFromIndex:15];
     }
     BOOL isNew = YES;
     for(NSInteger i=0;i<gameIdArray.count;i++) {
-        if([gameIdArray[i] isEqualToString:gameId]) {
+        if([[gameIdArray[i] substringToIndex:6] isEqualToString:gameId]) {
             isNew = NO;
             break;
         }
     }
     if(isNew) {
-        [gameIdArray addObject:gameId];
+        [gameIdArray addObject:[NSString stringWithFormat:@"%@(%@)",gameId,hostName]];
         [table reloadData];
     }
 }
