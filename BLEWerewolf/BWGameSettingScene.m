@@ -19,6 +19,8 @@
     
     UITableView *tableView;
     NSMutableArray *registeredPlayersArray;
+    
+    NSTimer *nstimer;
 }
 
 @end
@@ -81,7 +83,7 @@
     }
     
     NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
-    [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":message} repeats:YES];
+    nstimer = [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":message} repeats:YES];
 }
 
 -(void)sendMessage:(NSTimer*)timer {
@@ -131,6 +133,7 @@
     SKNode *node = [self nodeAtPoint:location];
     
     if([node.name isEqualToString:@"next"]) {
+        [nstimer invalidate];
         BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
         [scene sendPlayerInfo:registeredPlayersArray];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];

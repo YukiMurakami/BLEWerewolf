@@ -50,12 +50,30 @@
                 printMessage = @"ルール設定待ち";
                 [self initBackground];
             }
-            /*
-            BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
-            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-            [self.view presentScene:scene transition:transition];
-            */
         }
+    }
+    if([[BWUtility getCommand:message] isEqualToString:@"setting"] && [printMessage isEqualToString:@"ルール設定待ち"]) {
+        NSLog(@"ルール:%@",message);
+        NSArray *components = [BWUtility getCommandContents:message];
+        NSArray *roleStrings = [components[0] componentsSeparatedByString:@","];
+        NSArray *ruleStrings = [components[1] componentsSeparatedByString:@","];
+        NSMutableArray *roleArray = [NSMutableArray array];
+        for(NSInteger i=0;i<roleStrings.count;i++) {
+            [roleArray addObject:@([roleStrings[i]integerValue])];
+        }
+        
+        NSMutableDictionary *ruleDic = [@{@"timer":@([ruleStrings[0]integerValue]),
+                                          @"nightTimer":@([ruleStrings[1]integerValue]),
+                                          @"fortuneMode":@([ruleStrings[2]integerValue]),
+                                          @"canContinuousGuard":@([ruleStrings[3]integerValue]),
+                                          @"isLacking":@([ruleStrings[4]integerValue])}mutableCopy];
+        
+        NSMutableDictionary *infoDic = [@{@"rules":ruleDic,@"roles":roleArray}mutableCopy];
+        
+        BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
+        [scene setCentralOrPeripheral:NO :infoDic];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
     }
 }
 

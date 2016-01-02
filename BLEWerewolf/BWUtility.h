@@ -46,6 +46,7 @@ typedef NS_ENUM(NSUInteger, Role) {
 +(NSMutableDictionary *) getCardInfofromId :(int) cardId ;
 +(SKTexture *) getCardTexture :(int) cardId;
 + (NSString*)getFortuneButtonString :(FortuneTellerMode)mode;
++(NSString*)getRoleSetString:(NSMutableArray*)roles;
 
 #pragma mark - data
 //固有識別文字列を取得（初回呼び出し時に生成し、userdefaultsに保存しておく）

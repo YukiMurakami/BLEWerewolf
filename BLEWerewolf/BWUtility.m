@@ -97,6 +97,7 @@
     NSMutableDictionary *infoDic = [NSMutableDictionary dictionary];
     
     NSString *name = @"name";
+    NSString *token = @"";
     NSString *explain = @"explain";
     NSString *detailExplain = @"特になし";
     bool hasTable = false;//夜のアクションでテーブルが必要か
@@ -124,12 +125,14 @@
             //roleIdはcellActionなど全て共通で用いられるが、予約語的な例外もある
         case RoleVillager:
             name = @"村人";//実装済み
+            token = @"村";
             surfaceRole = RoleVillager;
             hasTable = false;
             explain = @"村人は特殊な能力を持たないただの一般人ですが、このゲームの主人公でもあります。他の村人や特殊能力を持った仲間たちと協力して人狼を処刑し、全滅させましょう。";
             break;
         case RoleWerewolf:
             name = @"人狼";//実装済み
+            token = @"狼";
             surfaceRole = RoleWerewolf;
             hasTable = true;
             hasTableFirst = true;
@@ -139,6 +142,7 @@
             break;
         case RoleFortuneTeller:
             name = @"予言者";//実装済み
+            token = @"占";
             surfaceRole = RoleFortuneTeller;
             hasTable = true;
             tableString = @"予言先を選択してください。";
@@ -148,18 +152,21 @@
             break;
         case RoleShaman:
             name = @"霊媒師";//実装済み
+            token = @"霊";
             surfaceRole = RoleShaman;
             hasTable = false;
             explain = @"霊媒師は毎晩目を覚まし、その日の昼のターンに処刑された人が人狼だったのかそうでなかったのかを知ることができます。";
             break;
         case RoleMadman:
             name = @"狂人";//実装済み
+            token = @"狂";
             surfaceRole = RoleMadman;
             hasTable = false;
             explain = @"狂人は何も能力を持っていませんが、人狼側の人間です。人狼が勝利した時、自らも勝者となります。予言者に見られてもただの人間と判定されます。積極的に役職を騙り村を混乱させましょう。";
             break;
         case RoleBodyguard:
             name = @"ボディーガード";//実装済み
+            token = @"狩";
             surfaceRole = RoleBodyguard;
             hasTable = true;
             tableString = @"護衛先を選択してください。";
@@ -167,6 +174,7 @@
             break;
         case RoleJointOwner:
             name = @"共有者";//実装済み
+            token = @"共";
             surfaceRole = RoleJointOwner;
             hasTable = false;
             hasTableFirst = true;
@@ -175,6 +183,7 @@
             break;
         case RoleFox:
             name = @"妖狐";//実装済み
+            token = @"狐";
             surfaceRole = RoleFox;
             hasTableFirst = true;
             tableStringFirst = @"仲間の妖狐を確認してください。";
@@ -357,9 +366,19 @@
     }
     
     infoDic = [@{@"name":name,@"explain":explain,@"hasTable":@(hasTable),@"tableString":tableString,
-                 @"hasTableFirst":@(hasTableFirst),@"tableStringFirst":tableStringFirst,@"maxPlayer":@(maxPlayer),@"surfaceRole":@(surfaceRole)} mutableCopy];
+                 @"hasTableFirst":@(hasTableFirst),@"tableStringFirst":tableStringFirst,@"maxPlayer":@(maxPlayer),@"surfaceRole":@(surfaceRole),@"token":token} mutableCopy];
     
     return infoDic;
+}
+
++(NSString*)getRoleSetString:(NSMutableArray*)roles {
+    NSString *result = @"";
+    for(NSInteger i=0;i<roles.count;i++) {
+        if([roles[i]integerValue] > 0) {
+            result = [NSString stringWithFormat:@"%@%@%@",result,[BWUtility getCardInfofromId:i][@"token"],roles[i]];
+        }
+    }
+    return result;
 }
 
 +(SKTexture *) getCardTexture :(int) cardId {
