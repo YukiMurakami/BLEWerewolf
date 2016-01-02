@@ -9,6 +9,7 @@
 #import "BWPeripheralManager.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "TransferService.h"
+#import "NSObject+BlocksWait.h"
 
 
 @interface BWPeripheralManager () 
@@ -33,10 +34,11 @@
 }
 
 - (void)updateSendMessage :(NSString*)sendMessage {
-    
+    [sendingMessageQueue addObject:sendMessage];
     NSData *data = [sendMessage dataUsingEncoding:NSUTF8StringEncoding];
     if([self.peripheralManager updateValue:data forCharacteristic:self.characteristic onSubscribedCentrals:nil]) {
-        NSLog(@"特性値更新");
+        NSLog(@"特性値更新:%@",sendingMessageQueue[0]);
+        [sendingMessageQueue removeObjectAtIndex:0];
     }
 }
 
@@ -45,6 +47,7 @@
     if (self) {
         // 初期化処理
         self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil options:nil];
+        sendingMessageQueue = [NSMutableArray array];
     }
     return self;
 }
@@ -184,6 +187,16 @@
 - (void)peripheralManagerIsReadyToUpdateSubscribers:(CBPeripheralManager *)peripheral
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
+    
+    [NSObject performBlock:^{
+        NSData *data = [sendingMessageQueue[0] dataUsingEncoding:NSUTF8StringEncoding];
+        if([self.peripheralManager updateValue:data forCharacteristic:self.characteristic onSubscribedCentrals:nil]) {
+            NSLog(@"特性値更新:%@",sendingMessageQueue[0]);
+            [sendingMessageQueue removeObjectAtIndex:0];
+        }
+    } afterDelay:0.01];
+    
+    
 }
 
 // Receiving Read and Write Requests

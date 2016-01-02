@@ -14,6 +14,13 @@
 		B63D90491B60DD35000E366B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B63D90481B60DD35000E366B /* Images.xcassets */; };
 		B63D90581B60DD35000E366B /* BLEWerewolfTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90571B60DD35000E366B /* BLEWerewolfTests.m */; };
 		B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90621B60DDCA000E366B /* BWTopScene.m */; };
+		B67CC3911C36D3D300546FC0 /* BWWaitConnectionScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3901C36D3D300546FC0 /* BWWaitConnectionScene.m */; };
+		B67CC3941C37650700546FC0 /* night.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B67CC3931C37650700546FC0 /* night.jpg */; };
+		B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3961C37657400546FC0 /* BWRuleCheckScene.m */; };
+		B67CC39A1C37715D00546FC0 /* BWSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3991C37715D00546FC0 /* BWSettingScene.m */; };
+		B67CC39D1C3789C700546FC0 /* LWRuleSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC39C1C3789C700546FC0 /* LWRuleSettingScene.m */; };
+		B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC39F1C378D3200546FC0 /* LWPickerTableScene.m */; };
+		B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */; };
 		B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */; };
 		B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B69A302D1C36660700B966D5 /* BWUserSettingScene.m */; };
 		B69ED5A61B6B2C2E00A9C355 /* afternoon.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B69ED59E1B6B2C2E00A9C355 /* afternoon.jpg */; };
@@ -57,6 +64,19 @@
 		B63D90571B60DD35000E366B /* BLEWerewolfTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEWerewolfTests.m; sourceTree = "<group>"; };
 		B63D90611B60DDCA000E366B /* BWTopScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWTopScene.h; sourceTree = "<group>"; };
 		B63D90621B60DDCA000E366B /* BWTopScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWTopScene.m; sourceTree = "<group>"; };
+		B67CC38F1C36D3D300546FC0 /* BWWaitConnectionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWWaitConnectionScene.h; path = BLEWerewolf/BWWaitConnectionScene.h; sourceTree = "<group>"; };
+		B67CC3901C36D3D300546FC0 /* BWWaitConnectionScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWWaitConnectionScene.m; path = BLEWerewolf/BWWaitConnectionScene.m; sourceTree = "<group>"; };
+		B67CC3931C37650700546FC0 /* night.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = night.jpg; sourceTree = "<group>"; };
+		B67CC3951C37657400546FC0 /* BWRuleCheckScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRuleCheckScene.h; sourceTree = "<group>"; };
+		B67CC3961C37657400546FC0 /* BWRuleCheckScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRuleCheckScene.m; sourceTree = "<group>"; };
+		B67CC3981C37715D00546FC0 /* BWSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWSettingScene.h; path = BLEWerewolf/BWSettingScene.h; sourceTree = "<group>"; };
+		B67CC3991C37715D00546FC0 /* BWSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWSettingScene.m; path = BLEWerewolf/BWSettingScene.m; sourceTree = "<group>"; };
+		B67CC39B1C3789C700546FC0 /* LWRuleSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LWRuleSettingScene.h; path = BLEWerewolf/LWRuleSettingScene.h; sourceTree = "<group>"; };
+		B67CC39C1C3789C700546FC0 /* LWRuleSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LWRuleSettingScene.m; path = BLEWerewolf/LWRuleSettingScene.m; sourceTree = "<group>"; };
+		B67CC39E1C378D3200546FC0 /* LWPickerTableScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LWPickerTableScene.h; path = BLEWerewolf/LWPickerTableScene.h; sourceTree = "<group>"; };
+		B67CC39F1C378D3200546FC0 /* LWPickerTableScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LWPickerTableScene.m; path = BLEWerewolf/LWPickerTableScene.m; sourceTree = "<group>"; };
+		B67CC3A01C378D3200546FC0 /* LWRoleSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LWRoleSettingScene.h; path = BLEWerewolf/LWRoleSettingScene.h; sourceTree = "<group>"; };
+		B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LWRoleSettingScene.m; path = BLEWerewolf/LWRoleSettingScene.m; sourceTree = "<group>"; };
 		B6863BAE1B809FB3005E049C /* BWMultipleLineLabelNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWMultipleLineLabelNode.h; sourceTree = "<group>"; };
 		B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWMultipleLineLabelNode.m; sourceTree = "<group>"; };
 		B69A302C1C36660700B966D5 /* BWUserSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWUserSettingScene.h; sourceTree = "<group>"; };
@@ -76,10 +96,10 @@
 		B69ED5B21B6B48CF00A9C355 /* BWPeripheralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWPeripheralManager.m; path = BLEWerewolf/BWPeripheralManager.m; sourceTree = "<group>"; };
 		B69ED5B41B6B4B8100A9C355 /* BWGameSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWGameSettingScene.h; path = BLEWerewolf/BWGameSettingScene.h; sourceTree = "<group>"; };
 		B69ED5B51B6B4B8100A9C355 /* BWGameSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWGameSettingScene.m; path = BLEWerewolf/BWGameSettingScene.m; sourceTree = "<group>"; };
-		B6B57D461B6774A600FBFEDB /* BWCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWCentralManager.h; sourceTree = "<group>"; };
-		B6B57D471B6774A600FBFEDB /* BWCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWCentralManager.m; sourceTree = "<group>"; };
-		B6B57D491B6781A900FBFEDB /* BWMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWMainScene.h; sourceTree = "<group>"; };
-		B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWMainScene.m; sourceTree = "<group>"; };
+		B6B57D461B6774A600FBFEDB /* BWCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWCentralManager.h; path = BLEWerewolf/BWCentralManager.h; sourceTree = "<group>"; };
+		B6B57D471B6774A600FBFEDB /* BWCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWCentralManager.m; path = BLEWerewolf/BWCentralManager.m; sourceTree = "<group>"; };
+		B6B57D491B6781A900FBFEDB /* BWMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWMainScene.h; path = BLEWerewolf/BWMainScene.h; sourceTree = "<group>"; };
+		B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWMainScene.m; path = BLEWerewolf/BWMainScene.m; sourceTree = "<group>"; };
 		B6CF75131C2640C70078309A /* NSObject+BlocksWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+BlocksWait.h"; sourceTree = "<group>"; };
 		B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+BlocksWait.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -106,6 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				B69ED59D1B6B2BDD00A9C355 /* images */,
+				B67CC3921C375D1E00546FC0 /* Central */,
 				B69ED5B71B6B4B8E00A9C355 /* Peripheral */,
 				B63D903A1B60DD34000E366B /* BLEWerewolf */,
 				B63D90541B60DD35000E366B /* BLEWerewolfTests */,
@@ -137,12 +158,8 @@
 				B63D90431B60DD35000E366B /* BWViewController.m */,
 				B63D90611B60DDCA000E366B /* BWTopScene.h */,
 				B63D90621B60DDCA000E366B /* BWTopScene.m */,
-				B6B57D491B6781A900FBFEDB /* BWMainScene.h */,
-				B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */,
 				B69A302C1C36660700B966D5 /* BWUserSettingScene.h */,
 				B69A302D1C36660700B966D5 /* BWUserSettingScene.m */,
-				B6B57D461B6774A600FBFEDB /* BWCentralManager.h */,
-				B6B57D471B6774A600FBFEDB /* BWCentralManager.m */,
 				B69ED59C1B6B289B00A9C355 /* TransferService.h */,
 				B63D90451B60DD35000E366B /* Main.storyboard */,
 				B63D90481B60DD35000E366B /* Images.xcassets */,
@@ -177,10 +194,26 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		B67CC3921C375D1E00546FC0 /* Central */ = {
+			isa = PBXGroup;
+			children = (
+				B6B57D491B6781A900FBFEDB /* BWMainScene.h */,
+				B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */,
+				B67CC38F1C36D3D300546FC0 /* BWWaitConnectionScene.h */,
+				B67CC3901C36D3D300546FC0 /* BWWaitConnectionScene.m */,
+				B67CC3951C37657400546FC0 /* BWRuleCheckScene.h */,
+				B67CC3961C37657400546FC0 /* BWRuleCheckScene.m */,
+				B6B57D461B6774A600FBFEDB /* BWCentralManager.h */,
+				B6B57D471B6774A600FBFEDB /* BWCentralManager.m */,
+			);
+			name = Central;
+			sourceTree = "<group>";
+		};
 		B69ED59D1B6B2BDD00A9C355 /* images */ = {
 			isa = PBXGroup;
 			children = (
 				B69ED59E1B6B2C2E00A9C355 /* afternoon.jpg */,
+				B67CC3931C37650700546FC0 /* night.jpg */,
 				B69ED59F1B6B2C2E00A9C355 /* button.png */,
 				B69ED5A01B6B2C2E00A9C355 /* card0.png */,
 				B69ED5A11B6B2C2E00A9C355 /* card1.png */,
@@ -197,6 +230,14 @@
 			children = (
 				B69ED5B11B6B48CF00A9C355 /* BWPeripheralManager.h */,
 				B69ED5B21B6B48CF00A9C355 /* BWPeripheralManager.m */,
+				B67CC3981C37715D00546FC0 /* BWSettingScene.h */,
+				B67CC3991C37715D00546FC0 /* BWSettingScene.m */,
+				B67CC39B1C3789C700546FC0 /* LWRuleSettingScene.h */,
+				B67CC39C1C3789C700546FC0 /* LWRuleSettingScene.m */,
+				B67CC39E1C378D3200546FC0 /* LWPickerTableScene.h */,
+				B67CC39F1C378D3200546FC0 /* LWPickerTableScene.m */,
+				B67CC3A01C378D3200546FC0 /* LWRoleSettingScene.h */,
+				B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */,
 				B69ED5B41B6B4B8100A9C355 /* BWGameSettingScene.h */,
 				B69ED5B51B6B4B8100A9C355 /* BWGameSettingScene.m */,
 			);
@@ -293,6 +334,7 @@
 				B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */,
 				B69ED5A61B6B2C2E00A9C355 /* afternoon.jpg in Resources */,
 				B69ED5AC1B6B2C2E00A9C355 /* card4.png in Resources */,
+				B67CC3941C37650700546FC0 /* night.jpg in Resources */,
 				B63D90491B60DD35000E366B /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -313,15 +355,21 @@
 			files = (
 				B6B57D4B1B6781A900FBFEDB /* BWMainScene.m in Sources */,
 				B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */,
+				B67CC39A1C37715D00546FC0 /* BWSettingScene.m in Sources */,
 				B63D90441B60DD35000E366B /* BWViewController.m in Sources */,
 				B6CF75151C2640C70078309A /* NSObject+BlocksWait.m in Sources */,
 				B69ED5B01B6B2C6800A9C355 /* BWUtility.m in Sources */,
+				B67CC39D1C3789C700546FC0 /* LWRuleSettingScene.m in Sources */,
+				B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */,
 				B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */,
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
 				B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */,
 				B69ED5B31B6B48CF00A9C355 /* BWPeripheralManager.m in Sources */,
 				B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */,
+				B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */,
+				B67CC3911C36D3D300546FC0 /* BWWaitConnectionScene.m in Sources */,
 				B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */,
+				B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */,
 				B63D903E1B60DD35000E366B /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

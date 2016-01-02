@@ -10,6 +10,7 @@
 #import "BWPeripheralManager.h"
 #import "BWUtility.h"
 #import "NSObject+BlocksWait.h"
+#import "BWSettingScene.h"
 
 @interface BWGameSettingScene () {
     BWPeripheralManager *manager;
@@ -35,6 +36,10 @@
     
     registeredPlayersArray = [NSMutableArray array];
     
+    //まずは自分を追加
+    NSMutableDictionary *dic = [@{@"identificationId":[BWUtility getIdentificationString],@"name":[BWUtility getUserName]}mutableCopy];
+    [registeredPlayersArray addObject:dic];
+    
     [self initBackground];
     
     return self;
@@ -51,10 +56,10 @@
     
     SKLabelNode *title = [[SKLabelNode alloc]init];
     title.fontSize = self.size.height*0.05;
-    title.text = [NSString stringWithFormat:@"プレイヤー登録画面（%d人）",registeredPlayersArray.count];
+    title.text = [NSString stringWithFormat:@"プレイヤー登録画面"];
     SKLabelNode *title2 = [[SKLabelNode alloc]init];
     title2.fontSize = self.size.height*0.05;
-    title2.text = [NSString stringWithFormat:@"ゲームID:%06ld",(long)gameId];
+    title2.text = [NSString stringWithFormat:@"ゲームID:%06ld（%ld人）",(long)gameId,registeredPlayersArray.count];
     title2.fontName = @"HiraKakuProN-W3";
     
     
@@ -64,10 +69,16 @@
     [backgroundNode addChild:title2];
     
     CGFloat margin = self.size.height * 0.05;
-    tableView = [[UITableView alloc]initWithFrame:CGRectMake(margin, (title.fontSize+margin)*2, self.size.width-margin*2, self.size.height-margin*3-title.fontSize*2)];
-    tableView.delegate = self;
-    tableView.dataSource = self;
-    tableView.rowHeight = tableView.frame.size.height/6;
+    
+    SKSpriteNode *buttonNode = [BWUtility makeButton:@"参加締め切り" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" position:CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2)];
+    [backgroundNode addChild:buttonNode];
+    
+    if(!tableView) {
+        tableView = [[UITableView alloc]initWithFrame:CGRectMake(margin, title.fontSize*2+margin*3, self.size.width-margin*2, self.size.height-margin*5-title.fontSize*2-buttonNode.size.height)];
+        tableView.delegate = self;
+        tableView.dataSource = self;
+        tableView.rowHeight = tableView.frame.size.height/6;
+    }
     
     NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
     [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":message} repeats:YES];
@@ -75,6 +86,14 @@
 
 -(void)sendMessage:(NSTimer*)timer {
     [[BWPeripheralManager sharedInstance] updateSendMessage:[timer userInfo][@"message"]];
+    
+    for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
+        //participateAllow:A..A
+        [NSObject performBlock:^{
+            NSString *allowMessage = [NSString stringWithFormat:@"participateAllow:%@",registeredPlayersArray[i][@"identificationId"]];
+            [[BWPeripheralManager sharedInstance] updateSendMessage:allowMessage];
+        } afterDelay:0.01*i];
+    }
 }
 
 -(void)willMoveFromView:(SKView *)view {
@@ -106,13 +125,27 @@
     return cell;
 }
 
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInNode:self];
+    SKNode *node = [self nodeAtPoint:location];
+    
+    if([node.name isEqualToString:@"next"]) {
+        BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
+        [scene sendPlayerInfo:registeredPlayersArray];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
+    }
+}
+
 #pragma mark - BWPeripheralManagerDelegate
 -(void)didReceiveMessage:(NSString *)message {
     //participateRequest:NNNNNN/A..A(32)/S...S
-    if(message.length >= 18 && [[message substringToIndex:18] isEqualToString:@"participateRequest"]) {
-        NSString *identificationIdString = [message substringWithRange:NSMakeRange(26,32)];
-        NSString *gameIdString = [message substringWithRange:NSMakeRange(19,6)];
-        NSString *userNameString = [message substringFromIndex:59];
+    if([[BWUtility getCommand:message] isEqualToString:@"participateRequest"]) {
+        NSArray *params = [BWUtility getCommandContents:message];
+        NSString *identificationIdString = params[1];
+        NSString *gameIdString = params[0];
+        NSString *userNameString = params[2];
         
         if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
             NSLog(@"接続要求:%@,%@",identificationIdString,userNameString);
@@ -128,6 +161,7 @@
                 NSMutableDictionary *dic = [@{@"identificationId":identificationIdString,@"name":userNameString}mutableCopy];
                 [registeredPlayersArray addObject:dic];
                 [tableView reloadData];
+                [self initBackground];
             }
         }
     }

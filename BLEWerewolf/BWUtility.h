@@ -10,15 +10,22 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-typedef NS_ENUM(NSUInteger, Roll) {
-    RollVillager,
-    RollWerewolf,
-    RollFortuneTeller,
-    RollShaman,
-    RollMadman,
-    RollBodyguard,
-    RollJointOwner,
-    RollFox,
+typedef NS_ENUM(NSUInteger, FortuneTellerMode)
+{
+    FortuneTellerModeNone,
+    FortuneTellerModeFree,
+    FortuneTellerModeRevelation,
+};
+
+typedef NS_ENUM(NSUInteger, Role) {
+    RoleVillager,
+    RoleWerewolf,
+    RoleFortuneTeller,
+    RoleShaman,
+    RoleMadman,
+    RoleBodyguard,
+    RoleJointOwner,
+    RoleFox,
     //TODO::役職追加時変更点
 };
 
@@ -33,11 +40,22 @@ typedef NS_ENUM(NSUInteger, Roll) {
 
 + (NSString*)getRandomString :(NSInteger)digit;
 
+#pragma mark - role
++(NSMutableArray *) getDefaultRoleArray :(int) count ;
++(int) getMaxRoleCount ;
++(NSMutableDictionary *) getCardInfofromId :(int) cardId ;
++(SKTexture *) getCardTexture :(int) cardId;
++ (NSString*)getFortuneButtonString :(FortuneTellerMode)mode;
+
 #pragma mark - data
 //固有識別文字列を取得（初回呼び出し時に生成し、userdefaultsに保存しておく）
 + (NSString*)getIdentificationString;
 //ユーザデータを設定していたかどうか
 + (BOOL)wasSetting;
 + (NSString*)getUserName;
+
+#pragma mark - string
++(NSString*)getCommand :(NSString*)command;
++(NSArray*)getCommandContents:(NSString*)command;
 
 @end

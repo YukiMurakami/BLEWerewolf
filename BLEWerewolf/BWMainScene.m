@@ -8,6 +8,7 @@
 
 #import "BWMainScene.h"
 #import "BWUtility.h"
+#import "BWWaitConnectionScene.h"
 
 
 @implementation BWMainScene {
@@ -88,30 +89,32 @@
     NSString *touchedGameId = [gameIdArray[indexPath.row] substringToIndex:6];
     NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
     [centralManager sendMessageFromClient:sendMessage];
+    
+    BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
+    SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+    [self.view presentScene:scene transition:transition];
 }
 
 #pragma mark - BWCentralManagerDelegate
 
 -(void)didReceivedMessage:(NSString *)message {
-    NSLog(@"catch:%@",message);
-    BOOL isFound = NO;
-    NSString *gameId = @"";
-    NSString *hostName = @"";
-    if(message.length >= 15) {
-        isFound = YES;
-        gameId = [message substringWithRange:NSMakeRange(8, 6)];
-        hostName = [message substringFromIndex:15];
-    }
-    BOOL isNew = YES;
-    for(NSInteger i=0;i<gameIdArray.count;i++) {
-        if([[gameIdArray[i] substringToIndex:6] isEqualToString:gameId]) {
-            isNew = NO;
-            break;
+    //serveId:NNNNNN/S...S
+    if([[BWUtility getCommand:message] isEqualToString:@"serveId"]) {
+        NSArray *array = [BWUtility getCommandContents:message];
+        NSString *gameId = array[0];
+        NSString *hostName = array[1];
+    
+        BOOL isNew = YES;
+        for(NSInteger i=0;i<gameIdArray.count;i++) {
+            if([[gameIdArray[i] substringToIndex:6] isEqualToString:gameId]) {
+                isNew = NO;
+                break;
+            }
         }
-    }
-    if(isNew) {
-        [gameIdArray addObject:[NSString stringWithFormat:@"%@(%@)",gameId,hostName]];
-        [table reloadData];
+        if(isNew) {
+            [gameIdArray addObject:[NSString stringWithFormat:@"%@(%@)",gameId,hostName]];
+            [table reloadData];
+        }
     }
 }
 

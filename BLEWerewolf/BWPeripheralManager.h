@@ -15,6 +15,8 @@
 
 @interface BWPeripheralManager : NSObject <CBPeripheralManagerDelegate> {
     id<BWPeripheralManagerDelegate> _delegate;
+    
+    NSMutableArray *sendingMessageQueue;
 }
 
 @property (nonatomic) id<BWPeripheralManagerDelegate> delegate;
@@ -25,6 +27,7 @@
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
 @property (nonatomic, strong) CBCharacteristic *characteristic;
 @property (nonatomic, strong) CBMutableService *service;
+
 
 - (void)updateSendMessage :(NSString*)sendMessage;
 

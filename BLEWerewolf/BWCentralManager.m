@@ -233,7 +233,6 @@
         NSLog(@"[data] %@",receivedString);
         
         [_delegate didReceivedMessage:receivedString];
-        
     }
 }
 
