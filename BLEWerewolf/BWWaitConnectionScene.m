@@ -52,7 +52,7 @@
             }
         }
     }
-    if([[BWUtility getCommand:message] isEqualToString:@"setting"] && [printMessage isEqualToString:@"ルール設定待ち"]) {
+    if([[BWUtility getCommand:message] isEqualToString:@"setting"]) {
         NSLog(@"ルール:%@",message);
         NSArray *components = [BWUtility getCommandContents:message];
         NSArray *roleStrings = [components[0] componentsSeparatedByString:@","];

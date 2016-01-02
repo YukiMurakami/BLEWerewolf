@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
+		B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */; };
+		B614DD941C381C28006BB3C8 /* card6.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD921C381C28006BB3C8 /* card6.png */; };
+		B614DD951C381C28006BB3C8 /* card7.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD931C381C28006BB3C8 /* card7.png */; };
+		B614DD971C3821D6006BB3C8 /* frame.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD961C3821D6006BB3C8 /* frame.png */; };
 		B63D903E1B60DD35000E366B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D903D1B60DD35000E366B /* main.m */; };
 		B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90401B60DD35000E366B /* BWAppDelegate.m */; };
 		B63D90441B60DD35000E366B /* BWViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90431B60DD35000E366B /* BWViewController.m */; };
@@ -50,6 +55,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
+		B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRoleRotateScene.h; sourceTree = "<group>"; };
+		B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRoleRotateScene.m; sourceTree = "<group>"; };
+		B614DD921C381C28006BB3C8 /* card6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card6.png; sourceTree = "<group>"; };
+		B614DD931C381C28006BB3C8 /* card7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card7.png; sourceTree = "<group>"; };
+		B614DD961C3821D6006BB3C8 /* frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = frame.png; sourceTree = "<group>"; };
 		B63D90381B60DD34000E366B /* BLEWerewolf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLEWerewolf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B63D903C1B60DD35000E366B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B63D903D1B60DD35000E366B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -157,6 +168,8 @@
 				B69A302D1C36660700B966D5 /* BWUserSettingScene.m */,
 				B67CC3951C37657400546FC0 /* BWRuleCheckScene.h */,
 				B67CC3961C37657400546FC0 /* BWRuleCheckScene.m */,
+				B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */,
+				B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */,
 				B69ED59C1B6B289B00A9C355 /* TransferService.h */,
 				B63D90451B60DD35000E366B /* Main.storyboard */,
 				B63D90481B60DD35000E366B /* Images.xcassets */,
@@ -229,6 +242,10 @@
 				B69ED5A31B6B2C2E00A9C355 /* card3.png */,
 				B69ED5A41B6B2C2E00A9C355 /* card4.png */,
 				B69ED5A51B6B2C2E00A9C355 /* card5.png */,
+				B614DD921C381C28006BB3C8 /* card6.png */,
+				B614DD931C381C28006BB3C8 /* card7.png */,
+				B614DD8D1C37F953006BB3C8 /* back_card.jpg */,
+				B614DD961C3821D6006BB3C8 /* frame.png */,
 			);
 			path = images;
 			sourceTree = "<group>";
@@ -335,14 +352,18 @@
 			files = (
 				B69ED5A81B6B2C2E00A9C355 /* card0.png in Resources */,
 				B69ED5AB1B6B2C2E00A9C355 /* card3.png in Resources */,
+				B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */,
 				B69ED5A91B6B2C2E00A9C355 /* card1.png in Resources */,
 				B63D90471B60DD35000E366B /* Main.storyboard in Resources */,
 				B69ED5AA1B6B2C2E00A9C355 /* card2.png in Resources */,
 				B69ED5AD1B6B2C2E00A9C355 /* card5.png in Resources */,
 				B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */,
+				B614DD971C3821D6006BB3C8 /* frame.png in Resources */,
 				B69ED5A61B6B2C2E00A9C355 /* afternoon.jpg in Resources */,
+				B614DD951C381C28006BB3C8 /* card7.png in Resources */,
 				B69ED5AC1B6B2C2E00A9C355 /* card4.png in Resources */,
 				B67CC3941C37650700546FC0 /* night.jpg in Resources */,
+				B614DD941C381C28006BB3C8 /* card6.png in Resources */,
 				B63D90491B60DD35000E366B /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -376,6 +397,7 @@
 				B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */,
 				B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */,
 				B67CC3911C36D3D300546FC0 /* BWWaitConnectionScene.m in Sources */,
+				B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */,
 				B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */,
 				B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */,
 				B63D903E1B60DD35000E366B /* main.m in Sources */,

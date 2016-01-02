@@ -39,6 +39,7 @@ typedef NS_ENUM(NSUInteger, Role) {
 + (NSInteger)getRandInteger :(NSInteger)maxInteger;
 
 + (NSString*)getRandomString :(NSInteger)digit;
++(NSMutableArray*) getRandomArray :(NSMutableArray*)array;
 
 #pragma mark - role
 +(NSMutableArray *) getDefaultRoleArray :(int) count ;
@@ -47,6 +48,12 @@ typedef NS_ENUM(NSUInteger, Role) {
 +(SKTexture *) getCardTexture :(int) cardId;
 + (NSString*)getFortuneButtonString :(FortuneTellerMode)mode;
 +(NSString*)getRoleSetString:(NSMutableArray*)roles;
++(NSInteger)getMyPlayerId:(NSMutableDictionary*)infoDic;
+
+#pragma mark - ui
++(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture;
++(SKSpriteNode *) makeMessageNode :(CGSize)frameSize position:(CGPoint)position backColor:(UIColor*)color string:(NSString*)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor;
++(SKSpriteNode *) makeMessageAndImageNode :(CGSize)messageSize position:(CGPoint)messagePosition color:(UIColor*)backColor string:(NSString*)message fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor imageTexture:(SKTexture*)texture imageWidthRate:(CGFloat)imageWidthRate isRotateRight:(BOOL)isRotateRight;
 
 #pragma mark - data
 //固有識別文字列を取得（初回呼び出し時に生成し、userdefaultsに保存しておく）

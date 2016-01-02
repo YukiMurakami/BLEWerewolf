@@ -1,5 +1,5 @@
 //
-//  BWRuleCheckScene.h
+//  BWRoleRotateScene.h
 //  BLEWerewolf
 //
 //  Created by Yuki Murakami on 2016/01/02.
@@ -10,7 +10,7 @@
 #import "BWCentralManager.h"
 #import "BWPeripheralManager.h"
 
-@interface BWRuleCheckScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface BWRoleRotateScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
     SKSpriteNode *backgroundNode;
     BWCentralManager *centralManager;
     BWPeripheralManager *peripheralManager;
@@ -18,6 +18,7 @@
     NSMutableDictionary *infoDic;
     
     UITableView *table;
+    NSMutableArray *tablePlayerArray;
     
     //この画面からはペリフェラル、セントラルで共通で作る
     //ただし、内部処理は区別して行う

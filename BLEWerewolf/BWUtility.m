@@ -7,6 +7,7 @@
 //
 
 #import "BWUtility.h"
+#import "BWMultipleLineLabelNode.h"
 
 
 @implementation BWUtility
@@ -128,7 +129,7 @@
             token = @"村";
             surfaceRole = RoleVillager;
             hasTable = false;
-            explain = @"村人は特殊な能力を持たないただの一般人ですが、このゲームの主人公でもあります。他の村人や特殊能力を持った仲間たちと協力して人狼を処刑し、全滅させましょう。";
+            explain = @"村人は特殊な能力を持たないただの人です。夜時間は考察を書きましょう。";
             break;
         case RoleWerewolf:
             name = @"人狼";//実装済み
@@ -138,31 +139,29 @@
             hasTableFirst = true;
             tableStringFirst = @"仲間の人狼を確認してください。";
             tableString = @"襲撃先を選択してください。";
-            explain = @"人狼は毎晩目を覚まし、村の人間を一人ずつ選んで喰い殺していきます。人狼同士で協力して人間を喰い尽くし、村を全滅させてしまいましょう。";
+            explain = @"人狼は毎晩仲間同士で相談し人間を一人噛むことができます。夜時間は狼専用チャットで相談し、代表者が襲撃先を選択します。";
             break;
         case RoleFortuneTeller:
-            name = @"予言者";//実装済み
+            name = @"占い師";//実装済み
             token = @"占";
             surfaceRole = RoleFortuneTeller;
             hasTable = true;
-            tableString = @"予言先を選択してください。";
-            hasTableFirst = true;
-            tableStringFirst = @"予言先を選択してください。";
-            explain = @"予言者は毎晩目を覚まし、自分が人狼だと疑っている人物を１人指定してその人物が人狼かそうでないかを知ることができます。";
+            tableString = @"占い先を選択してください。";
+            explain = @"予言者は毎晩疑っている人物を１人指定してその人物が人狼かそうでないかを知ることができます。";
             break;
         case RoleShaman:
             name = @"霊媒師";//実装済み
             token = @"霊";
             surfaceRole = RoleShaman;
             hasTable = false;
-            explain = @"霊媒師は毎晩目を覚まし、その日の昼のターンに処刑された人が人狼だったのかそうでなかったのかを知ることができます。";
+            explain = @"霊媒師は毎晩その日の昼のターンに処刑された人が人狼だったのかそうでなかったのかを知ることができます。";
             break;
         case RoleMadman:
             name = @"狂人";//実装済み
             token = @"狂";
             surfaceRole = RoleMadman;
             hasTable = false;
-            explain = @"狂人は何も能力を持っていませんが、人狼側の人間です。人狼が勝利した時、自らも勝者となります。予言者に見られてもただの人間と判定されます。積極的に役職を騙り村を混乱させましょう。";
+            explain = @"狂人は何も能力を持っていませんが、人狼が勝つと勝利します。";
             break;
         case RoleBodyguard:
             name = @"ボディーガード";//実装済み
@@ -170,7 +169,7 @@
             surfaceRole = RoleBodyguard;
             hasTable = true;
             tableString = @"護衛先を選択してください。";
-            explain = @"ボディーガードは毎晩目を覚まし、誰かを一人指定してその人物を人狼の襲撃から守ります。ただし、自分自身を守ることはできません。";
+            explain = @"ボディーガードは毎晩誰かを一人指定してその人物を人狼の襲撃から守ります。ただし、自分自身を守ることはできません。";
             break;
         case RoleJointOwner:
             name = @"共有者";//実装済み
@@ -179,7 +178,7 @@
             hasTable = false;
             hasTableFirst = true;
             tableStringFirst = @"共有者を確認してください。";
-            explain = @"共有者は必ず２人一組として存在し、お互いに相手が村人ということを初日の夜に確認できます。パートナーが疑われてしまったときは自らが共有者だと名乗り出て無実を証明しましょう。";
+            explain = @"共有者は必ず複数人で一組として存在し、お互いに相手を確認できます。夜時間には共有者専用チャットを使用できます。";
             break;
         case RoleFox:
             name = @"妖狐";//実装済み
@@ -188,7 +187,7 @@
             hasTableFirst = true;
             tableStringFirst = @"仲間の妖狐を確認してください。";
             hasTable = false;
-            explain = @"妖狐は村人にも人狼にも属さない、第３の勢力です。ゲームが終了した時に妖狐が生き残っていれば、人狼でもなく村人でもなく、妖狐陣営の勝利となります。あなたは人狼に襲撃されても死にませんが、予言者に正体を見られると死んでしまいます。なお、勝利条件についてあなたは村人にも人狼にもカウントされません。";
+            explain = @"妖狐は第３の勢力です。ゲームが終了した時に妖狐が生き残っていれば勝利します。妖狐同士は夜時間に専用チャットを使用できます。";
             break;
             /*
         case RolePossessed:
@@ -382,6 +381,7 @@
 }
 
 +(SKTexture *) getCardTexture :(int) cardId {
+    NSLog(@"getTexture:filename[%@]",[NSString stringWithFormat:@"card%d.png",cardId]);
     NSString *filename = [NSString stringWithFormat:@"card%d.png",cardId];
     SKTexture *texture = [SKTexture textureWithRect:CGRectMake(0.03,0.2,0.94,0.8) inTexture:[SKTexture textureWithImageNamed:filename]];
     return texture;
@@ -392,6 +392,99 @@
     if(mode == FortuneTellerModeNone) return @"初日占い：なし";
     if(mode == FortuneTellerModeRevelation) return @"初日占い：お告げ";
     return @"";
+}
+
++(NSMutableArray*) getRandomArray :(NSMutableArray*)array {
+    NSMutableArray *result = [NSMutableArray array];
+    
+    int count = (int)array.count;
+    
+    for(int i=0;i<count*100;i++) {
+        int f1 = (int) arc4random_uniform(count);
+        int f2 = (int) arc4random_uniform(count);
+        
+        id object = array[f1];
+        array[f1] = array[f2];
+        array[f2] = object;
+    }
+    
+    for(int i=0;i<count;i++) {
+        [result addObject:array[i]];
+    }
+    
+    return result;
+}
+
++(NSInteger)getMyPlayerId:(NSMutableDictionary*)infoDic {
+    NSInteger id = -1;
+    NSString *identificationString = [BWUtility getIdentificationString];
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationString]) {
+            id = i;
+            break;
+        }
+    }
+    return id;
+}
+
+#pragma mark - ui
+
++(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture {
+    SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
+    explain.size = size;
+    explain.position = position;
+    SKSpriteNode *content = [[SKSpriteNode alloc]init];
+    content.size = CGSizeMake(explain.size.width*0.9,explain.size.height*0.92);
+    content.position = CGPointMake(0,0);
+    if(!texture) {
+        content.color = color;
+        content.colorBlendFactor = 1.0;
+    } else {
+        content.texture = texture;
+    }
+    [explain addChild:content];
+    
+    return explain;
+}
+
++(SKSpriteNode *) makeMessageNode :(CGSize)frameSize position:(CGPoint)position backColor:(UIColor*)color string:(NSString*)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor {
+    SKSpriteNode *explain = [BWUtility makeFrameNode:frameSize position:position color:color texture:nil];
+    BWMultipleLineLabelNode *explainLabel = [[BWMultipleLineLabelNode alloc]init];
+    explainLabel.size = CGSizeMake(explain.size.width*0.8,explain.size.height*0.8);
+    [explainLabel setText:string fontSize:fontSize fontColor:fontColor];
+    [explain addChild:explainLabel];
+    return explain;
+}
+
++(SKSpriteNode *) makeMessageAndImageNode :(CGSize)messageSize position:(CGPoint)messagePosition color:(UIColor*)backColor string:(NSString*)message fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor imageTexture:(SKTexture*)texture imageWidthRate:(CGFloat)imageWidthRate isRotateRight:(BOOL)isRotateRight {
+    
+    SKSpriteNode *explain = [BWUtility makeFrameNode:messageSize position:messagePosition color:backColor texture:nil];
+    CGSize imageSizeA = CGSizeMake(messageSize.width*imageWidthRate/3*4, messageSize.width*imageWidthRate);
+    CGSize imageSize = imageSizeA;
+    if(!isRotateRight) {
+        imageSize = CGSizeMake(imageSizeA.height, imageSizeA.width);
+    }
+    if(isRotateRight) {
+        SKSpriteNode *explain2 = [BWUtility makeFrameNode:imageSize position:CGPointMake(0,messageSize.height/2*0.88 - imageSize.width/2) color:nil texture:texture];
+        explain2.zRotation = -1.57;
+        [explain addChild:explain2];
+        BWMultipleLineLabelNode *explainLabel = [[BWMultipleLineLabelNode alloc]init];
+        explainLabel.size = CGSizeMake(explain.size.width*0.8,messageSize.height*0.88 - imageSize.width);
+        [explainLabel setText:message fontSize:fontSize fontColor:fontColor];
+        explainLabel.position = CGPointMake(0,-messageSize.height*0.88/2 + explainLabel.size.height/2);
+        [explain addChild:explainLabel];
+    } else {
+        SKSpriteNode *explain2 = [BWUtility makeFrameNode:imageSize position:CGPointMake(0,messageSize.height/2*0.88 - imageSize.height/2) color:nil texture:texture];
+        explain2.zRotation = 0.0;
+        [explain addChild:explain2];
+        BWMultipleLineLabelNode *explainLabel = [[BWMultipleLineLabelNode alloc]init];
+        explainLabel.size = CGSizeMake(explain.size.width*0.8,messageSize.height*0.88 - imageSize.height);
+        [explainLabel setText:message fontSize:fontSize fontColor:fontColor];
+        explainLabel.position = CGPointMake(0,-messageSize.height*0.88/2 + explainLabel.size.height/2);
+        [explain addChild:explainLabel];
+    }
+    
+    return explain;
 }
 
 #pragma mark - data
