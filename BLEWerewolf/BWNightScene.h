@@ -8,7 +8,7 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-#import "BWPeripheralManager.h";
+#import "BWPeripheralManager.h"
 #import "BWCentralManager.h"
 
 @interface BWNightScene : SKScene <BWPeripheralManagerDelegate,BWCentralManagerDelegate> {

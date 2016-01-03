@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B60A679A1C38ACED00FFD0E5 /* BWNightScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B60A67991C38ACED00FFD0E5 /* BWNightScene.m */; };
+		B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = B60A679C1C38B0FC00FFD0E5 /* BWTimer.m */; };
 		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
 		B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */; };
 		B614DD941C381C28006BB3C8 /* card6.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD921C381C28006BB3C8 /* card6.png */; };
@@ -58,6 +59,8 @@
 /* Begin PBXFileReference section */
 		B60A67981C38ACED00FFD0E5 /* BWNightScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWNightScene.h; sourceTree = "<group>"; };
 		B60A67991C38ACED00FFD0E5 /* BWNightScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWNightScene.m; sourceTree = "<group>"; };
+		B60A679B1C38B0FC00FFD0E5 /* BWTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWTimer.h; path = BLEWerewolf/BWTimer.h; sourceTree = "<group>"; };
+		B60A679C1C38B0FC00FFD0E5 /* BWTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWTimer.m; path = BLEWerewolf/BWTimer.m; sourceTree = "<group>"; };
 		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
 		B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRoleRotateScene.h; sourceTree = "<group>"; };
 		B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRoleRotateScene.m; sourceTree = "<group>"; };
@@ -231,6 +234,8 @@
 				B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */,
 				B6863BAE1B809FB3005E049C /* BWMultipleLineLabelNode.h */,
 				B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */,
+				B60A679B1C38B0FC00FFD0E5 /* BWTimer.h */,
+				B60A679C1C38B0FC00FFD0E5 /* BWTimer.m */,
 			);
 			name = utilities;
 			sourceTree = "<group>";
@@ -397,6 +402,7 @@
 				B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */,
 				B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */,
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
+				B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */,
 				B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */,
 				B69ED5B31B6B48CF00A9C355 /* BWPeripheralManager.m in Sources */,
 				B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */,
