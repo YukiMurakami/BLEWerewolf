@@ -8,6 +8,7 @@
 
 #import "BWRoleRotateScene.h"
 #import "BWUtility.h"
+#import "BWNightScene.h"
 
 @implementation BWRoleRotateScene {
     BOOL isFinishLoopTimer;
@@ -58,6 +59,15 @@
     }
     
     [self initBackground];
+}
+
+-(void)willMoveFromView:(SKView *)view {
+    [table removeFromSuperview];
+}
+
+-(void)didMoveToView:(SKView *)view {
+    [self.view addSubview:table];
+    [table reloadData];
 }
 
 -(void)initBackground {
@@ -240,8 +250,8 @@
         
     if([node.name isEqualToString:@"start"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
-            //settingCheck:A..A
-            [centralManager sendMessageFromClient:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]]];
+            //roleCheck:A..A
+            [centralManager sendMessageFromClient:[NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]]];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -264,11 +274,25 @@
 }
 
 -(void)goFirstNight {
+    isFinishLoopTimer = YES;
     
+    [peripheralManager updateSendMessage:@"firstNight:"];
+    
+    BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
+    [scene setCentralOrPeripheral:isPeripheral :infoDic];
+    SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+    [self.view presentScene:scene transition:transition];
 }
 
 -(void)didReceivedMessage:(NSString *)message {
     //central
+    //firstNight:
+    if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {
+        BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
+        [scene setCentralOrPeripheral:isPeripheral :infoDic];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
+    }
 }
 
 -(void)didReceiveMessage:(NSString *)message {

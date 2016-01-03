@@ -49,6 +49,7 @@ typedef NS_ENUM(NSUInteger, Role) {
 + (NSString*)getFortuneButtonString :(FortuneTellerMode)mode;
 +(NSString*)getRoleSetString:(NSMutableArray*)roles;
 +(NSInteger)getMyPlayerId:(NSMutableDictionary*)infoDic;
++(NSInteger)getPlayerId:(NSMutableDictionary*)infoDic id:(NSString*)identificationId;
 
 #pragma mark - ui
 +(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture;

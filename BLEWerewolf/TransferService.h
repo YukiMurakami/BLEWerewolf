@@ -25,5 +25,10 @@
 ゲーム開始
 ・ゲーム開始を通知（役職通知）「gamestart:A..A,S..S,0,0/A..A,S..S,1,0/.../A..A,S..S,8,1」識別ID,名前,プレイヤーID,役職Idのセットを人数分用意
 ・役職確認完了通知「roleCheck:A..A」
+・全員分の役職確認通知を回収後、初日夜を通知「firstNight:」
  基本的にブロードキャスト的な送信を行う（全体に宛先を書いたメッセージを送信し、受信側（セントラル）で取捨選択を行う）
+ 
+チャット
+・チャット送信（central->peripheral)「chatsend:A..A/T...T」T...Tは内容
+・チャット受信（peripheral->central)「chatreceive:A..A/T...T」
 */

@@ -47,7 +47,8 @@
 {
     [self setTranslatesAutoresizingMaskIntoConstraints:NO];
 
-    self.backgroundColor = [UIColor whiteColor];
+    //self.backgroundColor = [UIColor whiteColor];
+    self.backgroundColor = [UIColor blackColor];
     self.keyboardDismissMode = UIScrollViewKeyboardDismissModeNone;
     self.alwaysBounceVertical = YES;
     self.bounces = YES;

@@ -427,6 +427,18 @@
     return id;
 }
 
++(NSInteger)getPlayerId:(NSMutableDictionary*)infoDic id:(NSString*)identificationId {
+    NSInteger id = -1;
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
+            id = i;
+            break;
+        }
+    }
+    return id;
+}
+
+
 #pragma mark - ui
 
 +(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture {
