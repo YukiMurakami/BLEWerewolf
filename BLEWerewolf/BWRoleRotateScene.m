@@ -11,6 +11,8 @@
 
 @implementation BWRoleRotateScene {
     BOOL isFinishLoopTimer;
+    BOOL isCheck;
+    NSMutableArray *checkList;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -24,7 +26,15 @@
     
     infoDic = _infoDic;
     
+    isCheck = NO;
+    
+    tablePlayerArray = [NSMutableArray array];
+    
     if(isPeripheral) {
+        checkList = [NSMutableArray array];
+        for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+            [checkList addObject:@NO];
+        }
         
         peripheralManager = [BWPeripheralManager sharedInstance];
         peripheralManager.delegate = self;
@@ -105,14 +115,34 @@
         NSString *actionString = @"特に行うアクションはありません。「初日夜へ」を押してください。";
         SKSpriteNode *notActionNode = [BWUtility makeMessageNode:CGSizeMake(self.size.width/8*5, self.size.width/8*2) position:CGPointMake(0,-self.size.height/2+margin*3+buttonSize.height/2*3) backColor:[UIColor blackColor] string:actionString fontSize:14 fontColor:[UIColor whiteColor]];
         [backgroundNode addChild:notActionNode];
-        SKSpriteNode *button = [BWUtility makeButton:@"初日夜へ" size:buttonSize name:@"next" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
-        [backgroundNode addChild:button];
+        
+        
+        SKSpriteNode *button = [BWUtility makeButton:@"初日夜へ" size:buttonSize name:@"start" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
+        if(!isCheck) {
+            [backgroundNode addChild:button];
+        } else {
+            SKLabelNode *checkedLabelNode = [[SKLabelNode alloc]init];
+            checkedLabelNode.text = @"全員の確認待ち";
+            checkedLabelNode.fontColor = [UIColor blackColor];
+            checkedLabelNode.fontSize = self.size.width*0.2*0.7*0.7;
+            checkedLabelNode.position = CGPointMake(0, -self.size.height/2+margin+buttonSize.height/2);
+            [backgroundNode addChild:checkedLabelNode];
+        }
         return;
     } else {
         [self setTableDataFirst:roleId playerId:playerId];
         
-        SKSpriteNode *button = [BWUtility makeButton:@"初日夜へ" size:buttonSize name:@"next" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
-        [backgroundNode addChild:button];
+        SKSpriteNode *button = [BWUtility makeButton:@"初日夜へ" size:buttonSize name:@"start" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
+        if(!isCheck) {
+            [backgroundNode addChild:button];
+        } else {
+            SKLabelNode *checkedLabelNode = [[SKLabelNode alloc]init];
+            checkedLabelNode.text = @"全員の確認待ち";
+            checkedLabelNode.fontColor = [UIColor blackColor];
+            checkedLabelNode.fontSize = self.size.width*0.2*0.7*0.7;
+            checkedLabelNode.position = CGPointMake(0, -self.size.height/2+margin+buttonSize.height/2);
+            [backgroundNode addChild:checkedLabelNode];
+        }
         
         if(!table) {
             table = [[UITableView alloc]initWithFrame:CGRectMake(self.size.width*0.05,self.size.height/2 - messagePosition.y + messageSize.height/2 + margin*0.5 ,self.size.width*0.9,self.size.height - (22+messageSize.height+margin*2+button.size.height))];
@@ -125,7 +155,7 @@
     }
 }
 
--(void) setTableDataFirst :(int)rollId playerId:(int)playerId{
+-(void) setTableDataFirst :(NSInteger)roleId playerId:(NSInteger)playerId{
     //TODO::初夜のテーブル編集
     [tablePlayerArray removeAllObjects];
     NSMutableArray *playerArray = infoDic[@"players"];
@@ -134,17 +164,17 @@
         
         int playersRoleId = [player[@"roleId"]intValue];
         
-        if(rollId == RoleWerewolf) {
+        if(roleId == RoleWerewolf) {
             if((playersRoleId == RoleWerewolf) && playerId != i) {//人狼仲間確認
                 [tablePlayerArray addObject:player];
             }
         }
-        if(rollId == RoleFox) {//妖狐は妖狐を確認
+        if(roleId == RoleFox) {//妖狐は妖狐を確認
             if(playersRoleId == RoleFox && playerId != i) {
                 [tablePlayerArray addObject:player];
             }
         }
-        if(rollId == RoleJointOwner) {
+        if(roleId == RoleJointOwner) {
             if(playersRoleId == RoleJointOwner && playerId != i) {//共有者仲間を確認
                 [tablePlayerArray addObject:player];
             }
@@ -207,6 +237,34 @@
     if([node.name isEqualToString:@"next"]) {
         [self initNextBackground];
     }
+        
+    if([node.name isEqualToString:@"start"]) {
+        if(!isPeripheral) {//セントラルならペリフェラルに送信
+            //settingCheck:A..A
+            [centralManager sendMessageFromClient:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]]];
+        } else {//ペリフェラルなら内部的に直接値を変更する
+            NSString *identificationId = [BWUtility getIdentificationString];
+            BOOL isAllOK = YES;
+            for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+                if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
+                    checkList[i] = @YES;
+                }
+                if(![checkList[i]boolValue]) {
+                    isAllOK = NO;
+                }
+            }
+            if(isAllOK) {
+                //全員確認済み 初日よるへ
+                [self goFirstNight];
+            }
+        }
+        isCheck = YES;
+        [self initNextBackground];
+    }
+}
+
+-(void)goFirstNight {
+    
 }
 
 -(void)didReceivedMessage:(NSString *)message {
@@ -215,6 +273,23 @@
 
 -(void)didReceiveMessage:(NSString *)message {
     //peripheral
+    //roleCheck:A..A
+    if([[BWUtility getCommand:message] isEqualToString:@"roleCheck"]) {
+        NSString *identificationId = [BWUtility getCommandContents:message][0];
+        BOOL isAllOK = YES;
+        for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+            if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
+                checkList[i] = @YES;
+            }
+            if(![checkList[i]boolValue]) {
+                isAllOK = NO;
+            }
+        }
+        if(isAllOK) {
+            //全員確認済み 初日よるへ
+            [self goFirstNight];
+        }
+    }
 }
 
 #pragma mark - tableDelegate

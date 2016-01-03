@@ -119,11 +119,11 @@
                     NSLog(@"ここに UI の更新やデータベースへの追記などを実施するコードを記述する");
                     //名前変更
                     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-                    NSMutableDictionary *userData = [ud objectForKey:@"userData"];
+                    NSMutableDictionary *userData = [[ud objectForKey:@"userData"]mutableCopy];
                     if(!userData) {
                         userData = [NSMutableDictionary dictionary];
                     }
-                    userData[@"name"] = textField.text;
+                    [userData setObject:textField.text forKey:@"name"];
                     [ud setObject:userData forKey:@"userData"];
                     [self initBackground];
                 };

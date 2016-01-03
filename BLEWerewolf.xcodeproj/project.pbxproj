@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B60A679A1C38ACED00FFD0E5 /* BWNightScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B60A67991C38ACED00FFD0E5 /* BWNightScene.m */; };
 		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
 		B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */; };
 		B614DD941C381C28006BB3C8 /* card6.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD921C381C28006BB3C8 /* card6.png */; };
@@ -55,6 +56,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B60A67981C38ACED00FFD0E5 /* BWNightScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWNightScene.h; sourceTree = "<group>"; };
+		B60A67991C38ACED00FFD0E5 /* BWNightScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWNightScene.m; sourceTree = "<group>"; };
 		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
 		B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRoleRotateScene.h; sourceTree = "<group>"; };
 		B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRoleRotateScene.m; sourceTree = "<group>"; };
@@ -170,6 +173,8 @@
 				B67CC3961C37657400546FC0 /* BWRuleCheckScene.m */,
 				B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */,
 				B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */,
+				B60A67981C38ACED00FFD0E5 /* BWNightScene.h */,
+				B60A67991C38ACED00FFD0E5 /* BWNightScene.m */,
 				B69ED59C1B6B289B00A9C355 /* TransferService.h */,
 				B63D90451B60DD35000E366B /* Main.storyboard */,
 				B63D90481B60DD35000E366B /* Images.xcassets */,
@@ -400,6 +405,7 @@
 				B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */,
 				B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */,
 				B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */,
+				B60A679A1C38ACED00FFD0E5 /* BWNightScene.m in Sources */,
 				B63D903E1B60DD35000E366B /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

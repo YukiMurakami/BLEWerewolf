@@ -213,7 +213,18 @@
 -(void)gameStart {
     [self setRole];
     
-    //先に画面遷移してから通知を送る
+    //先に画面遷移してから通知を送る（こっち側では一回だけ送っとく）
+    NSString *message = @"gamestart:";
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        NSMutableDictionary *playerInfo = infoDic[@"players"][i];
+        message = [NSString stringWithFormat:@"%@%@,%@,%@,%@",message,playerInfo[@"identificationId"],playerInfo[@"name"],playerInfo[@"playerId"],playerInfo[@"roleId"]];
+        if(i != [infoDic[@"players"] count]-1) {
+            message = [NSString stringWithFormat:@"%@/",message];
+        }
+    }
+    [peripheralManager updateSendMessage:message];
+    
+    
     BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:YES :infoDic];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
