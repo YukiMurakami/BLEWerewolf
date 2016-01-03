@@ -68,7 +68,7 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     
     // ② MessageBubble (背景の吹き出し) を設定
     JSQMessagesBubbleImageFactory *bubbleFactory = [JSQMessagesBubbleImageFactory new];
-    self.gmBubble = [bubbleFactory  outgoingMessagesBubbleImageWithColor:[UIColor gmBubbleColor]];
+    self.gmBubble = [bubbleFactory  incomingMessagesBubbleImageWithColor:[UIColor gmBubbleColor]];
     if(myRoleId == RoleWerewolf) {
         self.incomingBubble = [bubbleFactory  incomingMessagesBubbleImageWithColor:[UIColor werewolfPartnerBubbleColor]];
         self.outgoingBubble = [bubbleFactory  outgoingMessagesBubbleImageWithColor:[UIColor werewolfBubbleColor]];
@@ -97,6 +97,7 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
             }
         }
     }
+    
 }
 
 -(BOOL)isMember:(NSString*)id {
@@ -119,6 +120,26 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     
     // ④ メッセージデータの配列を初期化
     self.messages = [NSMutableArray array];
+    
+    
+    //初回のGMメッセージを表示
+    NSString *GMString = @"";
+    NSInteger roleId = [copyInfoDic[@"players"][[BWUtility getMyPlayerId:copyInfoDic]][@"roleId"]integerValue];
+    if(roleId == RoleVillager) {
+        GMString = @"あなたは「村人」です。夜時間は必ず考察を書き込んでください。誰が人狼か、誰が真の役職なのかなど推理してください。";
+    }
+    if(roleId == RoleWerewolf) {
+        GMString = @"ここは「人狼専用チャット」です。仲間と相談できます。なお、夜時間終了までに代表者がアクションボタンから、襲撃先を決定してください。アクションが行われなかった場合はランダムに一名決定します。";
+    }
+    if(roleId == RoleFortuneTeller) {
+        GMString = @"あなたは「占い師」です。考察を書き込みつつ、夜時間中に占い作業を完了してください。";
+    }
+    JSQMessage *message = [JSQMessage messageWithSenderId:gmId
+                                              displayName:@"GM"
+                                                     text:GMString];
+    [self.messages addObject:message];
+    // メッセージの送信処理を完了する (画面上にメッセージが表示される)
+    [self finishSendingMessageAnimated:YES];
 }
 
 #pragma mark - JSQMessagesViewController
@@ -153,6 +174,9 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 - (id<JSQMessageBubbleImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView messageBubbleImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     JSQMessage *message = [self.messages objectAtIndex:indexPath.item];
+    if([message.senderId isEqualToString:gmId]) {
+        return self.gmBubble;
+    }
     if ([message.senderId isEqualToString:self.senderId]) {
         return self.outgoingBubble;
     }
