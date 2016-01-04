@@ -11,8 +11,9 @@
 #import "BWPeripheralManager.h"
 #import "BWCentralManager.h"
 #import "BWMessageViewController.h"
+#import "BWTimer.h"
 
-@interface BWNightScene : SKScene <BWPeripheralManagerDelegate,BWCentralManagerDelegate,BWMessageViewControllerDelegate> {
+@interface BWNightScene : SKScene <BWPeripheralManagerDelegate,BWCentralManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate> {
     SKSpriteNode *backgroundNode;
     BWCentralManager *centralManager;
     BWPeripheralManager *peripheralManager;
@@ -20,6 +21,8 @@
     NSMutableDictionary *infoDic;
     
     BWMessageViewController *messageViewController;
+    
+    BWTimer *timer;
     
     //この画面からはペリフェラル、セントラルで共通で作る
     //ただし、内部処理は区別して行う

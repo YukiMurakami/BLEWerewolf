@@ -13,6 +13,7 @@
 		B60A67A21C38C03900FFD0E5 /* gm.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B60A67A11C38C03900FFD0E5 /* gm.jpg */; };
 		B60A67A41C38C47D00FFD0E5 /* player.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B60A67A31C38C47D00FFD0E5 /* player.jpg */; };
 		B60A67A71C38C92900FFD0E5 /* UIColor+BWAddtions.m in Sources */ = {isa = PBXBuildFile; fileRef = B60A67A61C38C92900FFD0E5 /* UIColor+BWAddtions.m */; };
+		B60A67A91C3A502800FFD0E5 /* time_frame.png in Resources */ = {isa = PBXBuildFile; fileRef = B60A67A81C3A502800FFD0E5 /* time_frame.png */; };
 		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
 		B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */; };
 		B614DD941C381C28006BB3C8 /* card6.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD921C381C28006BB3C8 /* card6.png */; };
@@ -75,6 +76,7 @@
 		B60A67A31C38C47D00FFD0E5 /* player.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = player.jpg; sourceTree = "<group>"; };
 		B60A67A51C38C92900FFD0E5 /* UIColor+BWAddtions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+BWAddtions.h"; path = "BLEWerewolf/UIColor+BWAddtions.h"; sourceTree = "<group>"; };
 		B60A67A61C38C92900FFD0E5 /* UIColor+BWAddtions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+BWAddtions.m"; path = "BLEWerewolf/UIColor+BWAddtions.m"; sourceTree = "<group>"; };
+		B60A67A81C3A502800FFD0E5 /* time_frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = time_frame.png; sourceTree = "<group>"; };
 		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
 		B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRoleRotateScene.h; sourceTree = "<group>"; };
 		B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRoleRotateScene.m; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				B614DD961C3821D6006BB3C8 /* frame.png */,
 				B60A67A11C38C03900FFD0E5 /* gm.jpg */,
 				B60A67A31C38C47D00FFD0E5 /* player.jpg */,
+				B60A67A81C3A502800FFD0E5 /* time_frame.png */,
 			);
 			path = images;
 			sourceTree = "<group>";
@@ -412,6 +415,7 @@
 				B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */,
 				B614DD971C3821D6006BB3C8 /* frame.png in Resources */,
 				B60A67A21C38C03900FFD0E5 /* gm.jpg in Resources */,
+				B60A67A91C3A502800FFD0E5 /* time_frame.png in Resources */,
 				B69ED5A61B6B2C2E00A9C355 /* afternoon.jpg in Resources */,
 				B60A67A41C38C47D00FFD0E5 /* player.jpg in Resources */,
 				B614DD951C381C28006BB3C8 /* card7.png in Resources */,

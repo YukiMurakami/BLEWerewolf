@@ -7,9 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <SpriteKit/SpriteKit.h>
 
-@interface BWTimer : NSObject {
-    NSInteger time;
+@protocol BWTimerDelegate
+-(void)didDecreaseTime:(NSInteger)seconds;
+@end
+
+@interface BWTimer : SKSpriteNode {
+    NSDate *start;
+    NSDate *end;
+    
+    id<BWTimerDelegate> _delegate;
 }
+@property (nonatomic) id<BWTimerDelegate> delegate;
+
+-(void)setSeconds:(NSInteger)second;
+-(NSInteger)getSeconds;
+-(void)initNodeWithFontColor:(UIColor*)color;
 
 @end

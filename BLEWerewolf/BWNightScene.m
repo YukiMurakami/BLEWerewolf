@@ -36,6 +36,10 @@
     messageViewController.view.frame = CGRectMake(margin, margin*2+timerHeight, self.size.width - margin*2, self.size.height - margin*3 - timerHeight);
     messageViewController.delegate = self;
     
+    timer = [[BWTimer alloc]init];
+    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*60];
+    timer.delegate = self;
+    
     [self initBackground];
 }
 
@@ -58,6 +62,11 @@
     content.texture = [BWUtility getCardTexture:[infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"roleId"]integerValue]];
     [explain addChild:content];
     [backgroundNode addChild:explain];
+    
+    timer.size = CGSizeMake(timerHeight*2.4, timerHeight);
+    [timer initNodeWithFontColor:[UIColor whiteColor]];
+    timer.position = CGPointMake(explain.position.x + explain.size.width/2 + timer.size.width/2 + margin, explain.position.y);
+    [backgroundNode addChild:timer];
 }
 
 -(void)willMoveFromView:(SKView *)view {
@@ -125,6 +134,15 @@
         NSString *mes = [NSString stringWithFormat:@"chatsend:%@/%@",[BWUtility getIdentificationString],message];
         [centralManager sendMessageFromClient:mes];
     }
+}
+
+-(void)update:(NSTimeInterval)currentTime {
+    [timer getSeconds];
+}
+
+#pragma mark - TimerDelegate
+-(void)didDecreaseTime:(NSInteger)seconds {
+    
 }
 
 @end
