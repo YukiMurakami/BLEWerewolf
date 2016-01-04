@@ -13,7 +13,7 @@
 #import "BWMessageViewController.h"
 #import "BWTimer.h"
 
-@interface BWNightScene : SKScene <BWPeripheralManagerDelegate,BWCentralManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate> {
+@interface BWNightScene : SKScene <BWPeripheralManagerDelegate,BWCentralManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate,UITableViewDataSource,UITableViewDelegate> {
     SKSpriteNode *backgroundNode;
     BWCentralManager *centralManager;
     BWPeripheralManager *peripheralManager;

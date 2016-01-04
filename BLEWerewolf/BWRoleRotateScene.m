@@ -42,12 +42,12 @@
         
         //全員に役職とプレイヤー情報を送信する
         //受信確認は役職確認後に受信通知を返してもらう
-        //gamestart:A..A,S..S,0,0/A..A,S..S,1,0/.../A..A,S..S,8,1
+        //gamestart:0,0/1,0/.../8,1
         isFinishLoopTimer = NO;
         NSString *message = @"gamestart:";
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
             NSMutableDictionary *playerInfo = infoDic[@"players"][i];
-            message = [NSString stringWithFormat:@"%@%@,%@,%@,%@",message,playerInfo[@"identificationId"],playerInfo[@"name"],playerInfo[@"playerId"],playerInfo[@"roleId"]];
+            message = [NSString stringWithFormat:@"%@%@,%@",message,playerInfo[@"playerId"],playerInfo[@"roleId"]];
             if(i != [infoDic[@"players"] count]-1) {
                 message = [NSString stringWithFormat:@"%@/",message];
             }

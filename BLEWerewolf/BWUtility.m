@@ -427,6 +427,12 @@
     return id;
 }
 
++(Role)getMyRoleId:(NSMutableDictionary*)infoDic {
+    NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
+    Role roleId = (Role)[infoDic[@"players"][myPlayerId][@"roleId"]integerValue];
+    return roleId;
+}
+
 +(NSInteger)getPlayerId:(NSMutableDictionary*)infoDic id:(NSString*)identificationId {
     NSInteger id = -1;
     for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {

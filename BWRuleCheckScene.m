@@ -170,17 +170,14 @@
 
 -(void)didReceivedMessage:(NSString *)message {
     //central
-    //gamestart:A..A,S..S,0,0/A..A,S..S,1,0/.../A..A,S..S,8,1
-    //セントラル側ではプレイヤー情報を格納しておく（配役とルールはすでに取得済み）
+    //gamestart:0,0/1,0/.../8,1
+    //セントラル側では役職IDを格納しておく（配役とルールとプレイヤーはすでに取得済み）
     if([[BWUtility getCommand:message] isEqualToString:@"gamestart"]) {
-        NSMutableArray *playerArray = [NSMutableArray array];
         NSArray *components = [BWUtility getCommandContents:message];
         for(NSInteger i=0;i<components.count;i++) {
             NSArray *strings = [components[i] componentsSeparatedByString:@","];
-            NSMutableDictionary *dic = [@{@"identificationId":strings[0],@"name":strings[1],@"playerId":@([strings[2]integerValue]),@"roleId":@([strings[3]integerValue]),@"isLive":@YES}mutableCopy];
-            [playerArray addObject:dic];
+            [infoDic[@"players"][[strings[0]integerValue]] setObject:@([strings[1]integerValue]) forKey:@"roleId"];
         }
-        [infoDic setObject:playerArray forKey:@"players"];
         
         BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
@@ -217,7 +214,7 @@
     NSString *message = @"gamestart:";
     for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
         NSMutableDictionary *playerInfo = infoDic[@"players"][i];
-        message = [NSString stringWithFormat:@"%@%@,%@,%@,%@",message,playerInfo[@"identificationId"],playerInfo[@"name"],playerInfo[@"playerId"],playerInfo[@"roleId"]];
+        message = [NSString stringWithFormat:@"%@%@,%@",message,playerInfo[@"playerId"],playerInfo[@"roleId"]];
         if(i != [infoDic[@"players"] count]-1) {
             message = [NSString stringWithFormat:@"%@/",message];
         }

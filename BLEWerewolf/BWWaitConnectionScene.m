@@ -10,7 +10,9 @@
 #import "BWUtility.h"
 #import "BWRuleCheckScene.h"
 
-@implementation BWWaitConnectionScene
+@implementation BWWaitConnectionScene {
+    NSMutableArray *playerInfos;
+}
 
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
@@ -19,6 +21,8 @@
     centralManager.delegate = self;
     
     printMessage = @"接続中、、、";
+    
+    
     
     [self initBackground];
     
@@ -34,7 +38,7 @@
     
     SKLabelNode *messageLabel = [[SKLabelNode alloc]init];
     messageLabel.fontColor = [UIColor whiteColor];
-    messageLabel.fontSize = 50.0;
+    messageLabel.fontSize = 30.0;
     messageLabel.text = printMessage;
     messageLabel.position = CGPointMake(0, 0);
     [backgroundNode addChild:messageLabel];
@@ -42,17 +46,18 @@
 
 -(void)didReceivedMessage:(NSString *)message {
     //participateAllow:A..A
-    if([[BWUtility getCommand:message] isEqualToString:@"participateAllow"]) {
+    if([printMessage isEqualToString:@"接続中、、、"] && [[BWUtility getCommand:message] isEqualToString:@"participateAllow"]) {
         NSString *identificationString = [BWUtility getCommandContents:message][0];
         if([identificationString isEqualToString:[BWUtility getIdentificationString]]) {
             NSLog(@"接続完了");
             if([printMessage isEqualToString:@"接続中、、、"]) {
-                printMessage = @"ルール設定待ち";
+                printMessage = @"プレイヤー情報受信中";
                 [self initBackground];
             }
         }
     }
-    if([[BWUtility getCommand:message] isEqualToString:@"setting"]) {
+    //setting:/6,3,1,1,1,1/7,3,0,1,1
+    if([printMessage isEqualToString:@"ルール設定待ち"] && [[BWUtility getCommand:message] isEqualToString:@"setting"]) {
         NSLog(@"ルール:%@",message);
         NSArray *components = [BWUtility getCommandContents:message];
         NSArray *roleStrings = [components[0] componentsSeparatedByString:@","];
@@ -68,13 +73,49 @@
                                           @"canContinuousGuard":@([ruleStrings[3]integerValue]),
                                           @"isLacking":@([ruleStrings[4]integerValue])}mutableCopy];
         
-        NSMutableDictionary *infoDic = [@{@"rules":ruleDic,@"roles":roleArray}mutableCopy];
+        NSMutableDictionary *infoDic = [@{@"rules":ruleDic,@"roles":roleArray,@"players":playerInfos}mutableCopy];
         
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }
+    
+    //member:0/A..A/S..S/12
+    if([printMessage isEqualToString:@"プレイヤー情報受信中"] && [[BWUtility getCommand:message] isEqualToString:@"member"]) {
+        NSArray *contents = [BWUtility getCommandContents:message];
+        NSInteger nPlayer = [contents[3]integerValue];
+        NSInteger playerId = [contents[0]integerValue];
+        NSString *nameString = contents[2];
+        NSString *identificationid = contents[1];
+        
+        if(!playerInfos) {
+            playerInfos = [NSMutableArray array];
+            for(NSInteger i=0;i<nPlayer;i++) {
+                [playerInfos addObject:[@{@"identificationId":@"",@"name":@""}mutableCopy]];
+            }
+        }
+        
+        playerInfos[playerId][@"identificationId"] = identificationid;
+        playerInfos[playerId][@"name"] = nameString;
+        
+        BOOL isAllReceived = YES;
+        for(NSInteger i=0;i<playerInfos.count;i++) {
+            if([playerInfos[i][@"identificationId"] isEqualToString:@""]) {
+                isAllReceived = NO;
+                break;
+            }
+        }
+        if(isAllReceived) {
+            //memberCheck:A..A
+            //メンバー情報をすべて受け取ったらペリフェラルに送信
+            printMessage = @"ルール設定待ち";
+            [self initBackground];
+            [centralManager sendMessageFromClient:[NSString stringWithFormat:@"memberCheck:%@",[BWUtility getIdentificationString]]];
+        }
+    }
+    
+    
 }
 
 @end

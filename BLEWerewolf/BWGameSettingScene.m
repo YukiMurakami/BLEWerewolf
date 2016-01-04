@@ -21,6 +21,10 @@
     NSMutableArray *registeredPlayersArray;
     
     BOOL isFinishLoopTimer;
+    BOOL isFinishLoopTimer2;
+    NSMutableArray *checkList;
+    
+    SKSpriteNode *buttonNode;
 }
 
 @end
@@ -72,7 +76,7 @@
     
     CGFloat margin = self.size.height * 0.05;
     
-    SKSpriteNode *buttonNode = [BWUtility makeButton:@"参加締め切り" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" position:CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2)];
+    buttonNode = [BWUtility makeButton:@"参加締め切り" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" position:CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2)];
     [backgroundNode addChild:buttonNode];
     
     if(!tableView) {
@@ -100,6 +104,21 @@
         //participateAllow:A..A
         [NSObject performBlock:^{
             NSString *allowMessage = [NSString stringWithFormat:@"participateAllow:%@",registeredPlayersArray[i][@"identificationId"]];
+            [[BWPeripheralManager sharedInstance] updateSendMessage:allowMessage];
+        } afterDelay:0.01*i];
+    }
+}
+
+-(void)sendMessage2:(NSTimer*)timer {
+    if(isFinishLoopTimer2) {
+        [timer invalidate];
+        return ;
+    }
+    
+    for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
+        //member:0/A..A/S..S/12
+        [NSObject performBlock:^{
+            NSString *allowMessage = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)i,registeredPlayersArray[i][@"identificationId"],registeredPlayersArray[i][@"name"],(int)registeredPlayersArray.count];
             [[BWPeripheralManager sharedInstance] updateSendMessage:allowMessage];
         } afterDelay:0.01*i];
     }
@@ -140,11 +159,15 @@
     SKNode *node = [self nodeAtPoint:location];
     
     if([node.name isEqualToString:@"next"]) {
+        checkList = [NSMutableArray array];
         isFinishLoopTimer = YES;
-        BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
-        [scene sendPlayerInfo:registeredPlayersArray];
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-        [self.view presentScene:scene transition:transition];
+        isFinishLoopTimer2 = NO;
+        
+        [buttonNode removeFromParent];
+        
+        [checkList addObject:[BWUtility getIdentificationString]];
+     
+        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(sendMessage2:) userInfo:nil repeats:YES];
     }
 }
 
@@ -173,6 +196,23 @@
                 [tableView reloadData];
                 [self initBackground];
             }
+        }
+    }
+    
+    //memberCheck:A..A
+    if([[BWUtility getCommand:message] isEqualToString:@"memberCheck"]) {
+        NSLog(@"memberCheckを受信:%@",message);
+        NSString *identificationId = [BWUtility getCommandContents:message][0];
+        if(![checkList containsObject:identificationId]) {
+            [checkList addObject:identificationId];
+        }
+        if(checkList.count == registeredPlayersArray.count) {
+            //全員がプレイヤー情報を取得（プレイヤーIDと識別IDが紐づく）
+            isFinishLoopTimer2 = YES;
+            BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
+            [scene sendPlayerInfo:registeredPlayersArray];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
         }
     }
 }

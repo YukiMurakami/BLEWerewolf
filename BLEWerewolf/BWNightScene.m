@@ -9,7 +9,13 @@
 #import "BWNightScene.h"
 #import "BWUtility.h"
 
-@implementation BWNightScene
+@implementation BWNightScene {
+    BOOL didAction;
+    NSInteger actionId;
+    SKSpriteNode *actionButtonNode;
+    
+    UITableView *table;
+}
 
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
@@ -30,15 +36,23 @@
         centralManager.delegate = self;
     }
     
-    CGFloat margin = self.size.height*0.05;
+    CGFloat margin = self.size.height*0.02;
+    CGFloat statusHeight = 22;
     CGFloat timerHeight = self.size.height*0.1;
     messageViewController = [BWMessageViewController sharedInstance:infoDic];
-    messageViewController.view.frame = CGRectMake(margin, margin*2+timerHeight, self.size.width - margin*2, self.size.height - margin*3 - timerHeight);
+    messageViewController.view.frame = CGRectMake(margin, margin*2+timerHeight+statusHeight, self.size.width - margin*2, self.size.height - margin*3 - timerHeight - statusHeight);
     messageViewController.delegate = self;
     
     timer = [[BWTimer alloc]init];
     [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*60];
     timer.delegate = self;
+    
+    table.delegate = self;
+    table.dataSource = self;
+    table = [[UITableView alloc]initWithFrame:CGRectMake(statusHeight+margin, margin, self.size.width-margin*2,self.size.height - (statusHeight+margin*3-self.size.height*0.1))];
+    table.rowHeight = table.frame.size.height/6;
+    
+    didAction = NO;
     
     [self initBackground];
 }
@@ -50,16 +64,17 @@
     backgroundNode.texture = [SKTexture textureWithImageNamed:@"night.jpg"];
     [self addChild:backgroundNode];
     
-    CGFloat margin = self.size.height*0.05;
+    CGFloat margin = self.size.height*0.02;
     CGFloat timerHeight = self.size.height*0.1;
+    CGFloat statusHeight = 22;
     
     SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
     explain.size = CGSizeMake(timerHeight*218/307,timerHeight);
-    explain.position = CGPointMake(-self.size.width/2+explain.size.width/2+margin,self.size.height/2-timerHeight/2-margin);
+    explain.position = CGPointMake(-self.size.width/2+explain.size.width/2+margin,self.size.height/2-timerHeight/2-margin-statusHeight);
     SKSpriteNode *content = [[SKSpriteNode alloc]init];
     content.size = CGSizeMake(explain.size.width*0.9,explain.size.height*0.92);
     content.position = CGPointMake(0,0);
-    content.texture = [BWUtility getCardTexture:[infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"roleId"]integerValue]];
+    content.texture = [BWUtility getCardTexture:[BWUtility getMyRoleId:infoDic]];
     [explain addChild:content];
     [backgroundNode addChild:explain];
     
@@ -67,6 +82,18 @@
     [timer initNodeWithFontColor:[UIColor whiteColor]];
     timer.position = CGPointMake(explain.position.x + explain.size.width/2 + timer.size.width/2 + margin, explain.position.y);
     [backgroundNode addChild:timer];
+    
+    NSInteger roleId = [BWUtility getMyRoleId:infoDic];
+    NSString *buttonTitle = @"";
+    NSString *buttonName = @"action";
+    
+    if(roleId == RoleWerewolf) buttonTitle = @"噛む";
+    if(roleId == RoleFortuneTeller) buttonTitle = @"占う";
+    CGFloat buttonSizeWidth = self.size.width-(margin*4+explain.size.width+timer.size.width);
+    actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
+    if(![buttonTitle isEqualToString:@""]) {
+        [backgroundNode addChild:actionButtonNode];
+    }
 }
 
 -(void)willMoveFromView:(SKView *)view {
@@ -144,5 +171,7 @@
 -(void)didDecreaseTime:(NSInteger)seconds {
     
 }
+
+#pragma mark - tableDelegate
 
 @end
