@@ -135,4 +135,6 @@ FOUNDATION_EXPORT NSString * const JSQMessagesKeyboardControllerUserInfoKeyKeybo
  */
 - (void)endListeningForKeyboard;
 
+- (void)jsq_resetKeyboardAndTextView;
+
 @end

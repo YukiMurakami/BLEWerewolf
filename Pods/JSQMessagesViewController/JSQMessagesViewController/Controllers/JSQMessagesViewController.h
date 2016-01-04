@@ -268,4 +268,6 @@
  */
 - (void)scrollToBottomAnimated:(BOOL)animated;
 
+-(void)hiddenKeyboard;
+
 @end

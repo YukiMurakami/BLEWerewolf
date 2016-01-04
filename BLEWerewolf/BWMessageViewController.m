@@ -162,6 +162,10 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [_delegate didSendChat:text];
 }
 
+- (void)didPressAccessoryButton:(UIButton *)sender {
+    [self hiddenKeyboard];
+}
+
 #pragma mark - JSQMessagesCollectionViewDataSource
 
 // ④ アイテムごとに参照するメッセージデータを返す

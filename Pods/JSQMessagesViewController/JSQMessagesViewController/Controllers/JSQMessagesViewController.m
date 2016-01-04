@@ -331,6 +331,10 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
     [self finishSendingMessageAnimated:YES];
 }
 
+-(void)hiddenKeyboard {
+    [self.keyboardController jsq_resetKeyboardAndTextView];
+}
+
 - (void)finishSendingMessageAnimated:(BOOL)animated {
 
     UITextView *textView = self.inputToolbar.contentView.textView;
