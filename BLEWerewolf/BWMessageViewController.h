@@ -24,4 +24,6 @@
 -(BOOL)isMember:(NSString*)id;
 
 -(void)receiveMessage:(NSString*)text id:(NSString*)identificationId infoDic:(NSMutableDictionary*)infoDic;
+
+-(NSString*)getGmId;
 @end

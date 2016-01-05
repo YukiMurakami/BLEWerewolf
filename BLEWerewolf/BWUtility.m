@@ -101,6 +101,7 @@
     NSString *token = @"";
     NSString *explain = @"explain";
     NSString *detailExplain = @"特になし";
+    NSString *firstNightMessage = @"";
     bool hasTable = false;//夜のアクションでテーブルが必要か
     bool hasTableFirst = false;//初夜のアクションでテーブルが必要か
     NSString *tableString = @"";//夜のアクションでテーブルに表示される文字列
@@ -130,6 +131,7 @@
             surfaceRole = RoleVillager;
             hasTable = false;
             explain = @"村人は特殊な能力を持たないただの人です。夜時間は考察を書きましょう。";
+            firstNightMessage = @"あなたは「村人」です。夜時間は必ず考察を書き込んでください。誰が人狼か、誰が真の役職なのかなど推理してください。";
             break;
         case RoleWerewolf:
             name = @"人狼";//実装済み
@@ -140,6 +142,7 @@
             tableStringFirst = @"仲間の人狼を確認してください。";
             tableString = @"襲撃先を選択してください。";
             explain = @"人狼は毎晩仲間同士で相談し人間を一人噛むことができます。夜時間は狼専用チャットで相談し、代表者が襲撃先を選択します。";
+            firstNightMessage = @"ここは「人狼専用チャット」です。仲間と相談できます。なお、夜時間終了までに代表者がアクションボタンから、襲撃先を決定してください。アクションが行われなかった場合はランダムに一名決定します。";
             break;
         case RoleFortuneTeller:
             name = @"占い師";//実装済み
@@ -148,6 +151,7 @@
             hasTable = true;
             tableString = @"占い先を選択してください。";
             explain = @"予言者は毎晩疑っている人物を１人指定してその人物が人狼かそうでないかを知ることができます。";
+            firstNightMessage = @"あなたは「占い師」です。考察を書き込みつつ、夜時間中に占い作業を完了してください。";
             break;
         case RoleShaman:
             name = @"霊媒師";//実装済み
@@ -365,7 +369,7 @@
     }
     
     infoDic = [@{@"name":name,@"explain":explain,@"hasTable":@(hasTable),@"tableString":tableString,
-                 @"hasTableFirst":@(hasTableFirst),@"tableStringFirst":tableStringFirst,@"maxPlayer":@(maxPlayer),@"surfaceRole":@(surfaceRole),@"token":token} mutableCopy];
+                 @"hasTableFirst":@(hasTableFirst),@"tableStringFirst":tableStringFirst,@"maxPlayer":@(maxPlayer),@"surfaceRole":@(surfaceRole),@"token":token,@"firstNightMessage":firstNightMessage} mutableCopy];
     
     return infoDic;
 }

@@ -30,7 +30,12 @@
 ・全員分の役職確認通知を回収後、初日夜を通知「firstNight:」
  基本的にブロードキャスト的な送信を行う（全体に宛先を書いたメッセージを送信し、受信側（セントラル）で取捨選択を行う）
  
+ 
 チャット
 ・チャット送信（central->peripheral)「chatsend:A..A/T...T」T...Tは内容
 ・チャット受信（peripheral->central)「chatreceive:A..A/T...T」
+・GMメッセージ（peripheral(gm)->central）「chatreceive:G..G/A..A/T..T」G..GはgmId
+ 
+役職アクション
+・「action:1/0/3」1は役職ID、0は実行者、3は対象者
 */

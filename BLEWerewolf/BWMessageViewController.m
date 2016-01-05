@@ -121,25 +121,6 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     // ④ メッセージデータの配列を初期化
     self.messages = [NSMutableArray array];
     
-    
-    //初回のGMメッセージを表示
-    NSString *GMString = @"";
-    NSInteger roleId = [copyInfoDic[@"players"][[BWUtility getMyPlayerId:copyInfoDic]][@"roleId"]integerValue];
-    if(roleId == RoleVillager) {
-        GMString = @"あなたは「村人」です。夜時間は必ず考察を書き込んでください。誰が人狼か、誰が真の役職なのかなど推理してください。";
-    }
-    if(roleId == RoleWerewolf) {
-        GMString = @"ここは「人狼専用チャット」です。仲間と相談できます。なお、夜時間終了までに代表者がアクションボタンから、襲撃先を決定してください。アクションが行われなかった場合はランダムに一名決定します。";
-    }
-    if(roleId == RoleFortuneTeller) {
-        GMString = @"あなたは「占い師」です。考察を書き込みつつ、夜時間中に占い作業を完了してください。";
-    }
-    JSQMessage *message = [JSQMessage messageWithSenderId:gmId
-                                              displayName:@"GM"
-                                                     text:GMString];
-    [self.messages addObject:message];
-    // メッセージの送信処理を完了する (画面上にメッセージが表示される)
-    [self finishSendingMessageAnimated:YES];
 }
 
 #pragma mark - JSQMessagesViewController
@@ -212,7 +193,12 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 -(void)receiveMessage:(NSString*)text id:(NSString*)identificationId infoDic:(NSMutableDictionary*)infoDic {
     NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
-    NSString *name = infoDic[@"players"][playerId][@"name"];
+    NSString *name = @"";
+    if([identificationId isEqualToString:gmId]) {
+        name = @"GM";
+    } else {
+        name = infoDic[@"players"][playerId][@"name"];
+    }
     
     JSQMessage *message = [JSQMessage messageWithSenderId:identificationId
                                               displayName:name
@@ -222,5 +208,8 @@ NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     [self finishReceivingMessageAnimated:YES];
 }
 
+-(NSString*)getGmId {
+    return gmId;
+}
 
 @end

@@ -166,6 +166,15 @@
         [buttonNode removeFromParent];
         
         [checkList addObject:[BWUtility getIdentificationString]];
+        
+        if(checkList.count == registeredPlayersArray.count) {
+            //全員がプレイヤー情報を取得（プレイヤーIDと識別IDが紐づく）
+            isFinishLoopTimer2 = YES;
+            BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
+            [scene sendPlayerInfo:registeredPlayersArray];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
+        }
      
         [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(sendMessage2:) userInfo:nil repeats:YES];
     }
