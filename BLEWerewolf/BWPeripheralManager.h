@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <SpriteKit/SpriteKit.h>
 
 @protocol BWPeripheralManagerDelegate
 -(void)didReceiveMessage:(NSString*)message;
@@ -22,11 +23,16 @@
 @property (nonatomic) id<BWPeripheralManagerDelegate> delegate;
 
 + (instancetype)sharedInstance;
-
+- (void)setScene:(SKScene*)_scene;
 
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
 @property (nonatomic, strong) CBCharacteristic *characteristic;
 @property (nonatomic, strong) CBMutableService *service;
+
+
+
+- (NSInteger)sendGlobalSignalMessage:(NSString*)message interval:(double)intervalTime;
+- (void)stopGlobalSignal:(NSInteger)_signalId;
 
 
 - (void)updateSendMessage :(NSString*)sendMessage;

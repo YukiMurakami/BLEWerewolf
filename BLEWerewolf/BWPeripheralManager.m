@@ -10,9 +10,34 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "TransferService.h"
 #import "NSObject+BlocksWait.h"
+#import "BWAppDelegate.h"
 
 
-@interface BWPeripheralManager () 
+@interface BWSenderNode : SKSpriteNode {
+    
+}
+@property (nonatomic) NSInteger signalId;
+@property (nonatomic) SignalKind signalKind;
+@property (nonatomic) NSDate *firstSendDate;
+@property (nonatomic) CGFloat timeOutSeconds;
+@property (nonatomic) NSString *message;
+@property (nonatomic) BOOL isReceived;
+
+@end
+
+@implementation BWSenderNode
+
+@end
+
+
+
+@interface BWPeripheralManager () {
+    NSInteger signalId;
+    
+    NSMutableArray *signals;
+    
+    SKScene *scene;
+}
 
 @end
 
@@ -33,6 +58,59 @@
     return sharedInstance;
 }
 
+- (void)setScene:(SKScene*)_scene {
+    scene = _scene;
+}
+
+- (NSInteger)sendGlobalSignalMessage:(NSString*)message interval:(double)intervalTime {
+    NSInteger _signalId = signalId;
+    signalId++;
+    
+    BWSenderNode *senderNode = [[BWSenderNode alloc]init];
+    senderNode.signalId = _signalId;
+    senderNode.signalKind = SignalKindGlobal;
+    senderNode.firstSendDate = [NSDate date];
+    senderNode.timeOutSeconds = 100000;
+    senderNode.message = message;
+    senderNode.isReceived = NO;
+    
+    [signals addObject:senderNode];
+    
+    SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *send = [SKAction runBlock:^{
+        NSLog(@"send");
+        [self updateSendMessage:senderNode.message];
+    }];
+    
+    [(SKScene*)self.delegate addChild:senderNode];
+    
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    [senderNode runAction:repeat];
+    
+    return _signalId;
+}
+
+- (void)stopGlobalSignal:(NSInteger)_signalId {
+    BWSenderNode *senderNode = [self getSenderNodeWithSignalId:_signalId];
+    if(senderNode.signalKind == SignalKindGlobal) {
+        [senderNode removeAllActions];
+        [senderNode removeFromParent];
+        [signals removeObject:senderNode];
+    }
+}
+
+- (BWSenderNode*)getSenderNodeWithSignalId:(NSInteger)_signalId {
+    BWSenderNode *node;
+    for(NSInteger i=0;i<signals.count;i++) {
+        if(((BWSenderNode*)signals[i]).signalId == _signalId) {
+            node = signals[i];
+            break;
+        }
+    }
+    return node;
+}
+
+
 - (void)updateSendMessage :(NSString*)sendMessage {
     [sendingMessageQueue addObject:sendMessage];
     NSData *data = [sendMessage dataUsingEncoding:NSUTF8StringEncoding];
@@ -48,6 +126,9 @@
         // 初期化処理
         self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil options:nil];
         sendingMessageQueue = [NSMutableArray array];
+        
+        signalId = 0;
+        signals = [NSMutableArray array];
     }
     return self;
 }

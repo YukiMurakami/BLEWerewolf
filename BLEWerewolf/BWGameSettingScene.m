@@ -20,11 +20,12 @@
     UITableView *tableView;
     NSMutableArray *registeredPlayersArray;
     
-    BOOL isFinishLoopTimer;
     BOOL isFinishLoopTimer2;
     NSMutableArray *checkList;
     
     SKSpriteNode *buttonNode;
+    
+    NSInteger sendGlobalId;
 }
 
 @end
@@ -39,6 +40,7 @@
     manager = [BWPeripheralManager sharedInstance];
     
     manager.delegate = self;
+    
     
     registeredPlayersArray = [NSMutableArray array];
     
@@ -87,19 +89,13 @@
     }
     
     
-    isFinishLoopTimer = NO;
     NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
-    [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":message} repeats:YES];
+    sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
+    //[NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:nil repeats:YES];
     
 }
 
 -(void)sendMessage:(NSTimer*)timer {
-    if(isFinishLoopTimer) {
-        [timer invalidate];
-        return ;
-    }
-    [[BWPeripheralManager sharedInstance] updateSendMessage:[timer userInfo][@"message"]];
-    
     for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
         //participateAllow:A..A
         [NSObject performBlock:^{
@@ -160,7 +156,9 @@
     
     if([node.name isEqualToString:@"next"]) {
         checkList = [NSMutableArray array];
-        isFinishLoopTimer = YES;
+        
+        [manager stopGlobalSignal:sendGlobalId];
+        
         isFinishLoopTimer2 = NO;
         
         [buttonNode removeFromParent];

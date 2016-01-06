@@ -253,7 +253,7 @@
 
 -(void)sendGMMessage:(NSString*)message receiverId:(NSString*)id {
     if(!isPeripheral) return;
-    
+    NSLog(@"GMMessage:%@",message);
     if([id isEqualToString:[BWUtility getIdentificationString]]) {
         //自分自身あて
         [messageViewController receiveMessage:message id:[messageViewController getGmId] infoDic:infoDic];
