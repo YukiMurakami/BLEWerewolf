@@ -69,6 +69,45 @@
 }
 
 
+- (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut {
+    NSInteger _signalId = signalId;
+    signalId++;
+    
+    BWSenderNode *senderNode = [[BWSenderNode alloc]init];
+    senderNode.signalId = _signalId;
+    senderNode.signalKind = SignalKindNormal;
+    senderNode.firstSendDate = [NSDate date];
+    senderNode.timeOutSeconds = timeOut;
+    senderNode.message = message;
+    senderNode.isReceived = NO;
+    
+    [signals addObject:senderNode];
+    
+    SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *send = [SKAction runBlock:^{
+        //「1:NNNNNN:T..T:A..A:message」T..Tは自分のsignalID,A..Aは自分のidentificationID
+        if([gameIdString isEqualToString:@""]) exit(0);
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,[BWUtility getIdentificationString],senderNode.message];
+        [self sendMessageFromClient:sendMessage];
+        
+        NSDate *now = [NSDate date];
+        NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
+        NSComparisonResult result = [now compare:finishDate];
+        if(result == NSOrderedDescending || senderNode.isReceived) {
+            [senderNode removeFromParent];
+            [signals removeObject:senderNode];
+        }
+    }];
+    
+    [(SKScene*)self.delegate addChild:senderNode];
+    
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    [senderNode runAction:repeat];
+    
+    return _signalId;
+}
+
+
 -(void)sendReceivedMessage:(NSInteger)receivedSignalId {
     double timeOut = 5.0;
     double intervalTime = 1.0;
@@ -109,6 +148,17 @@
     NSLog(@"send message :%@",message);
     [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithResponse];
     
+}
+
+- (BWSenderNode*)getSenderNodeWithSignalId:(NSInteger)_signalId {
+    BWSenderNode *node;
+    for(NSInteger i=0;i<signals.count;i++) {
+        if(((BWSenderNode*)signals[i]).signalId == _signalId) {
+            node = signals[i];
+            break;
+        }
+    }
+    return node;
 }
 
 -(NSString*)getGameId {
@@ -309,6 +359,16 @@
         //「0:message」
             message = [receivedString substringFromIndex:2];
             [_delegate didReceivedMessage:message];
+        }
+        if(kind == SignalKindReceived) {
+            //「2:NNNNNN:T..T:A..A」
+            NSString *gotGameId = [message componentsSeparatedByString:@":"][1];
+            NSInteger gotSignalId = [[message componentsSeparatedByString:@":"][2]integerValue];
+            NSString *identificationId = [message componentsSeparatedByString:@":"][3];
+            if([gotGameId isEqualToString:gameIdString] && [identificationId isEqualToString:[BWUtility getIdentificationString]]) {
+                BWSenderNode *node = [self getSenderNodeWithSignalId:gotSignalId];
+                node.isReceived = YES;
+            }
         }
         if(kind == SignalKindNormal) {
         //「1:NNNNNN:T..T:A..A:message」

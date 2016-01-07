@@ -27,6 +27,8 @@
     SKScene *scene;
     
     NSString *gameIdString;
+    
+    NSMutableArray *receivedSignalIds;
 }
 
 @end
@@ -137,6 +139,42 @@
     return _signalId;
 }
 
+-(void)sendReceivedMessage:(NSInteger)receivedSignalId identificationId:(NSString*)identificationId {
+    double timeOut = 5.0;
+    double intervalTime = 1.0;
+    
+    BWSenderNode *senderNode = [[BWSenderNode alloc]init];
+    senderNode.signalId = -1;
+    senderNode.signalKind = SignalKindReceived;
+    senderNode.firstSendDate = [NSDate date];
+    senderNode.timeOutSeconds = timeOut;
+    senderNode.isReceived = NO;
+    senderNode.toIdentificationId = identificationId;
+    
+    [signals addObject:senderNode];
+    
+    SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *send = [SKAction runBlock:^{
+        //「2:NNNNNN:T..T:A..A」
+        if([gameIdString isEqualToString:@""]) exit(0);
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId,senderNode.toIdentificationId];
+        [self updateSendMessage:sendMessage];
+        
+        NSDate *now = [NSDate date];
+        NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
+        NSComparisonResult result = [now compare:finishDate];
+        if(result == NSOrderedDescending) {
+            [senderNode removeFromParent];
+            [signals removeObject:senderNode];
+        }
+    }];
+    
+    [(SKScene*)self.delegate addChild:senderNode];
+    
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    [senderNode runAction:repeat];
+}
+
 - (BWSenderNode*)getSenderNodeWithSignalId:(NSInteger)_signalId {
     BWSenderNode *node;
     for(NSInteger i=0;i<signals.count;i++) {
@@ -167,6 +205,7 @@
         
         signalId = 0;
         signals = [NSMutableArray array];
+        receivedSignalIds = [NSMutableArray array];
     }
     return self;
 }
@@ -341,6 +380,7 @@
         //TODO::セントラルからの受信を処理
         //「1:NNNNNN:T..T:A..A:message」T..TはセントラルのシグナルID
         //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
+        NSString *contentMessage = @"";
         SignalKind kind = [[BWUtility getCommand:message]integerValue];
         if(kind == SignalKindReceived) {
             //「2:NNNNNN:T..T」
@@ -353,7 +393,30 @@
         }
         if(kind == SignalKindNormal) {
             //「1:NNNNNN:T..T:A..A:message」
-            [_delegate didReceiveMessage:message];
+            NSArray *array = [message componentsSeparatedByString:@":"];
+            NSString *gotGameId = array[1];
+            NSInteger gotSignalId = [array[2]integerValue];
+            NSString *identificationId = array[3];
+            
+            if([receivedSignalIds containsObject:@(gotSignalId)]) {
+                return;//２重受信を防ぐ
+            }
+            [receivedSignalIds addObject:@(gotSignalId)];
+            
+            if([identificationId isEqualToString:[BWUtility getIdentificationString]] && [gameIdString isEqualToString:gotGameId]) {
+                //受信
+                for(NSInteger i=4;i<array.count;i++) {
+                    if(i == 4) {
+                        contentMessage = [NSString stringWithFormat:@"%@%@",contentMessage,array[i]];
+                    } else {
+                        contentMessage = [NSString stringWithFormat:@"%@:%@",contentMessage,array[i]];
+                    }
+                }
+                [_delegate didReceiveMessage:contentMessage];
+                
+                //受信完了通知を返す
+                [self sendReceivedMessage:gotSignalId identificationId:identificationId];
+            }
         }
     }
     
