@@ -48,6 +48,7 @@
 		B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B69ED5B51B6B4B8100A9C355 /* BWGameSettingScene.m */; };
 		B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B57D471B6774A600FBFEDB /* BWCentralManager.m */; };
 		B6B57D4B1B6781A900FBFEDB /* BWMainScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */; };
+		B6BA9D541C3E659E00F75065 /* BWSenderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6BA9D531C3E659E00F75065 /* BWSenderNode.m */; };
 		B6CF75151C2640C70078309A /* NSObject+BlocksWait.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */; };
 		D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B305F111B76436C68C48C08 /* libPods.a */; };
 /* End PBXBuildFile section */
@@ -133,6 +134,8 @@
 		B6B57D471B6774A600FBFEDB /* BWCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWCentralManager.m; path = BLEWerewolf/BWCentralManager.m; sourceTree = "<group>"; };
 		B6B57D491B6781A900FBFEDB /* BWMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BWMainScene.h; path = BLEWerewolf/BWMainScene.h; sourceTree = "<group>"; };
 		B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BWMainScene.m; path = BLEWerewolf/BWMainScene.m; sourceTree = "<group>"; };
+		B6BA9D521C3E659E00F75065 /* BWSenderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWSenderNode.h; sourceTree = "<group>"; };
+		B6BA9D531C3E659E00F75065 /* BWSenderNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWSenderNode.m; sourceTree = "<group>"; };
 		B6CF75131C2640C70078309A /* NSObject+BlocksWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+BlocksWait.h"; path = "BLEWerewolf/NSObject+BlocksWait.h"; sourceTree = "<group>"; };
 		B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+BlocksWait.m"; path = "BLEWerewolf/NSObject+BlocksWait.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -249,6 +252,8 @@
 			children = (
 				B69ED5AE1B6B2C6800A9C355 /* BWUtility.h */,
 				B69ED5AF1B6B2C6800A9C355 /* BWUtility.m */,
+				B6BA9D521C3E659E00F75065 /* BWSenderNode.h */,
+				B6BA9D531C3E659E00F75065 /* BWSenderNode.m */,
 				B60A67A51C38C92900FFD0E5 /* UIColor+BWAddtions.h */,
 				B60A67A61C38C92900FFD0E5 /* UIColor+BWAddtions.m */,
 				B6CF75131C2640C70078309A /* NSObject+BlocksWait.h */,
@@ -474,6 +479,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6B57D4B1B6781A900FBFEDB /* BWMainScene.m in Sources */,
+				B6BA9D541C3E659E00F75065 /* BWSenderNode.m in Sources */,
 				B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */,
 				B67CC39A1C37715D00546FC0 /* BWSettingScene.m in Sources */,
 				B63D90441B60DD35000E366B /* BWViewController.m in Sources */,

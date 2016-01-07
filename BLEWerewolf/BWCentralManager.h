@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <SpriteKit/SpriteKit.h>
 
 @protocol BWCentralManagerDelegate
 - (void)didReceivedMessage:(NSString*)message;
@@ -26,6 +27,8 @@
 
 + (instancetype)sharedInstance;
 -(void)sendMessageFromClient:(NSString*)message;
+-(void)setGameId :(NSString*)gameIdStr;
+-(NSString*)getGameId;
 
 // --------------------------------
 // CBCentralManagerDelegate

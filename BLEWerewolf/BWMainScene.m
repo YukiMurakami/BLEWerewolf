@@ -87,6 +87,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *touchedGameId = [gameIdArray[indexPath.row] substringToIndex:6];
+    [centralManager setGameId:touchedGameId];
+    //ここでgameIdを確定させる
     NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
     [centralManager sendMessageFromClient:sendMessage];
     

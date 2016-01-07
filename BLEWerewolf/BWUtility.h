@@ -29,6 +29,8 @@ typedef NS_ENUM(NSUInteger, Role) {
     //TODO::役職追加時変更点
 };
 
+
+
 @interface BWUtility : NSObject
 
 +(SKSpriteNode *) makeButton :(NSString*) text

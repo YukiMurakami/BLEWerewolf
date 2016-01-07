@@ -31,9 +31,10 @@
 
 
 
+- (NSString*)getGameId;
 - (NSInteger)sendGlobalSignalMessage:(NSString*)message interval:(double)intervalTime;
 - (void)stopGlobalSignal:(NSInteger)_signalId;
-
+- (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut;
 
 - (void)updateSendMessage :(NSString*)sendMessage;
 

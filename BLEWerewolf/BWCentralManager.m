@@ -12,10 +12,19 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "TransferService.h"
+#import "BWUtility.h"
+
+#import "BWSenderNode.h"
 
 
 
-@interface BWCentralManager ()
+@interface BWCentralManager () {
+    NSString *gameIdString;
+    
+    NSMutableArray *signals;
+    NSMutableArray *receivedSignalIds;
+    NSInteger signalId;
+}
 
 
 @end
@@ -32,7 +41,7 @@
     
     static dispatch_once_t once;
     dispatch_once( &once, ^{
-        sharedInstance = [[BWCentralManager alloc] init];
+        sharedInstance = [[BWCentralManager alloc] initSharedInstance];
         
         sharedInstance.centralManager = [[CBCentralManager alloc] initWithDelegate:sharedInstance queue:nil];
     
@@ -42,11 +51,72 @@
     return sharedInstance;
 }
 
+- (id)initSharedInstance {
+    self = [super init];
+    if (self) {
+        // 初期化処理
+        
+        signalId = 0;
+        signals = [NSMutableArray array];
+        receivedSignalIds = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (id)init {
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+
+-(void)sendReceivedMessage:(NSInteger)receivedSignalId {
+    double timeOut = 5.0;
+    double intervalTime = 1.0;
+    
+    BWSenderNode *senderNode = [[BWSenderNode alloc]init];
+    senderNode.signalId = -1;
+    senderNode.signalKind = SignalKindReceived;
+    senderNode.firstSendDate = [NSDate date];
+    senderNode.timeOutSeconds = timeOut;
+    senderNode.isReceived = NO;
+    
+    [signals addObject:senderNode];
+    
+    SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *send = [SKAction runBlock:^{
+        //「2:NNNNNN:T..T」
+        if([gameIdString isEqualToString:@""]) exit(0);
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId];
+        [self sendMessageFromClient:sendMessage];
+        
+        NSDate *now = [NSDate date];
+        NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
+        NSComparisonResult result = [now compare:finishDate];
+        if(result == NSOrderedDescending) {
+            [senderNode removeFromParent];
+            [signals removeObject:senderNode];
+        }
+    }];
+    
+    [(SKScene*)self.delegate addChild:senderNode];
+    
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    [senderNode runAction:repeat];
+}
+
 -(void)sendMessageFromClient:(NSString*)message {
     NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
     NSLog(@"send message :%@",message);
     [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithResponse];
     
+}
+
+-(NSString*)getGameId {
+    return gameIdString;
+}
+
+-(void)setGameId :(NSString*)gameIdStr{
+    gameIdString = gameIdStr;
 }
 
 // --------------------------------
@@ -232,7 +302,43 @@
         
         NSLog(@"[data] %@",receivedString);
         
-        [_delegate didReceivedMessage:receivedString];
+        //TODO::受信振り分け、受信完了通知が必要な場合は返す
+        SignalKind kind = [[BWUtility getCommand:receivedString]integerValue];
+        NSString *message = @"";
+        if(kind == SignalKindGlobal) {
+        //「0:message」
+            message = [receivedString substringFromIndex:2];
+            [_delegate didReceivedMessage:message];
+        }
+        if(kind == SignalKindNormal) {
+        //「1:NNNNNN:T..T:A..A:message」
+            NSArray *array = [receivedString componentsSeparatedByString:@":"];
+            NSString *gotGameId = array[1];
+            NSInteger gotSignalId = [array[2]integerValue];
+            
+            if([receivedSignalIds containsObject:@(gotSignalId)]) {
+                return;//２重受信を防ぐ
+            }
+            [receivedSignalIds addObject:@(gotSignalId)];
+            
+            NSString *identificationId = array[3];
+            if([identificationId isEqualToString:[BWUtility getIdentificationString]] && [gameIdString isEqualToString:gotGameId]) {
+                //受信
+                for(NSInteger i=4;i<array.count;i++) {
+                    if(i == 4) {
+                        message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+                    } else {
+                        message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+                    }
+                }
+                [_delegate didReceivedMessage:message];
+                
+                //受信完了通知を返す
+                [self sendReceivedMessage:gotSignalId];
+            }
+        }
+        
+        
     }
 }
 

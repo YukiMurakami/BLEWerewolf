@@ -11,23 +11,11 @@
 #import "TransferService.h"
 #import "NSObject+BlocksWait.h"
 #import "BWAppDelegate.h"
+#import "BWUtility.h"
+#import "BWSenderNode.h"
 
 
-@interface BWSenderNode : SKSpriteNode {
-    
-}
-@property (nonatomic) NSInteger signalId;
-@property (nonatomic) SignalKind signalKind;
-@property (nonatomic) NSDate *firstSendDate;
-@property (nonatomic) CGFloat timeOutSeconds;
-@property (nonatomic) NSString *message;
-@property (nonatomic) BOOL isReceived;
 
-@end
-
-@implementation BWSenderNode
-
-@end
 
 
 
@@ -37,6 +25,8 @@
     NSMutableArray *signals;
     
     SKScene *scene;
+    
+    NSString *gameIdString;
 }
 
 @end
@@ -62,9 +52,18 @@
     scene = _scene;
 }
 
+- (NSString*)getGameId {
+    return gameIdString;
+}
+
 - (NSInteger)sendGlobalSignalMessage:(NSString*)message interval:(double)intervalTime {
     NSInteger _signalId = signalId;
     signalId++;
+    
+    if([[BWUtility getCommand:message] isEqualToString:@"serveId"]) {
+        gameIdString = [BWUtility getCommandContents:message][0];
+        //ここでゲームIDを確定させる
+    }
     
     BWSenderNode *senderNode = [[BWSenderNode alloc]init];
     senderNode.signalId = _signalId;
@@ -78,8 +77,8 @@
     
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *send = [SKAction runBlock:^{
-        NSLog(@"send");
-        [self updateSendMessage:senderNode.message];
+        //「0:message」
+        [self updateSendMessage:[NSString stringWithFormat:@"%d:%@",(int)senderNode.signalKind,senderNode.message]];
     }];
     
     [(SKScene*)self.delegate addChild:senderNode];
@@ -97,6 +96,45 @@
         [senderNode removeFromParent];
         [signals removeObject:senderNode];
     }
+}
+
+- (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut {
+    NSInteger _signalId = signalId;
+    signalId++;
+    
+    BWSenderNode *senderNode = [[BWSenderNode alloc]init];
+    senderNode.signalId = _signalId;
+    senderNode.signalKind = SignalKindNormal;
+    senderNode.firstSendDate = [NSDate date];
+    senderNode.timeOutSeconds = timeOut;
+    senderNode.message = message;
+    senderNode.isReceived = NO;
+    senderNode.toIdentificationId = toIdentificationId;
+    
+    [signals addObject:senderNode];
+    
+    SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *send = [SKAction runBlock:^{
+        //「1:NNNNNN:T..T:A..A:message」
+        if([gameIdString isEqualToString:@""]) exit(0);
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,senderNode.toIdentificationId,senderNode.message];
+        [self updateSendMessage:sendMessage];
+        
+        NSDate *now = [NSDate date];
+        NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
+        NSComparisonResult result = [now compare:finishDate];
+        if(result == NSOrderedDescending || senderNode.isReceived) {
+            [senderNode removeFromParent];
+            [signals removeObject:senderNode];
+        }
+    }];
+    
+    [(SKScene*)self.delegate addChild:senderNode];
+    
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    [senderNode runAction:repeat];
+    
+    return _signalId;
 }
 
 - (BWSenderNode*)getSenderNodeWithSignalId:(NSInteger)_signalId {
@@ -299,7 +337,24 @@
     for(CBATTRequest *request in requests) {
         NSString *message = [[NSString alloc]initWithData:request.value encoding:NSUTF8StringEncoding];
         NSLog(@"written data:%@",message);
-        [_delegate didReceiveMessage:message];
+        
+        //TODO::セントラルからの受信を処理
+        //「1:NNNNNN:T..T:A..A:message」T..TはセントラルのシグナルID
+        //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
+        SignalKind kind = [[BWUtility getCommand:message]integerValue];
+        if(kind == SignalKindReceived) {
+            //「2:NNNNNN:T..T」
+            NSString *gotGameId = [message componentsSeparatedByString:@":"][1];
+            NSInteger gotSignalId = [[message componentsSeparatedByString:@":"][2]integerValue];
+            if([gotGameId isEqualToString:gameIdString]) {
+                BWSenderNode *node = [self getSenderNodeWithSignalId:gotSignalId];
+                node.isReceived = YES;
+            }
+        }
+        if(kind == SignalKindNormal) {
+            //「1:NNNNNN:T..T:A..A:message」
+            [_delegate didReceiveMessage:message];
+        }
     }
     
     [self.peripheralManager respondToRequest:[requests objectAtIndex:0] withResult:CBATTErrorSuccess];

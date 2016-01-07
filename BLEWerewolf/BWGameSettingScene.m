@@ -93,6 +93,8 @@
     sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
     //[NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:nil repeats:YES];
     
+    //[manager sendNormalMessage:@"testtest" toIdentificationId:@"c0gvq5gh5FHlrKu7QsOP40ESS5qBSpJc" interval:2.0 timeOut:30.0];
+    
 }
 
 -(void)sendMessage:(NSTimer*)timer {
