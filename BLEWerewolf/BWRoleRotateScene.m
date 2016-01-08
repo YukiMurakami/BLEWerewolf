@@ -11,7 +11,6 @@
 #import "BWNightScene.h"
 
 @implementation BWRoleRotateScene {
-    BOOL isFinishLoopTimer;
     BOOL isCheck;
     NSMutableArray *checkList;
 }
@@ -43,7 +42,6 @@
         //全員に役職とプレイヤー情報を送信する
         //受信確認は役職確認後に受信通知を返してもらう
         //gamestart:0,0/1,0/.../8,1
-        isFinishLoopTimer = NO;
         NSString *message = @"gamestart:";
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
             NSMutableDictionary *playerInfo = infoDic[@"players"][i];
@@ -52,7 +50,8 @@
                 message = [NSString stringWithFormat:@"%@/",message];
             }
         }
-        [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":message} repeats:YES];
+        [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:2.0 timeOut:30.0];
+       
     } else {
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
@@ -92,7 +91,7 @@
     NSMutableDictionary *roleDic = [BWUtility getCardInfofromId:(int)roleId];
     NSInteger surfaceRoleId = [roleDic[@"surfaceRole"]integerValue];
 
-    SKTexture *texture = [BWUtility getCardTexture:surfaceRoleId];
+    SKTexture *texture = [BWUtility getCardTexture:(int)surfaceRoleId];
     NSString *string = [NSString stringWithFormat:@"あなたの役職は「%@」です。%@",roleDic[@"name"],roleDic[@"explain"]];
     CGSize messageSize = CGSizeMake(self.size.width*0.9, self.size.width*0.9/300*240);
     CGPoint messagePosition = CGPointMake(0, self.size.height/2 - 22 - messageSize.height/2);
@@ -121,7 +120,7 @@
                                                      isRotateRight:NO];
     [backgroundNode addChild:messageNode];
         
-    if(![[BWUtility getCardInfofromId:roleId][@"hasTableFirst"]boolValue]) {
+    if(![[BWUtility getCardInfofromId:(int)roleId][@"hasTableFirst"]boolValue]) {
         NSString *actionString = @"特に行うアクションはありません。「初日夜へ」を押してください。";
         SKSpriteNode *notActionNode = [BWUtility makeMessageNode:CGSizeMake(self.size.width/8*5, self.size.width/8*2) position:CGPointMake(0,-self.size.height/2+margin*3+buttonSize.height/2*3) backColor:[UIColor blackColor] string:actionString fontSize:14 fontColor:[UIColor whiteColor]];
         [backgroundNode addChild:notActionNode];
@@ -219,7 +218,7 @@
         NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
         NSInteger surfaceRoleId = [[BWUtility getCardInfofromId:(int)roleId][@"surfaceRole"] integerValue];
         content.texture = [BWUtility getCardTexture:(int)surfaceRoleId];
-        NSLog(@"役職:%@",[BWUtility getCardInfofromId:roleId][@"name"]);
+        NSLog(@"役職:%@",[BWUtility getCardInfofromId:(int)roleId][@"name"]);
         CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
       
         SKSpriteNode *button = [BWUtility makeButton:@"詳細確認" size:buttonSize name:@"next" position:CGPointMake(0, -explain.size.height/2 - (self.size.height - explain.size.height)/4)];
@@ -230,14 +229,6 @@
     [backgroundNode addChild:explain];
 }
 
--(void)sendMessage:(NSTimer*)timer {
-    if(isFinishLoopTimer) {
-        [timer invalidate];
-        return ;
-    }
-    [[BWPeripheralManager sharedInstance] updateSendMessage:[timer userInfo][@"message"]];
-    
-}
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [touches anyObject];
@@ -251,7 +242,7 @@
     if([node.name isEqualToString:@"start"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //roleCheck:A..A
-            [centralManager sendMessageFromClient:[NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]]];
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]] interval:2.0 timeOut:20.0];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -274,12 +265,12 @@
 }
 
 -(void)goFirstNight {
-    isFinishLoopTimer = YES;
-    
-    [peripheralManager updateSendMessage:@"firstNight:"];
+    //ペリフェラルのみ
+    [peripheralManager sendNormalMessageEveryClient:@"firstNight:" infoDic:infoDic interval:1.0 timeOut:30.0];
     
     BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:isPeripheral :infoDic];
+    [peripheralManager replaceSenderScene:&scene];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
     [self.view presentScene:scene transition:transition];
 }
@@ -290,6 +281,7 @@
     if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {
         BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:isPeripheral :infoDic];
+        [centralManager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }

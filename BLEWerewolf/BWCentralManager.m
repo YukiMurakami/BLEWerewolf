@@ -80,6 +80,7 @@
     senderNode.timeOutSeconds = timeOut;
     senderNode.message = message;
     senderNode.isReceived = NO;
+    senderNode.name = @"senderNode";
     
     [signals addObject:senderNode];
     
@@ -118,6 +119,7 @@
     senderNode.firstSendDate = [NSDate date];
     senderNode.timeOutSeconds = timeOut;
     senderNode.isReceived = NO;
+    senderNode.name = @"senderNode";
     
     [signals addObject:senderNode];
     
@@ -167,6 +169,16 @@
 
 -(void)setGameId :(NSString*)gameIdStr{
     gameIdString = gameIdStr;
+}
+
+-(void)replaceSenderScene :(SKScene**)newscene {
+    SKScene *oldScene = (SKScene*)self.delegate;
+    NSArray *senderNodes = [oldScene children];
+    for(SKNode *node in senderNodes) {
+        if([node.name isEqualToString:@"senderNode"]) {
+            [*newscene addChild:node];
+        }
+    }
 }
 
 // --------------------------------

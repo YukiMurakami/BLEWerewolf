@@ -21,7 +21,6 @@
     
     SKScene *rollSettingScene;
     SKScene *ruleSettingScene;
-    SKScene *gameScene;
     
     NSMutableDictionary *informations;
     

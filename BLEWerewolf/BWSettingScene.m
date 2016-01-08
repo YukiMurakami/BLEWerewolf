@@ -12,7 +12,6 @@
 @interface BWSettingScene () {
     SKLabelNode *playCount;
     
-    NSTimer *nstimer;
 }
 
 @end
@@ -148,52 +147,13 @@
         }
          */
         
-        if(!gameScene) {
-            /*
-            gameScene = [LWGameScene sceneWithSize:self.size];
-             */
-        }
-        /*
-        NSMutableDictionary *info = informations;
-        [(LWGameScene *) gameScene setBackScene:self infoDic:info];
-        
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:0.5];
-        
-        [self.view presentScene:gameScene transition:transition];
-         */
-        
-        NSMutableDictionary *ruleDic = informations[@"rules"];
-        NSMutableArray *roleArray = informations[@"roles"];
-        NSString *ruleString = @"setting:";
-        for(NSInteger i=0;i<[BWUtility getMaxRoleCount];i++) {
-            if(i != [BWUtility getMaxRoleCount]-1) {
-                ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,roleArray[i]];
-            } else {
-                ruleString = [NSString stringWithFormat:@"%@%@/",ruleString,roleArray[i]];
-            }
-        }
-        
-        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"timer"]];
-        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"nightTimer"]];
-        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"fortuneMode"]];
-        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"canContinuousGuard"]];
-        ruleString = [NSString stringWithFormat:@"%@%@",ruleString,ruleDic[@"isLacking"]];
-        
-        nstimer = [NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:@{@"message":ruleString} repeats:YES];
         
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:YES :informations];
+        [manager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }
-}
-
--(void)sendMessage:(NSTimer*)timer {
-    [[BWPeripheralManager sharedInstance] updateSendMessage:[timer userInfo][@"message"]];
-}
-
--(void)stopMessage {
-    [nstimer invalidate];
 }
 
 

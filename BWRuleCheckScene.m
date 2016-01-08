@@ -38,6 +38,7 @@
         
         peripheralManager = [BWPeripheralManager sharedInstance];
         peripheralManager.delegate = self;
+    
     } else {
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
@@ -86,6 +87,28 @@
 -(void)didMoveToView:(SKView *)view {
     [self.view addSubview:table];
     [table reloadData];
+    
+    if(isPeripheral) {
+        //setting:/6,3,1,1,1,1/7,3,0,1,1
+        NSMutableDictionary *ruleDic = infoDic[@"rules"];
+        NSMutableArray *roleArray = infoDic[@"roles"];
+        NSString *ruleString = @"setting:";
+        for(NSInteger i=0;i<[BWUtility getMaxRoleCount];i++) {
+            if(i != [BWUtility getMaxRoleCount]-1) {
+                ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,roleArray[i]];
+            } else {
+                ruleString = [NSString stringWithFormat:@"%@%@/",ruleString,roleArray[i]];
+            }
+        }
+        
+        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"timer"]];
+        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"nightTimer"]];
+        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"fortuneMode"]];
+        ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"canContinuousGuard"]];
+        ruleString = [NSString stringWithFormat:@"%@%@",ruleString,ruleDic[@"isLacking"]];
+        
+        [peripheralManager sendNormalMessageEveryClient:ruleString infoDic:infoDic interval:3.0 timeOut:12.0];
+    }
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -96,7 +119,7 @@
     if([node.name isEqualToString:@"next"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //settingCheck:A..A
-            [centralManager sendMessageFromClient:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]]];
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:1.0 timeOut:10.0];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -181,6 +204,7 @@
         
         BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
+        [centralManager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }
@@ -211,19 +235,10 @@
     [self setRole];
     
     //先に画面遷移してから通知を送る（こっち側では一回だけ送っとく）
-    NSString *message = @"gamestart:";
-    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
-        NSMutableDictionary *playerInfo = infoDic[@"players"][i];
-        message = [NSString stringWithFormat:@"%@%@,%@",message,playerInfo[@"playerId"],playerInfo[@"roleId"]];
-        if(i != [infoDic[@"players"] count]-1) {
-            message = [NSString stringWithFormat:@"%@/",message];
-        }
-    }
-    [peripheralManager updateSendMessage:message];
-    
     
     BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:YES :infoDic];
+    [peripheralManager replaceSenderScene:&scene];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
     [self.view presentScene:scene transition:transition];
 }

@@ -184,6 +184,7 @@
 }
 
 -(void)setTableData {
+    //TODO::夜のアクションテーブルデータ
     tableArray = [NSMutableArray array];
     NSInteger myRoleId = [BWUtility getMyRoleId:infoDic];
     NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
@@ -212,7 +213,7 @@
         //セントラルは命令をペリフェラルに送信
         NSInteger myRoleId = [BWUtility getMyRoleId:infoDic];
         NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)myRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
-        [centralManager sendMessageFromClient:message];
+        [centralManager sendNormalMessage:message interval:1.0 timeOut:10.0];
     } else {
         //ペリフェラルは即実行
         [self processRoleAction:[BWUtility getMyRoleId:infoDic] actionPlayerId:[BWUtility getMyPlayerId:infoDic] targetPlayerId:targetIndex];
@@ -251,16 +252,33 @@
     }
 }
 
--(void)sendGMMessage:(NSString*)message receiverId:(NSString*)id {
+-(void)sendGMMessage:(NSString*)message receiverId:(NSString*)identificationId {
     if(!isPeripheral) return;
     NSLog(@"GMMessage:%@",message);
-    if([id isEqualToString:[BWUtility getIdentificationString]]) {
+    if([identificationId isEqualToString:[BWUtility getIdentificationString]]) {
         //自分自身あて
         [messageViewController receiveMessage:message id:[messageViewController getGmId] infoDic:infoDic];
     } else {
-        NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],id,message];
-        [peripheralManager updateSendMessage:mes];
+        NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],identificationId,message];
+        [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:1.0 timeOut:10.0];
     }
+}
+
+-(NSArray*)getSameChatroomMemberId:(NSString*)identificationId {
+    //TODO::送られてきた信号に対して、誰にchat信号を送るべきなのかを振り分ける
+    NSMutableArray *shouldSenderId = [NSMutableArray array];
+    [shouldSenderId addObject:identificationId];
+    
+    NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+    NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        NSInteger targetId = [infoDic[@"players"][i][@"roleId"]integerValue];
+        //人狼同士
+        if(roleId == RoleWerewolf && targetId == RoleWerewolf) {
+            [shouldSenderId addObject:@(i)];
+        }
+    }
+    return [shouldSenderId copy];
 }
 
 #pragma mark - messageDelegate
@@ -298,19 +316,24 @@
 
 -(void)didReceiveMessage:(NSString *)message {
     //peripheral
-    //セントラルから受け取ったメッセージを全体に送信
+    //セントラルから受け取ったメッセージを送るべき相手に送信
     //その後自分と同じグループと同じグループチャットがあったら反映（ただし自分はむし）
     //chatsend:A..A/T...T
     if([[BWUtility getCommand:message] isEqualToString:@"chatsend"]) {
         NSArray *contents = [BWUtility getCommandContents:message];
+        NSString *identificationId = contents[0];
         
         NSString *text = @"";
         for(NSInteger i=1;i<contents.count;i++) {
             text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
         }
-        [peripheralManager updateSendMessage:[NSString stringWithFormat:@"chatreceive:%@/%@",contents[0],text]];
         
-        if([messageViewController isMember:contents[0]] && ![contents[0] isEqualToString:[BWUtility getIdentificationString]]) {
+        NSArray *shouldSendIds = [self getSameChatroomMemberId:identificationId];
+        for(NSInteger i=0;i<shouldSendIds.count;i++) {
+            [peripheralManager sendNormalMessage:[NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text] toIdentificationId:shouldSendIds[i] interval:1.0 timeOut:10.0];
+        }
+        
+        if([messageViewController isMember:identificationId] && ![identificationId isEqualToString:[BWUtility getIdentificationString]]) {
             //メッセージを反映
             NSString *text = @"";
             for(NSInteger i=1;i<contents.count;i++) {
@@ -339,11 +362,14 @@
     if(isPeripheral) {
         //外部に直接知らせる
         NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",[BWUtility getIdentificationString],message];
-        [peripheralManager updateSendMessage:mes];
+        NSArray *shouldSendIds = [self getSameChatroomMemberId:[BWUtility getIdentificationString]];
+        for(NSInteger i=0;i<shouldSendIds.count;i++) {
+            [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:1.0 timeOut:10.0];
+        }
     } else {
         //まずはペリフェラルに知らせる
         NSString *mes = [NSString stringWithFormat:@"chatsend:%@/%@",[BWUtility getIdentificationString],message];
-        [centralManager sendMessageFromClient:mes];
+        [centralManager sendNormalMessage:mes interval:1.0 timeOut:10.0];
     }
 }
 

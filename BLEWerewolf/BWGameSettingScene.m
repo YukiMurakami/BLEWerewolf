@@ -20,12 +20,10 @@
     UITableView *tableView;
     NSMutableArray *registeredPlayersArray;
     
-    BOOL isFinishLoopTimer2;
-    NSMutableArray *checkList;
-    
     SKSpriteNode *buttonNode;
     
     NSInteger sendGlobalId;
+    NSInteger memberAllCheckId;
 }
 
 @end
@@ -91,36 +89,8 @@
     
     NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
     sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
-    //[NSTimer scheduledTimerWithTimeInterval:3.0f target:self selector:@selector(sendMessage:) userInfo:nil repeats:YES];
-    
-    //[manager sendNormalMessage:@"testtest" toIdentificationId:@"c0gvq5gh5FHlrKu7QsOP40ESS5qBSpJc" interval:2.0 timeOut:30.0];
-    
 }
 
--(void)sendMessage:(NSTimer*)timer {
-    for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
-        //participateAllow:A..A
-        [NSObject performBlock:^{
-            NSString *allowMessage = [NSString stringWithFormat:@"participateAllow:%@",registeredPlayersArray[i][@"identificationId"]];
-            [[BWPeripheralManager sharedInstance] updateSendMessage:allowMessage];
-        } afterDelay:0.01*i];
-    }
-}
-
--(void)sendMessage2:(NSTimer*)timer {
-    if(isFinishLoopTimer2) {
-        [timer invalidate];
-        return ;
-    }
-    
-    for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
-        //member:0/A..A/S..S/12
-        [NSObject performBlock:^{
-            NSString *allowMessage = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)i,registeredPlayersArray[i][@"identificationId"],registeredPlayersArray[i][@"name"],(int)registeredPlayersArray.count];
-            [[BWPeripheralManager sharedInstance] updateSendMessage:allowMessage];
-        } afterDelay:0.01*i];
-    }
-}
 
 -(void)willMoveFromView:(SKView *)view {
     [tableView removeFromSuperview];
@@ -157,26 +127,21 @@
     SKNode *node = [self nodeAtPoint:location];
     
     if([node.name isEqualToString:@"next"]) {
-        checkList = [NSMutableArray array];
-        
         [manager stopGlobalSignal:sendGlobalId];
-        
-        isFinishLoopTimer2 = NO;
         
         [buttonNode removeFromParent];
         
-        [checkList addObject:[BWUtility getIdentificationString]];
-        
-        if(checkList.count == registeredPlayersArray.count) {
-            //全員がプレイヤー情報を取得（プレイヤーIDと識別IDが紐づく）
-            isFinishLoopTimer2 = YES;
-            BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
-            [scene sendPlayerInfo:registeredPlayersArray];
-            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-            [self.view presentScene:scene transition:transition];
+        NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
+        //member:0/A..A/S..S/12
+        for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
+            NSString *toIdentificationId = registeredPlayersArray[i][@"identificationId"];
+            for(NSInteger j=0;j<registeredPlayersArray.count;j++) {
+                NSString *identificationId = registeredPlayersArray[j][@"identificationId"];
+                NSString *message = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)j,identificationId,registeredPlayersArray[j][@"name"],(int)registeredPlayersArray.count];
+                [messagesAndIdentificationIds addObject:@{@"message":message,@"identificationId":toIdentificationId}];
+            }
         }
-     
-        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector:@selector(sendMessage2:) userInfo:nil repeats:YES];
+        memberAllCheckId = [manager sendNeedSynchronizeMessage:messagesAndIdentificationIds];
     }
 }
 
@@ -189,8 +154,10 @@
         NSString *gameIdString = params[0];
         NSString *userNameString = params[2];
         
+        //participateAllow:A..A
+        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:2.0 timeOut:10];
+        
         if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
-            NSLog(@"接続要求:%@,%@",identificationIdString,userNameString);
             
             BOOL isNew = YES;
             for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
@@ -207,22 +174,16 @@
             }
         }
     }
-    
-    //memberCheck:A..A
-    if([[BWUtility getCommand:message] isEqualToString:@"memberCheck"]) {
-        NSLog(@"memberCheckを受信:%@",message);
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        if(![checkList containsObject:identificationId]) {
-            [checkList addObject:identificationId];
-        }
-        if(checkList.count == registeredPlayersArray.count) {
-            //全員がプレイヤー情報を取得（プレイヤーIDと識別IDが紐づく）
-            isFinishLoopTimer2 = YES;
-            BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
-            [scene sendPlayerInfo:registeredPlayersArray];
-            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-            [self.view presentScene:scene transition:transition];
-        }
+}
+
+-(void)gotAllReceiveMessage:(NSInteger)id {
+    if(id == memberAllCheckId) {
+        [manager sendNormalMessage:@"testMessage" toIdentificationId:@"aaa" interval:1.0 timeOut:10.0];
+        BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
+        [scene sendPlayerInfo:registeredPlayersArray];
+        [manager replaceSenderScene:&scene];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
     }
 }
 

@@ -12,6 +12,7 @@
 
 @protocol BWPeripheralManagerDelegate
 -(void)didReceiveMessage:(NSString*)message;
+-(void)gotAllReceiveMessage:(NSInteger)id;
 @end
 
 @interface BWPeripheralManager : NSObject <CBPeripheralManagerDelegate> {
@@ -35,8 +36,12 @@
 - (NSInteger)sendGlobalSignalMessage:(NSString*)message interval:(double)intervalTime;
 - (void)stopGlobalSignal:(NSInteger)_signalId;
 - (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut;
+- (void)sendNormalMessageEveryClient:(NSString*)message infoDic:(NSMutableDictionary*)infoDic interval:(double)intervalTime timeOut:(double)timeOut;
+- (NSInteger)sendNeedSynchronizeMessage:(NSMutableArray*)messageAndIdentificationId;
 
-- (void)updateSendMessage :(NSString*)sendMessage;
+
+//シーン移動の時は必ず呼ぶこと
+-(void)replaceSenderScene :(SKScene**)newscene;
 
 // ------------------------------
 // CBPeripheralManagerDelegate

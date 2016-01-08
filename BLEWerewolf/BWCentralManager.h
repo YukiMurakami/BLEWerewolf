@@ -26,10 +26,12 @@
 @property (nonatomic, strong) NSMutableData *data;
 
 + (instancetype)sharedInstance;
--(void)sendMessageFromClient:(NSString*)message;
 - (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut;
 -(void)setGameId :(NSString*)gameIdStr;
 -(NSString*)getGameId;
+
+//シーン移動の時は必ず呼ぶこと
+-(void)replaceSenderScene :(SKScene**)newscene;
 
 // --------------------------------
 // CBCentralManagerDelegate

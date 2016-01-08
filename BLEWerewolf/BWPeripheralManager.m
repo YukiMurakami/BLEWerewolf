@@ -29,6 +29,9 @@
     NSString *gameIdString;
     
     NSMutableArray *receivedSignalIds;
+    
+    NSInteger synchronizeSignalId;//すべてのメッセージの受信チェックが必要な信号セットのID
+    NSMutableArray *synchronizeSignalArray;//信号セットの情報を保存する配列
 }
 
 @end
@@ -74,6 +77,7 @@
     senderNode.timeOutSeconds = 100000;
     senderNode.message = message;
     senderNode.isReceived = NO;
+    senderNode.name = @"senderNode";
     
     [signals addObject:senderNode];
     
@@ -112,6 +116,7 @@
     senderNode.message = message;
     senderNode.isReceived = NO;
     senderNode.toIdentificationId = toIdentificationId;
+    senderNode.name = @"senderNode";
     
     [signals addObject:senderNode];
     
@@ -139,6 +144,70 @@
     return _signalId;
 }
 
+- (void)sendNormalMessageEveryClient:(NSString*)message infoDic:(NSMutableDictionary*)infoDic interval:(double)intervalTime timeOut:(double)timeOut {
+    
+    NSMutableArray *players = infoDic[@"players"];
+    for(NSInteger i=0;i<players.count;i++) {
+        NSString *identificationId = players[i][@"identificationId"];
+        if([identificationId isEqualToString:[BWUtility getIdentificationString]]) continue;
+        //peripheral自信には送信しない
+        [self sendNormalMessage:message toIdentificationId:identificationId interval:intervalTime timeOut:timeOut];
+    }
+    
+}
+
+- (NSInteger)sendNeedSynchronizeMessage:(NSMutableArray*)messageAndIdentificationId {
+    NSInteger _synchronizeSignalId = synchronizeSignalId;
+    synchronizeSignalId++;
+    
+    double intervalTime = 1.0;
+    double timeOut = 1000.0;
+    
+    NSMutableArray *ids = [NSMutableArray array];
+    for(NSInteger i=0;i<messageAndIdentificationId.count;i++) {
+        NSString *message = messageAndIdentificationId[i][@"message"];
+        NSString *identificationId = messageAndIdentificationId[i][@"identificationId"];
+        
+        NSInteger sendSignalId = [self sendNormalMessage:message toIdentificationId:identificationId interval:intervalTime timeOut:timeOut];
+        [ids addObject:@(sendSignalId)];
+    }
+    
+    [synchronizeSignalArray addObject:@{@"ids":ids,@"id":@(_synchronizeSignalId),@"isAllOk":@NO}];
+    
+    return _synchronizeSignalId;
+}
+
+- (void)checkSynchronizeMessageReceive {
+    //これを呼ぶと、受信通知状況をチェックして、すべて受信されていたらデリゲートを呼ぶ
+    for(NSInteger i=0;i<synchronizeSignalArray.count;i++) {
+        if([synchronizeSignalArray[i][@"isAllOk"]boolValue]) continue;
+        NSArray *ids = synchronizeSignalArray[i][@"ids"];
+        NSInteger id = [synchronizeSignalArray[i][@"id"]integerValue];
+        BOOL isAllReceived = YES;
+        for(NSInteger j=0;j<ids.count;j++) {
+            BWSenderNode *node = [self getSenderNodeWithSignalId:[ids[j]integerValue]];
+            if(!node.isReceived) {
+                isAllReceived = NO;
+                break;
+            }
+        }
+        if(isAllReceived) {
+            synchronizeSignalArray[i][@"isAllOk"] = @YES;
+            [_delegate gotAllReceiveMessage:id];
+        }
+    }
+}
+
+-(void)replaceSenderScene :(SKScene**)newscene {
+    SKScene *oldScene = (SKScene*)self.delegate;
+    NSArray *senderNodes = [oldScene children];
+    for(SKNode *node in senderNodes) {
+        if([node.name isEqualToString:@"senderNode"]) {
+            [*newscene addChild:node];
+        }
+    }
+}
+
 -(void)sendReceivedMessage:(NSInteger)receivedSignalId identificationId:(NSString*)identificationId {
     double timeOut = 5.0;
     double intervalTime = 1.0;
@@ -150,6 +219,7 @@
     senderNode.timeOutSeconds = timeOut;
     senderNode.isReceived = NO;
     senderNode.toIdentificationId = identificationId;
+    senderNode.name = @"senderNode";
     
     [signals addObject:senderNode];
     
@@ -206,6 +276,7 @@
         signalId = 0;
         signals = [NSMutableArray array];
         receivedSignalIds = [NSMutableArray array];
+        synchronizeSignalArray = [NSMutableArray array];
     }
     return self;
 }
@@ -389,6 +460,8 @@
             if([gotGameId isEqualToString:gameIdString]) {
                 BWSenderNode *node = [self getSenderNodeWithSignalId:gotSignalId];
                 node.isReceived = YES;
+                
+                [self checkSynchronizeMessageReceive];
             }
         }
         if(kind == SignalKindNormal) {
