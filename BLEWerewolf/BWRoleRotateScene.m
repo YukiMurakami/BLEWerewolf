@@ -50,7 +50,7 @@
                 message = [NSString stringWithFormat:@"%@/",message];
             }
         }
-        [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:2.0 timeOut:30.0];
+        [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:30.0];
        
     } else {
         centralManager = [BWCentralManager sharedInstance];
@@ -242,7 +242,7 @@
     if([node.name isEqualToString:@"start"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //roleCheck:A..A
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]] interval:2.0 timeOut:20.0];
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -266,11 +266,10 @@
 
 -(void)goFirstNight {
     //ペリフェラルのみ
-    [peripheralManager sendNormalMessageEveryClient:@"firstNight:" infoDic:infoDic interval:1.0 timeOut:30.0];
+    [peripheralManager sendNormalMessageEveryClient:@"firstNight:" infoDic:infoDic interval:5.0 timeOut:30.0];
     
     BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:isPeripheral :infoDic];
-    [peripheralManager replaceSenderScene:&scene];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
     [self.view presentScene:scene transition:transition];
 }
@@ -281,7 +280,6 @@
     if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {
         BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:isPeripheral :infoDic];
-        [centralManager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }

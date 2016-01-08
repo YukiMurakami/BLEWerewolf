@@ -30,8 +30,6 @@
 -(void)setGameId :(NSString*)gameIdStr;
 -(NSString*)getGameId;
 
-//シーン移動の時は必ず呼ぶこと
--(void)replaceSenderScene :(SKScene**)newscene;
 
 // --------------------------------
 // CBCentralManagerDelegate

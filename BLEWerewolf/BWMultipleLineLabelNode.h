@@ -12,4 +12,9 @@
 
 -(void)setText :(NSString *)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor;
 
+-(NSString*)getAllText;
+
+-(UIColor*)getFontColor;
+-(CGFloat)getAllFontSize;
+
 @end

@@ -150,7 +150,6 @@
         
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:YES :informations];
-        [manager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }

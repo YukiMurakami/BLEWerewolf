@@ -90,10 +90,9 @@
     [centralManager setGameId:touchedGameId];
     //ここでgameIdを確定させる
     NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
-    [centralManager sendNormalMessage:sendMessage interval:1.0 timeOut:10.0];
+    [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0];
     
     BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
-    [centralManager replaceSenderScene:&scene];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
     [self.view presentScene:scene transition:transition];
 }

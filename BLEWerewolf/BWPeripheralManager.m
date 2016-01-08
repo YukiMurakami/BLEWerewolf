@@ -12,6 +12,7 @@
 #import "NSObject+BlocksWait.h"
 #import "BWAppDelegate.h"
 #import "BWUtility.h"
+#import "BWViewController.h"
 #import "BWSenderNode.h"
 
 
@@ -85,11 +86,17 @@
     SKAction *send = [SKAction runBlock:^{
         //「0:message」
         [self updateSendMessage:[NSString stringWithFormat:@"%d:%@",(int)senderNode.signalKind,senderNode.message]];
+        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+        [viewController addSendMessage:senderNode.message];
     }];
     
-    [(SKScene*)self.delegate addChild:senderNode];
+    BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+    BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+    [viewController.sceneForSenderNodes addChild:senderNode];
     
-    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[send,wait]]];
+    senderNode.runningAction = repeat;
     [senderNode runAction:repeat];
     
     return _signalId;
@@ -100,7 +107,7 @@
     if(senderNode.signalKind == SignalKindGlobal) {
         [senderNode removeAllActions];
         [senderNode removeFromParent];
-        [signals removeObject:senderNode];
+        //[signals removeObject:senderNode];
     }
 }
 
@@ -126,19 +133,25 @@
         if([gameIdString isEqualToString:@""]) exit(0);
         NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,senderNode.toIdentificationId,senderNode.message];
         [self updateSendMessage:sendMessage];
+        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+        [viewController addSendMessage:senderNode.message];
         
         NSDate *now = [NSDate date];
         NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
         NSComparisonResult result = [now compare:finishDate];
         if(result == NSOrderedDescending || senderNode.isReceived) {
             [senderNode removeFromParent];
-            [signals removeObject:senderNode];
+            //[signals removeObject:senderNode];
         }
     }];
     
-    [(SKScene*)self.delegate addChild:senderNode];
+    BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+    BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+    [viewController.sceneForSenderNodes addChild:senderNode];
     
-    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[send,wait]]];
+    senderNode.runningAction = repeat;
     [senderNode runAction:repeat];
     
     return _signalId;
@@ -160,7 +173,7 @@
     NSInteger _synchronizeSignalId = synchronizeSignalId;
     synchronizeSignalId++;
     
-    double intervalTime = 1.0;
+    double intervalTime = 5.0;
     double timeOut = 1000.0;
     
     NSMutableArray *ids = [NSMutableArray array];
@@ -172,7 +185,13 @@
         [ids addObject:@(sendSignalId)];
     }
     
-    [synchronizeSignalArray addObject:@{@"ids":ids,@"id":@(_synchronizeSignalId),@"isAllOk":@NO}];
+    [synchronizeSignalArray addObject:[@{@"ids":ids,@"id":@(_synchronizeSignalId),@"isAllOk":@NO}mutableCopy]];
+    
+    if(messageAndIdentificationId.count == 0) {
+        [NSObject performBlock:^{
+            [_delegate gotAllReceiveMessage:_synchronizeSignalId];
+        } afterDelay:3.0];
+    }
     
     return _synchronizeSignalId;
 }
@@ -184,33 +203,26 @@
         NSArray *ids = synchronizeSignalArray[i][@"ids"];
         NSInteger id = [synchronizeSignalArray[i][@"id"]integerValue];
         BOOL isAllReceived = YES;
+        NSString *debug = @"";
         for(NSInteger j=0;j<ids.count;j++) {
             BWSenderNode *node = [self getSenderNodeWithSignalId:[ids[j]integerValue]];
+            debug = [NSString stringWithFormat:@"%@%@(%@,%d)",node,debug,ids[j],node.isReceived];
             if(!node.isReceived) {
                 isAllReceived = NO;
-                break;
             }
         }
+        NSLog(@"%@",debug);
         if(isAllReceived) {
-            synchronizeSignalArray[i][@"isAllOk"] = @YES;
+            [synchronizeSignalArray[i] setObject:@YES forKey:@"isAllOk"];
             [_delegate gotAllReceiveMessage:id];
         }
     }
 }
 
--(void)replaceSenderScene :(SKScene**)newscene {
-    SKScene *oldScene = (SKScene*)self.delegate;
-    NSArray *senderNodes = [oldScene children];
-    for(SKNode *node in senderNodes) {
-        if([node.name isEqualToString:@"senderNode"]) {
-            [*newscene addChild:node];
-        }
-    }
-}
 
 -(void)sendReceivedMessage:(NSInteger)receivedSignalId identificationId:(NSString*)identificationId {
-    double timeOut = 5.0;
-    double intervalTime = 1.0;
+    double timeOut = 15.0;
+    double intervalTime = 5.0;
     
     BWSenderNode *senderNode = [[BWSenderNode alloc]init];
     senderNode.signalId = -1;
@@ -229,19 +241,25 @@
         if([gameIdString isEqualToString:@""]) exit(0);
         NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId,senderNode.toIdentificationId];
         [self updateSendMessage:sendMessage];
+        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+        [viewController addSendMessage:sendMessage];
         
         NSDate *now = [NSDate date];
         NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
         NSComparisonResult result = [now compare:finishDate];
         if(result == NSOrderedDescending) {
             [senderNode removeFromParent];
-            [signals removeObject:senderNode];
+            //[signals removeObject:senderNode];
         }
     }];
     
-    [(SKScene*)self.delegate addChild:senderNode];
+    BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+    BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+    [viewController.sceneForSenderNodes addChild:senderNode];
     
-    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[wait,send]]];
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[send,wait]]];
+    senderNode.runningAction = repeat;
     [senderNode runAction:repeat];
 }
 
@@ -448,6 +466,9 @@
         NSString *message = [[NSString alloc]initWithData:request.value encoding:NSUTF8StringEncoding];
         NSLog(@"written data:%@",message);
         
+        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+        [viewController addRecieveMessage:message];
         //TODO::セントラルからの受信を処理
         //「1:NNNNNN:T..T:A..A:message」T..TはセントラルのシグナルID
         //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
@@ -476,7 +497,7 @@
             }
             [receivedSignalIds addObject:@(gotSignalId)];
             
-            if([identificationId isEqualToString:[BWUtility getIdentificationString]] && [gameIdString isEqualToString:gotGameId]) {
+            if([gameIdString isEqualToString:gotGameId]) {
                 //受信
                 for(NSInteger i=4;i<array.count;i++) {
                     if(i == 4) {

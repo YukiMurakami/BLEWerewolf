@@ -77,7 +77,6 @@
         
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
-        [centralManager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }

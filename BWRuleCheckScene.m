@@ -107,7 +107,7 @@
         ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"canContinuousGuard"]];
         ruleString = [NSString stringWithFormat:@"%@%@",ruleString,ruleDic[@"isLacking"]];
         
-        [peripheralManager sendNormalMessageEveryClient:ruleString infoDic:infoDic interval:3.0 timeOut:12.0];
+        [peripheralManager sendNormalMessageEveryClient:ruleString infoDic:infoDic interval:5.0 timeOut:30.0];
     }
 }
 
@@ -119,7 +119,7 @@
     if([node.name isEqualToString:@"next"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //settingCheck:A..A
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:1.0 timeOut:10.0];
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -204,7 +204,6 @@
         
         BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
-        [centralManager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }
@@ -238,7 +237,6 @@
     
     BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:YES :infoDic];
-    [peripheralManager replaceSenderScene:&scene];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
     [self.view presentScene:scene transition:transition];
 }

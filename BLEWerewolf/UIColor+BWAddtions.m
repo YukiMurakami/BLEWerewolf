@@ -35,17 +35,20 @@
 + (UIColor *)villagerBubbleColor {//草色
     return [self colorWithHex:0xc4ff99];
 }
-+ (UIColor *)fortuneTellerBubbleColor {//黄色
-    return [self colorWithHex:0xffff6a];
++ (UIColor *)fortuneTellerBubbleColor {//紫色
+    return [self colorWithHex:0xff6aff];
+}
++ (UIColor *)shamanBubbleColor {//青色
+    return [self colorWithHex:0x1111ff];
 }
 
 + (UIColor *)getPlayerColor:(NSInteger)id {
-    NSArray *colors = @[@(0xff0000),
-                        @(0xffff00),
-                        @(0x00ff00),
-                        @(0x00ffff),
-                        @(0x0000ff),
-                        @(0xff00ff),
+    NSArray *colors = @[@(0xff1111),
+                        @(0xffff11),
+                        @(0x11ff11),
+                        @(0x11ffff),
+                        @(0x1111ff),
+                        @(0xff11ff),
                         @(0x800000),
                         @(0x808000),
                         @(0x008000),

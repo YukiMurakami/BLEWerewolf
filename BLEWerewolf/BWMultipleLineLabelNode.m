@@ -8,9 +8,30 @@
 
 #import "BWMultipleLineLabelNode.h"
 
-@implementation BWMultipleLineLabelNode
+@implementation BWMultipleLineLabelNode {
+    NSString * text;
+    UIColor * fontColor;
+    CGFloat AllfontSize;
+}
 
--(void)setText :(NSString *)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor {
+-(NSString*)getAllText {
+    return text;
+}
+
+-(UIColor*)getFontColor {
+    return fontColor;
+}
+
+-(CGFloat)getAllFontSize {
+    return AllfontSize;
+}
+
+-(void)setText :(NSString *)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)_fontColor {
+    [self removeAllChildren];
+    text = string;
+    fontColor = _fontColor;
+    AllfontSize = fontSize;
+    if([string isEqualToString:@""]) return;
     
     NSMutableArray *lines = [NSMutableArray array];
     
@@ -46,7 +67,7 @@
         node.fontColor = [UIColor blackColor];
         node.fontName = @"HiraKakuProN-W3";
         node.text = lines[i];
-        node.fontColor = fontColor;
+        node.fontColor = _fontColor;
         node.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
         node.position = CGPointMake(-self.size.width/2-fontSize/3,self.size.height/2 - (self.size.height-lines.count*fontSize)/2-(i+1)*fontSize);
         [self addChild:node];

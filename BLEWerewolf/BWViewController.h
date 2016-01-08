@@ -11,5 +11,11 @@
 
 @interface BWViewController : UIViewController
 
+@property (nonatomic) SKView *viewForSenderNodes;
+@property (nonatomic) SKScene *sceneForSenderNodes;
+
+-(void)addRecieveMessage:(NSString*)message;
+-(void)addSendMessage:(NSString*)message;
+
 @end
 

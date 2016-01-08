@@ -213,7 +213,7 @@
         //セントラルは命令をペリフェラルに送信
         NSInteger myRoleId = [BWUtility getMyRoleId:infoDic];
         NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)myRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
-        [centralManager sendNormalMessage:message interval:1.0 timeOut:10.0];
+        [centralManager sendNormalMessage:message interval:5.0 timeOut:15.0];
     } else {
         //ペリフェラルは即実行
         [self processRoleAction:[BWUtility getMyRoleId:infoDic] actionPlayerId:[BWUtility getMyPlayerId:infoDic] targetPlayerId:targetIndex];
@@ -260,7 +260,7 @@
         [messageViewController receiveMessage:message id:[messageViewController getGmId] infoDic:infoDic];
     } else {
         NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],identificationId,message];
-        [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:1.0 timeOut:10.0];
+        [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:5.0 timeOut:15.0];
     }
 }
 
@@ -330,7 +330,7 @@
         
         NSArray *shouldSendIds = [self getSameChatroomMemberId:identificationId];
         for(NSInteger i=0;i<shouldSendIds.count;i++) {
-            [peripheralManager sendNormalMessage:[NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text] toIdentificationId:shouldSendIds[i] interval:1.0 timeOut:10.0];
+            [peripheralManager sendNormalMessage:[NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text] toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0];
         }
         
         if([messageViewController isMember:identificationId] && ![identificationId isEqualToString:[BWUtility getIdentificationString]]) {
@@ -364,12 +364,12 @@
         NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",[BWUtility getIdentificationString],message];
         NSArray *shouldSendIds = [self getSameChatroomMemberId:[BWUtility getIdentificationString]];
         for(NSInteger i=0;i<shouldSendIds.count;i++) {
-            [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:1.0 timeOut:10.0];
+            [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0];
         }
     } else {
         //まずはペリフェラルに知らせる
         NSString *mes = [NSString stringWithFormat:@"chatsend:%@/%@",[BWUtility getIdentificationString],message];
-        [centralManager sendNormalMessage:mes interval:1.0 timeOut:10.0];
+        [centralManager sendNormalMessage:mes interval:5.0 timeOut:15.0];
     }
 }
 

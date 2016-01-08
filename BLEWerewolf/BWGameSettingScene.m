@@ -89,6 +89,7 @@
     
     NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
     sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
+    
 }
 
 
@@ -155,7 +156,7 @@
         NSString *userNameString = params[2];
         
         //participateAllow:A..A
-        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:2.0 timeOut:10];
+        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0];
         
         if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
             
@@ -178,10 +179,8 @@
 
 -(void)gotAllReceiveMessage:(NSInteger)id {
     if(id == memberAllCheckId) {
-        [manager sendNormalMessage:@"testMessage" toIdentificationId:@"aaa" interval:1.0 timeOut:10.0];
         BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
         [scene sendPlayerInfo:registeredPlayersArray];
-        [manager replaceSenderScene:&scene];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }

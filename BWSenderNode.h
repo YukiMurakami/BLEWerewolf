@@ -19,5 +19,6 @@
 @property (nonatomic) NSString *message;
 @property (nonatomic) BOOL isReceived;
 @property (nonatomic) NSString *toIdentificationId;
+@property (nonatomic) SKAction *runningAction;
 
 @end
