@@ -48,6 +48,9 @@
     
     [self initBackground];
     
+    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
+    sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
+    
     return self;
 }
 
@@ -86,9 +89,6 @@
         tableView.rowHeight = tableView.frame.size.height/6;
     }
     
-    
-    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
-    sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
     
 }
 
@@ -156,7 +156,7 @@
         NSString *userNameString = params[2];
         
         //participateAllow:A..A
-        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0];
+        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0 firstWait:0.0];
         
         if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
             

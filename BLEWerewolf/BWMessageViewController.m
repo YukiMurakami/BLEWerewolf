@@ -10,7 +10,7 @@
 #import "BWUtility.h"
 #import "UIColor+BWAddtions.h"
 
-NSString *gmId = @"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+NSString *gmId = @"aaaaaa";
 
 @interface BWMessageViewController () {
     NSMutableDictionary *copyInfoDic;

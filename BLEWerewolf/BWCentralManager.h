@@ -26,7 +26,7 @@
 @property (nonatomic, strong) NSMutableData *data;
 
 + (instancetype)sharedInstance;
-- (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut;
+- (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait;
 -(void)setGameId :(NSString*)gameIdStr;
 -(NSString*)getGameId;
 

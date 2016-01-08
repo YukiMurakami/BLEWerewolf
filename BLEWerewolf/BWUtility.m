@@ -403,7 +403,7 @@
     
     int count = (int)array.count;
     
-    for(int i=0;i<count*100;i++) {
+    for(int i=0;i<count*1000;i++) {
         int f1 = (int) arc4random_uniform(count);
         int f2 = (int) arc4random_uniform(count);
         
@@ -519,7 +519,7 @@
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     NSString *identificationString = [ud stringForKey:@"identificationString"];
     if(!identificationString) {
-        identificationString = [BWUtility getRandomString:32];
+        identificationString = [BWUtility getRandomString:6];
         [ud setObject:identificationString forKey:@"identificationString"];
     }
     return identificationString;

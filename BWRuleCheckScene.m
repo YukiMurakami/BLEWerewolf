@@ -119,7 +119,7 @@
     if([node.name isEqualToString:@"next"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //settingCheck:A..A
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0];
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;

@@ -72,14 +72,14 @@
 }
 
 
-- (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut {
+- (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait {
     NSInteger _signalId = signalId;
     signalId++;
     
     BWSenderNode *senderNode = [[BWSenderNode alloc]init];
     senderNode.signalId = _signalId;
     senderNode.signalKind = SignalKindNormal;
-    senderNode.firstSendDate = [NSDate date];
+    senderNode.firstSendDate = [NSDate dateWithTimeIntervalSinceNow:firstWait];
     senderNode.timeOutSeconds = timeOut;
     senderNode.message = message;
     senderNode.isReceived = NO;
@@ -88,6 +88,7 @@
     [signals addObject:senderNode];
     
     SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *firstWaitAction = [SKAction waitForDuration:firstWait];
     SKAction *send = [SKAction runBlock:^{
         //「1:NNNNNN:T..T:A..A:message」T..Tは自分のsignalID,A..Aは自分のidentificationID
         if([gameIdString isEqualToString:@""]) exit(0);
@@ -110,7 +111,7 @@
     BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
     [viewController.sceneForSenderNodes addChild:senderNode];
     
-    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[send,wait]]];
+    SKAction *repeat = [SKAction sequence:@[firstWaitAction,[SKAction repeatActionForever:[SKAction sequence:@[send,wait]]]]];
     senderNode.runningAction = repeat;
     [senderNode runAction:repeat];
     
@@ -163,7 +164,7 @@
 -(void)sendMessageFromClient:(NSString*)message {
     NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
     NSLog(@"send message :%@",message);
-    [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithResponse];
+    [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithoutResponse];
     
 }
 

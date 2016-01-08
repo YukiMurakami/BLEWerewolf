@@ -29,7 +29,8 @@
     
     NSString *gameIdString;
     
-    NSMutableArray *receivedSignalIds;
+    NSMutableArray *receivedSignalIds;//ペリフェラル側は受信したsinglaIdとidentificationIdとセットで区別する
+    NSMutableArray *receivedReceiveNotifyIds;//受信通知signalIdを保存
     
     NSInteger synchronizeSignalId;//すべてのメッセージの受信チェックが必要な信号セットのID
     NSMutableArray *synchronizeSignalArray;//信号セットの情報を保存する配列
@@ -111,14 +112,14 @@
     }
 }
 
-- (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut {
+- (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait {
     NSInteger _signalId = signalId;
     signalId++;
     
     BWSenderNode *senderNode = [[BWSenderNode alloc]init];
     senderNode.signalId = _signalId;
     senderNode.signalKind = SignalKindNormal;
-    senderNode.firstSendDate = [NSDate date];
+    senderNode.firstSendDate = [NSDate dateWithTimeIntervalSinceNow:firstWait];
     senderNode.timeOutSeconds = timeOut;
     senderNode.message = message;
     senderNode.isReceived = NO;
@@ -128,6 +129,7 @@
     [signals addObject:senderNode];
     
     SKAction *wait = [SKAction waitForDuration:intervalTime];
+    SKAction *firstWaitAction = [SKAction waitForDuration:firstWait];
     SKAction *send = [SKAction runBlock:^{
         //「1:NNNNNN:T..T:A..A:message」
         if([gameIdString isEqualToString:@""]) exit(0);
@@ -150,7 +152,7 @@
     BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
     [viewController.sceneForSenderNodes addChild:senderNode];
     
-    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[send,wait]]];
+    SKAction *repeat = [SKAction sequence:@[firstWaitAction,[SKAction repeatActionForever:[SKAction sequence:@[send,wait]]]]];
     senderNode.runningAction = repeat;
     [senderNode runAction:repeat];
     
@@ -164,7 +166,7 @@
         NSString *identificationId = players[i][@"identificationId"];
         if([identificationId isEqualToString:[BWUtility getIdentificationString]]) continue;
         //peripheral自信には送信しない
-        [self sendNormalMessage:message toIdentificationId:identificationId interval:intervalTime timeOut:timeOut];
+        [self sendNormalMessage:message toIdentificationId:identificationId interval:intervalTime timeOut:timeOut firstWait:0.05*i];
     }
     
 }
@@ -181,7 +183,7 @@
         NSString *message = messageAndIdentificationId[i][@"message"];
         NSString *identificationId = messageAndIdentificationId[i][@"identificationId"];
         
-        NSInteger sendSignalId = [self sendNormalMessage:message toIdentificationId:identificationId interval:intervalTime timeOut:timeOut];
+        NSInteger sendSignalId = [self sendNormalMessage:message toIdentificationId:identificationId interval:intervalTime timeOut:timeOut firstWait:0.05*i];
         [ids addObject:@(sendSignalId)];
     }
     
@@ -295,6 +297,7 @@
         signals = [NSMutableArray array];
         receivedSignalIds = [NSMutableArray array];
         synchronizeSignalArray = [NSMutableArray array];
+        receivedReceiveNotifyIds = [NSMutableArray array];
     }
     return self;
 }
@@ -319,7 +322,7 @@
     //NSString *sendMessage = @"first_message";
     //NSData *data = [sendMessage dataUsingEncoding:NSUTF8StringEncoding];
     
-    self.characteristic = [[CBMutableCharacteristic alloc] initWithType:characteristicUUID properties:(CBCharacteristicPropertyRead | CBCharacteristicPropertyNotify | CBCharacteristicPropertyWrite) value:nil permissions:CBAttributePermissionsReadable | CBAttributePermissionsWriteable | CBAttributePermissionsWriteEncryptionRequired];
+    self.characteristic = [[CBMutableCharacteristic alloc] initWithType:characteristicUUID properties:(CBCharacteristicPropertyRead | CBCharacteristicPropertyNotify | CBCharacteristicPropertyWriteWithoutResponse) value:nil permissions:CBAttributePermissionsReadable | CBAttributePermissionsWriteable | CBAttributePermissionsWriteEncryptionRequired];
     
     
     // Creates the service UUID
@@ -441,7 +444,7 @@
             NSLog(@"特性値更新:%@",sendingMessageQueue[0]);
             [sendingMessageQueue removeObjectAtIndex:0];
         }
-    } afterDelay:0.01];
+    } afterDelay:0.05];
     
     
 }
@@ -466,9 +469,6 @@
         NSString *message = [[NSString alloc]initWithData:request.value encoding:NSUTF8StringEncoding];
         NSLog(@"written data:%@",message);
         
-        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-        BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
-        [viewController addRecieveMessage:message];
         //TODO::セントラルからの受信を処理
         //「1:NNNNNN:T..T:A..A:message」T..TはセントラルのシグナルID
         //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
@@ -479,8 +479,16 @@
             NSString *gotGameId = [message componentsSeparatedByString:@":"][1];
             NSInteger gotSignalId = [[message componentsSeparatedByString:@":"][2]integerValue];
             if([gotGameId isEqualToString:gameIdString]) {
+                if([receivedReceiveNotifyIds containsObject:@(gotSignalId)]) {
+                    return;//２重受信を防ぐ
+                }
+                [receivedReceiveNotifyIds addObject:@(gotSignalId)];
                 BWSenderNode *node = [self getSenderNodeWithSignalId:gotSignalId];
                 node.isReceived = YES;
+                
+                BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+                [viewController addRecieveMessage:message];
                 
                 [self checkSynchronizeMessageReceive];
             }
@@ -492,10 +500,14 @@
             NSInteger gotSignalId = [array[2]integerValue];
             NSString *identificationId = array[3];
             
-            if([receivedSignalIds containsObject:@(gotSignalId)]) {
+            if([receivedSignalIds containsObject:[NSString stringWithFormat:@"%@-%d",identificationId,(int)gotSignalId]]) {
                 return;//２重受信を防ぐ
             }
-            [receivedSignalIds addObject:@(gotSignalId)];
+            [receivedSignalIds addObject:[NSString stringWithFormat:@"%@-%d",identificationId,(int)gotSignalId]];
+            
+            BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+            BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+            [viewController addRecieveMessage:message];
             
             if([gameIdString isEqualToString:gotGameId]) {
                 //受信

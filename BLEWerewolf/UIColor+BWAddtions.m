@@ -29,8 +29,8 @@
 + (UIColor *)werewolfPartnerBubbleColor {//薄い赤
     return [self colorWithHex:0xffbbbb];
 }
-+ (UIColor *)gmBubbleColor {//空色
-    return [self colorWithHex:0x00ccff];
++ (UIColor *)gmBubbleColor {//白色
+    return [self colorWithHex:0xffffff];
 }
 + (UIColor *)villagerBubbleColor {//草色
     return [self colorWithHex:0xc4ff99];
@@ -40,6 +40,9 @@
 }
 + (UIColor *)shamanBubbleColor {//青色
     return [self colorWithHex:0x1111ff];
+}
++ (UIColor *)bodyguardBubbleColor {//空色
+    return [self colorWithHex:0x00ccff];
 }
 
 + (UIColor *)getPlayerColor:(NSInteger)id {
