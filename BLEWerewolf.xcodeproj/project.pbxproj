@@ -53,6 +53,9 @@
 		B6D1037C1C404DD30007D6AB /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D1037B1C404DD30007D6AB /* SpriteKit.framework */; };
 		B6D1037F1C40C7720007D6AB /* evening.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D1037D1C40C7720007D6AB /* evening.jpg */; };
 		B6D103801C40C7720007D6AB /* morning.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D1037E1C40C7720007D6AB /* morning.jpg */; };
+		B6D103851C413A680007D6AB /* ui_frameTable.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103821C413A680007D6AB /* ui_frameTable.png */; };
+		B6D103861C413A680007D6AB /* ui_frameTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103831C413A680007D6AB /* ui_frameTitle.png */; };
+		B6D103871C413A680007D6AB /* ui_nowLoading.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103841C413A680007D6AB /* ui_nowLoading.png */; };
 		D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B305F111B76436C68C48C08 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -144,6 +147,9 @@
 		B6D1037B1C404DD30007D6AB /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
 		B6D1037D1C40C7720007D6AB /* evening.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = evening.jpg; sourceTree = "<group>"; };
 		B6D1037E1C40C7720007D6AB /* morning.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = morning.jpg; sourceTree = "<group>"; };
+		B6D103821C413A680007D6AB /* ui_frameTable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameTable.png; sourceTree = "<group>"; };
+		B6D103831C413A680007D6AB /* ui_frameTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameTitle.png; sourceTree = "<group>"; };
+		B6D103841C413A680007D6AB /* ui_nowLoading.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_nowLoading.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -280,20 +286,13 @@
 		B69ED59D1B6B2BDD00A9C355 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				B6D103881C413A740007D6AB /* roleCard */,
+				B6D103811C413A390007D6AB /* ui */,
 				B69ED59E1B6B2C2E00A9C355 /* afternoon.jpg */,
 				B67CC3931C37650700546FC0 /* night.jpg */,
 				B6D1037D1C40C7720007D6AB /* evening.jpg */,
 				B6D1037E1C40C7720007D6AB /* morning.jpg */,
 				B69ED59F1B6B2C2E00A9C355 /* button.png */,
-				B69ED5A01B6B2C2E00A9C355 /* card0.png */,
-				B69ED5A11B6B2C2E00A9C355 /* card1.png */,
-				B69ED5A21B6B2C2E00A9C355 /* card2.png */,
-				B69ED5A31B6B2C2E00A9C355 /* card3.png */,
-				B69ED5A41B6B2C2E00A9C355 /* card4.png */,
-				B69ED5A51B6B2C2E00A9C355 /* card5.png */,
-				B614DD921C381C28006BB3C8 /* card6.png */,
-				B614DD931C381C28006BB3C8 /* card7.png */,
-				B614DD8D1C37F953006BB3C8 /* back_card.jpg */,
 				B614DD961C3821D6006BB3C8 /* frame.png */,
 				B60A67A11C38C03900FFD0E5 /* gm.jpg */,
 				B60A67A31C38C47D00FFD0E5 /* player.jpg */,
@@ -320,6 +319,32 @@
 			);
 			name = Peripheral;
 			path = BLEWerewolf/Peripheral;
+			sourceTree = "<group>";
+		};
+		B6D103811C413A390007D6AB /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				B6D103821C413A680007D6AB /* ui_frameTable.png */,
+				B6D103831C413A680007D6AB /* ui_frameTitle.png */,
+				B6D103841C413A680007D6AB /* ui_nowLoading.png */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		B6D103881C413A740007D6AB /* roleCard */ = {
+			isa = PBXGroup;
+			children = (
+				B69ED5A01B6B2C2E00A9C355 /* card0.png */,
+				B69ED5A11B6B2C2E00A9C355 /* card1.png */,
+				B69ED5A21B6B2C2E00A9C355 /* card2.png */,
+				B69ED5A31B6B2C2E00A9C355 /* card3.png */,
+				B69ED5A41B6B2C2E00A9C355 /* card4.png */,
+				B69ED5A51B6B2C2E00A9C355 /* card5.png */,
+				B614DD921C381C28006BB3C8 /* card6.png */,
+				B614DD931C381C28006BB3C8 /* card7.png */,
+				B614DD8D1C37F953006BB3C8 /* back_card.jpg */,
+			);
+			path = roleCard;
 			sourceTree = "<group>";
 		};
 		C5F3CDF1637BBF7A6FEA08E0 /* Pods */ = {
@@ -423,6 +448,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6D103851C413A680007D6AB /* ui_frameTable.png in Resources */,
 				B6D103801C40C7720007D6AB /* morning.jpg in Resources */,
 				B69ED5A81B6B2C2E00A9C355 /* card0.png in Resources */,
 				B69ED5AB1B6B2C2E00A9C355 /* card3.png in Resources */,
@@ -430,6 +456,8 @@
 				B69ED5A91B6B2C2E00A9C355 /* card1.png in Resources */,
 				B63D90471B60DD35000E366B /* Main.storyboard in Resources */,
 				B69ED5AA1B6B2C2E00A9C355 /* card2.png in Resources */,
+				B6D103871C413A680007D6AB /* ui_nowLoading.png in Resources */,
+				B6D103861C413A680007D6AB /* ui_frameTitle.png in Resources */,
 				B69ED5AD1B6B2C2E00A9C355 /* card5.png in Resources */,
 				B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */,
 				B614DD971C3821D6006BB3C8 /* frame.png in Resources */,

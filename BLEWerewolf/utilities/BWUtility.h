@@ -55,6 +55,10 @@ typedef NS_ENUM(NSUInteger, Role) {
 +(Role)getMyRoleId:(NSMutableDictionary*)infoDic;
 
 #pragma mark - ui
++(SKSpriteNode*)makeFrameNodeWithBoldrate:(CGFloat)_boldRate size:(CGSize)size;
++(SKSpriteNode*)makeTitleNodeWithBoldrate:(CGFloat)boldRate size:(CGSize)size title:(NSString*)title;
+
+
 +(SKSpriteNode*)makeVoteResultNode:(CGSize)size position:(CGPoint)position texture:(SKTexture*)texture day:(NSInteger)day voteCount:(NSInteger)voteCount excutionerId:(NSInteger)excutionerId voteArray:(NSMutableArray*)voteArray infoDic:(NSMutableDictionary*)infoDic;
 +(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture;
 +(SKSpriteNode *) makeMessageNode :(CGSize)frameSize position:(CGPoint)position backColor:(UIColor*)color string:(NSString*)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor;

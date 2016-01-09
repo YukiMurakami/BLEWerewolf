@@ -34,6 +34,10 @@
     backgroundNode.position = CGPointMake(self.size.width/2, self.size.height/2);
     [self addChild:backgroundNode];
     
+    SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width*0.8, self.size.width*0.8/4) title:@"通信設定"];
+    titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - self.size.width*0.1);
+    [backgroundNode addChild:titleNode];
+    
     NSArray *buttons = @[@{@"title":@"サーバ",@"name":@"server"},
                          @{@"title":@"クライアント",@"name":@"client"},
                          @{@"title":@"ユーザ設定",@"name":@"setting"}];

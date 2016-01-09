@@ -8,6 +8,7 @@
 
 #import "BWUtility.h"
 #import "BWMultipleLineLabelNode.h"
+#import "BWAppDelegate.h"
 
 
 @implementation BWUtility
@@ -455,6 +456,38 @@
 
 
 #pragma mark - ui
+
++(SKSpriteNode*)makeFrameNodeWithBoldrate:(CGFloat)_boldRate size:(CGSize)size {
+    BWAppDelegate *appDelegate = [[UIApplication sharedApplication]delegate];
+    CGFloat viewWidth = appDelegate.window.rootViewController.view.frame.size.width;
+    
+    SKSpriteNode *backNode = [[SKSpriteNode alloc]init];
+    backNode.size = size;
+    
+    SKSpriteNode *titleNode = [[SKSpriteNode alloc]initWithImageNamed:@"ui_frameTitle.png"];
+    CGFloat boldRate = viewWidth/375*_boldRate;
+    titleNode.size = CGSizeMake(64*boldRate,64*boldRate);
+    titleNode.xScale = size.width/64/boldRate;
+    titleNode.yScale = size.height/64/boldRate;
+    CGFloat margin = 0.45;
+    titleNode.centerRect = CGRectMake(margin, margin, 1.0-margin*2,1.0-margin*2);
+    titleNode.position = CGPointMake(0, 0);
+    
+    [backNode addChild:titleNode];
+    return backNode;
+}
+
++(SKSpriteNode*)makeTitleNodeWithBoldrate:(CGFloat)boldRate size:(CGSize)size title:(NSString*)title {
+    SKSpriteNode *frameNode = [BWUtility makeFrameNodeWithBoldrate:boldRate size:size];
+    SKLabelNode *labelNode = [[SKLabelNode alloc]init];
+    labelNode.text = title;
+    labelNode.fontSize = frameNode.size.height*0.4;
+    labelNode.fontColor = [UIColor blackColor];
+    labelNode.color = [UIColor grayColor];
+    labelNode.verticalAlignmentMode = SKLabelVerticalAlignmentModeCenter;
+    [frameNode addChild:labelNode];
+    return frameNode;
+}
 
 +(NSString*)getVoteResultFormatString:(NSMutableDictionary*)voteDic infoDic:(NSMutableDictionary*)infoDic {
     NSInteger voter = [voteDic[@"voter"]integerValue];
