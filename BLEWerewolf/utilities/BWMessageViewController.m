@@ -76,6 +76,7 @@ NSString *gmId = @"aaaaaa";
     if(myRoleId == RoleVillager) self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor villagerBubbleColor]];
     
     if(myRoleId == RoleFortuneTeller) self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor fortuneTellerBubbleColor]];
+    if(myRoleId == RoleShaman) self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor shamanBubbleColor]];
     
     // ③ アバター画像を設定
     self.gmAvatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"gm.jpg"] diameter:64];

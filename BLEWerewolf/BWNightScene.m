@@ -300,6 +300,20 @@ typedef NS_ENUM(NSInteger,Phase) {
         if(day != 1) {
             [NSObject performBlock:^{
                 for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+                    
+                    if([infoDic[@"players"][i][@"roleId"]integerValue] == RoleShaman) {
+                        //TODO::霊媒メッセージ送信
+                        [NSObject performBlock:^{
+                            NSInteger excutionerRoleId = [infoDic[@"players"][excutionerId][@"roleId"]integerValue];
+                            NSString *result = @"「人間 ○」";
+                            if(excutionerRoleId == RoleWerewolf) {
+                                result = @"「人狼 ●」";
+                            }
+                            NSString *mes = [NSString stringWithFormat:@"霊媒結果「%@」さんは%@でした",infoDic[@"players"][excutionerId][@"name"],result];
+                            [self sendGMMessage:mes receiverId:infoDic[@"players"][i][@"identificationId"]];
+                        } afterDelay:2.0];
+                    }
+                    
                     [NSObject performBlock:^{
                         [self sendGMMessage:[NSString stringWithFormat:@"%d日目の夜になりました。",day] receiverId:infoDic[@"players"][i][@"identificationId"]];
                     } afterDelay:0.1*i];

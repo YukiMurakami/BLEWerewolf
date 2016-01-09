@@ -165,6 +165,7 @@
             surfaceRole = RoleShaman;
             hasTable = false;
             explain = @"霊媒師は毎晩その日の昼のターンに処刑された人が人狼だったのかそうでなかったのかを知ることができます。";
+            firstNightMessage = @"あなたは「霊媒師」です。昼に処刑された人の正体が表示されます。";
             break;
         case RoleMadman:
             name = @"狂人";//実装済み
