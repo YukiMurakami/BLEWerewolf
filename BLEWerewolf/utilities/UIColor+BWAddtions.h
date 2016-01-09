@@ -23,7 +23,8 @@
 + (UIColor *)bodyguardBubbleColor;
 + (UIColor*)madmanBubbleColor;
 + (UIColor*)jointOwnerBubbleColor;
-+ (UIColor*)jointOwnerPartnerBubbleColor ;
++ (UIColor*)jointOwnerPartnerBubbleColor;
++ (UIColor*)foxBubbleColor;
 
 + (UIColor *)getPlayerColor:(NSInteger)id;//gm は-1
 @end

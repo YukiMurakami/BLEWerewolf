@@ -53,6 +53,9 @@
 + (UIColor*)jointOwnerPartnerBubbleColor {//薄い桃色
     return [self colorWithHex:0xffbbff];
 }
++ (UIColor*)foxBubbleColor {//黄色
+    return [self colorWithHex:0xffff00];
+}
 
 + (UIColor *)getPlayerColor:(NSInteger)id {
     NSArray *colors = @[@(0xff1111),

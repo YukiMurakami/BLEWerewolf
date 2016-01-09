@@ -202,6 +202,7 @@
             tableStringFirst = @"仲間の妖狐を確認してください。";
             hasTable = false;
             explain = @"妖狐は第３の勢力です。ゲームが終了した時に妖狐が生き残っていれば勝利します。妖狐同士は夜時間に専用チャットを使用できます。";
+            firstNightMessage = @"ここは「妖狐専用チャット」です。仲間と相談できます。";
             break;
             /*
         case RolePossessed:

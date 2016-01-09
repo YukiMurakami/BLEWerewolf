@@ -83,6 +83,10 @@ NSString *gmId = @"aaaaaa";
         self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor jointOwnerBubbleColor]];
         self.incomingBubble = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor jointOwnerPartnerBubbleColor]];
     }
+    if(myRoleId == RoleFox) {
+        self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor foxBubbleColor]];
+        self.incomingBubble = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor foxBubbleColor]];
+    }
     
     // ③ アバター画像を設定
     self.gmAvatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"gm.jpg"] diameter:64];

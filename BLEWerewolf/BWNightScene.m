@@ -129,7 +129,11 @@ typedef NS_ENUM(NSInteger,Phase) {
         }
     } else {
         if(nWerewolf >= nHuman) {
-            return WinnerWerewolf;
+            if(nFox <= 0) {
+                return WinnerWerewolf;
+            } else {
+                return WinnerFox;
+            }
         }
     }
     return WinnerNone;
@@ -257,7 +261,9 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     if(day >= 2) {
         [voteCheckNode removeFromParent];
-        messageViewController.view.hidden = NO;
+        if(!isPeripheral || [infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
+            messageViewController.view.hidden = NO;
+        }
         [waitLabelNode removeFromParent];
         [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*60];
         
@@ -489,7 +495,9 @@ typedef NS_ENUM(NSInteger,Phase) {
     if(!table.superview) {
         [self.view addSubview:table];
     }
-    table.hidden = NO;
+    if(!isPeripheral || [infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
+        table.hidden = NO;
+    }
 }
 
 -(void)finishVoting {
@@ -760,6 +768,10 @@ typedef NS_ENUM(NSInteger,Phase) {
             message = [NSString stringWithFormat:@"占い結果「%@」さんは「人狼 ●」です。",infoDic[@"players"][targetPlayerId][@"name"]];
         } else {
             message = [NSString stringWithFormat:@"占い結果「%@」さんは「人間 ○」です。",infoDic[@"players"][targetPlayerId][@"name"]];
+            if([infoDic[@"players"][targetPlayerId][@"roleId"]integerValue] == RoleFox) {
+                //狐は溶ける
+                [victimArray addObject:@(targetPlayerId)];
+            }
         }
         [self sendGMMessage:message receiverId:infoDic[@"players"][actionPlayerId][@"identificationId"]];
     }
