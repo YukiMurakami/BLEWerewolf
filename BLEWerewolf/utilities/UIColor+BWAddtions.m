@@ -47,6 +47,12 @@
 + (UIColor*)madmanBubbleColor {//灰色
     return [self colorWithHex:0x888888];
 }
++ (UIColor*)jointOwnerBubbleColor {//桃色
+    return [self colorWithHex:0xff88ff];
+}
++ (UIColor*)jointOwnerPartnerBubbleColor {//薄い桃色
+    return [self colorWithHex:0xffbbff];
+}
 
 + (UIColor *)getPlayerColor:(NSInteger)id {
     NSArray *colors = @[@(0xff1111),

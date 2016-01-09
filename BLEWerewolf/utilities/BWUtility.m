@@ -192,6 +192,7 @@
             hasTableFirst = true;
             tableStringFirst = @"共有者を確認してください。";
             explain = @"共有者は必ず複数人で一組として存在し、お互いに相手を確認できます。夜時間には共有者専用チャットを使用できます。";
+            firstNightMessage = @"ここは「共有者専用チャット」です。仲間と相談できます。";
             break;
         case RoleFox:
             name = @"妖狐";//実装済み

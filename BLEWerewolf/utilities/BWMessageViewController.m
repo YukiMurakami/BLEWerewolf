@@ -79,6 +79,10 @@ NSString *gmId = @"aaaaaa";
     if(myRoleId == RoleShaman) self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor shamanBubbleColor]];
     if(myRoleId == RoleBodyguard) self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor bodyguardBubbleColor]];
     if(myRoleId == RoleMadman) self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor madmanBubbleColor]];
+    if(myRoleId == RoleJointOwner) {
+        self.outgoingBubble = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor jointOwnerBubbleColor]];
+        self.incomingBubble = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor jointOwnerPartnerBubbleColor]];
+    }
     
     // ③ アバター画像を設定
     self.gmAvatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"gm.jpg"] diameter:64];
@@ -88,6 +92,7 @@ NSString *gmId = @"aaaaaa";
         [self.playerAvatars addObject:[JSQMessagesAvatarImageFactory avatarImageWithUserInitials:infoDic[@"players"][i][@"name"] backgroundColor:[UIColor getPlayerColor:i] textColor:[UIColor blackColor] font:[UIFont fontWithName:@"HiraKakuProN-W6" size:self.view.frame.size.width*0.1*0.25] diameter:self.view.frame.size.width*0.1]];
     }
     
+    //TODO::グループチャット設定
     self.membersId = [NSMutableArray array];
     [self.membersId addObject:gmId];//まずはGMをメンバに追加
     [self.membersId addObject:self.senderId];//自分をメンバに追加
@@ -96,6 +101,11 @@ NSString *gmId = @"aaaaaa";
         NSInteger targetRoleId = [infoDic[@"players"][i][@"roleId"]integerValue];
         if(myRoleId == RoleWerewolf) {//人狼チャットなら人狼を追加
             if(targetRoleId == RoleWerewolf) {
+                [self.membersId addObject:infoDic[@"players"][i][@"identificationId"]];
+            }
+        }
+        if(myRoleId == RoleJointOwner) {//共有者なら共有者を追加
+            if(targetRoleId == RoleJointOwner) {
                 [self.membersId addObject:infoDic[@"players"][i][@"identificationId"]];
             }
         }

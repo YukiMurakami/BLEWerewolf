@@ -626,7 +626,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         messageViewController.view.hidden = YES;
         
         //セントラルはこっち
-        backgroundNode.texture = hevenTexture;
+        backgroundNode.texture = deadTexture;
         
         CGSize size = CGSizeMake(self.size.width*0.7, self.size.width*0.7*0.5);
         NSString *mes = @"あなたは襲撃されました。";
@@ -635,7 +635,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         messageNode.position = CGPointMake(0, messageNode.size.height*0.8);
         [backgroundNode addChild:messageNode];
         
-        [self backgroundMorphing:deadTexture time:20.0];
+        [self backgroundMorphing:hevenTexture time:20.0];
     }
 }
 
@@ -820,6 +820,10 @@ typedef NS_ENUM(NSInteger,Phase) {
         NSInteger targetRoleId = [infoDic[@"players"][i][@"roleId"]integerValue];
         //人狼同士
         if(roleId == RoleWerewolf && targetRoleId == RoleWerewolf) {
+            [shouldSenderId addObject:infoDic[@"players"][i][@"identificationId"]];
+        }
+        //共有者同士
+        if(roleId == RoleJointOwner && targetRoleId == RoleJointOwner) {
             [shouldSenderId addObject:infoDic[@"players"][i][@"identificationId"]];
         }
     }
