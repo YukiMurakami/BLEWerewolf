@@ -29,7 +29,12 @@ typedef NS_ENUM(NSUInteger, Role) {
     //TODO::役職追加時変更点
 };
 
-
+typedef NS_ENUM(NSInteger,Winner) {
+    WinnerVillager,
+    WinnerWerewolf,
+    WinnerFox,
+    WinnerNone,//ゲーム続行
+};
 
 @interface BWUtility : NSObject
 

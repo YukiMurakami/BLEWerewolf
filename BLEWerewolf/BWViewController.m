@@ -83,6 +83,20 @@
     [node setText:message fontSize:fontSize fontColor:[UIColor cyanColor]];
 }
 
+-(void)addPlayersInfo:(NSMutableArray*)playersArray {
+    [self.view bringSubviewToFront:self.viewForSenderNodes];
+    for(NSInteger i=0;i<playersArray.count;i++) {
+        NSInteger isLive = [playersArray[i][@"isLive"]boolValue];
+        NSString *name = playersArray[i][@"name"];
+        NSString *id = playersArray[i][@"identificationId"];
+        NSInteger roleId = [playersArray[i][@"roleId"]integerValue];
+        NSString *mes = [NSString stringWithFormat:@"live:%d,roleId:%d,name:%@,id:%@",isLive,roleId,name,id];
+        BWMultipleLineLabelNode *node = messages[i];
+
+        [node setText:mes fontSize:12.0 fontColor:[UIColor greenColor]];
+    }
+}
+
 -(void)flipHiddenDebugView {
     if(self.viewForSenderNodes.isHidden) {
         self.viewForSenderNodes.hidden = NO;
