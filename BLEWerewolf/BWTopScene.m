@@ -12,6 +12,9 @@
 #import "BWUtility.h"
 #import "BWUserSettingScene.h"
 
+#import "BWAppDelegate.h"
+#import "BWViewController.h"
+
 
 @implementation BWTopScene
 
@@ -57,17 +60,24 @@
         BWGameSettingScene *scene = [BWGameSettingScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
+        return;
     }
     if([node.name isEqualToString:@"client"]) {
         BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
+        return;
     }
     if([node.name isEqualToString:@"setting"]) {
         BWUserSettingScene *scene = [BWUserSettingScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
+        return;
     }
+ 
+    BWAppDelegate *appDelegate = [[UIApplication sharedApplication]delegate];
+    BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+    [viewController flipHiddenDebugView];
 }
 
 @end

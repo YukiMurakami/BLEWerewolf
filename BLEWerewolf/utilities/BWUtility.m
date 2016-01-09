@@ -387,7 +387,7 @@
 +(SKTexture *) getCardTexture :(int) cardId {
     NSLog(@"getTexture:filename[%@]",[NSString stringWithFormat:@"card%d.png",cardId]);
     NSString *filename = [NSString stringWithFormat:@"card%d.png",cardId];
-    SKTexture *texture = [SKTexture textureWithRect:CGRectMake(0.03,0.2,0.94,0.8) inTexture:[SKTexture textureWithImageNamed:filename]];
+    SKTexture *texture = [SKTexture textureWithRect:CGRectMake(0,0,1,1/*0.03,0.2,0.94,0.8*/) inTexture:[SKTexture textureWithImageNamed:filename]];
     return texture;
 }
 
@@ -481,13 +481,15 @@
 +(SKSpriteNode *) makeMessageAndImageNode :(CGSize)messageSize position:(CGPoint)messagePosition color:(UIColor*)backColor string:(NSString*)message fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor imageTexture:(SKTexture*)texture imageWidthRate:(CGFloat)imageWidthRate isRotateRight:(BOOL)isRotateRight {
     
     SKSpriteNode *explain = [BWUtility makeFrameNode:messageSize position:messagePosition color:backColor texture:nil];
-    CGSize imageSizeA = CGSizeMake(messageSize.width*imageWidthRate/3*4, messageSize.width*imageWidthRate);
+    CGSize imageSizeA = CGSizeMake(messageSize.width*imageWidthRate/5*6, messageSize.width*imageWidthRate);
     CGSize imageSize = imageSizeA;
     if(!isRotateRight) {
         imageSize = CGSizeMake(imageSizeA.height, imageSizeA.width);
     }
     if(isRotateRight) {
-        SKSpriteNode *explain2 = [BWUtility makeFrameNode:imageSize position:CGPointMake(0,messageSize.height/2*0.88 - imageSize.width/2) color:nil texture:texture];
+        SKSpriteNode *explain2 = [[SKSpriteNode alloc]initWithTexture:texture];
+        explain2.size = imageSize;
+        explain2.position = CGPointMake(0,messageSize.height/2*0.88 - imageSize.width/2);
         explain2.zRotation = -1.57;
         [explain addChild:explain2];
         BWMultipleLineLabelNode *explainLabel = [[BWMultipleLineLabelNode alloc]init];
@@ -496,7 +498,9 @@
         explainLabel.position = CGPointMake(0,-messageSize.height*0.88/2 + explainLabel.size.height/2);
         [explain addChild:explainLabel];
     } else {
-        SKSpriteNode *explain2 = [BWUtility makeFrameNode:imageSize position:CGPointMake(0,messageSize.height/2*0.88 - imageSize.height/2) color:nil texture:texture];
+        SKSpriteNode *explain2 = [[SKSpriteNode alloc]initWithTexture:texture];
+        explain2.size = imageSize;
+        explain2.position = CGPointMake(0,messageSize.height/2*0.88 - imageSize.width/2);
         explain2.zRotation = 0.0;
         [explain addChild:explain2];
         BWMultipleLineLabelNode *explainLabel = [[BWMultipleLineLabelNode alloc]init];

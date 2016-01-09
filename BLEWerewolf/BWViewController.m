@@ -27,6 +27,7 @@
     //skView.showsNodeCount = NO;
     
     self.viewForSenderNodes = [[SKView alloc]initWithFrame:CGRectMake(0,0, skView.bounds.size.width, skView.bounds.size.height)];
+    self.viewForSenderNodes.hidden = YES;
     [self.view addSubview:self.viewForSenderNodes];
     self.viewForSenderNodes.alpha = 0.8;
     self.viewForSenderNodes.userInteractionEnabled = NO;
@@ -82,6 +83,12 @@
     [node setText:message fontSize:fontSize fontColor:[UIColor cyanColor]];
 }
 
-
+-(void)flipHiddenDebugView {
+    if(self.viewForSenderNodes.isHidden) {
+        self.viewForSenderNodes.hidden = NO;
+    } else {
+        self.viewForSenderNodes.hidden = YES;
+    }
+}
 
 @end

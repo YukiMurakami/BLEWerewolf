@@ -201,31 +201,25 @@
         [textures addObject:texture];
     }
     
-    SKTexture *backCardTexture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
     SKAction *wait = [SKAction waitForDuration:1.0];
     SKAction *anime = [SKAction animateWithTextures:textures timePerFrame:0.02f];
     SKAction *animes = [SKAction sequence:@[wait,[SKAction repeatAction:anime count:10]]];
     
-    SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
-    explain.size = CGSizeMake(self.size.width*0.65,self.size.width*0.65/218*307);
+    SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"back_card.jpg"];
+    explain.size = CGSizeMake(self.size.width*0.65,self.size.width*0.65*6/5);
     explain.position = CGPointMake(0,0);
-    SKSpriteNode *content = [[SKSpriteNode alloc]init];
-    content.size = CGSizeMake(explain.size.width*0.9,explain.size.height*0.92);
-    content.position = CGPointMake(0,0);
-    content.texture = backCardTexture;
     
-    [content runAction:animes completion:^{
+    [explain runAction:animes completion:^{
         NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
         NSInteger surfaceRoleId = [[BWUtility getCardInfofromId:(int)roleId][@"surfaceRole"] integerValue];
-        content.texture = [BWUtility getCardTexture:(int)surfaceRoleId];
+        explain.texture = [BWUtility getCardTexture:(int)surfaceRoleId];
         NSLog(@"役職:%@",[BWUtility getCardInfofromId:(int)roleId][@"name"]);
         CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
       
         SKSpriteNode *button = [BWUtility makeButton:@"詳細確認" size:buttonSize name:@"next" position:CGPointMake(0, -explain.size.height/2 - (self.size.height - explain.size.height)/4)];
         [backgroundNode addChild:button];
     }];
-    
-    [explain addChild:content];
+ 
     [backgroundNode addChild:explain];
 }
 

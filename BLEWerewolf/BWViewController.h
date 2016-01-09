@@ -16,6 +16,6 @@
 
 -(void)addRecieveMessage:(NSString*)message;
 -(void)addSendMessage:(NSString*)message;
-
+-(void)flipHiddenDebugView;
 @end
 

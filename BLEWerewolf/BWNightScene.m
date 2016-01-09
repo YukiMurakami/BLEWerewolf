@@ -92,13 +92,9 @@
     CGFloat statusHeight = 22;
     
     SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
-    explain.size = CGSizeMake(timerHeight*218/307,timerHeight);
+    explain.size = CGSizeMake(timerHeight*5/6,timerHeight);
     explain.position = CGPointMake(-self.size.width/2+explain.size.width/2+margin,self.size.height/2-timerHeight/2-margin-statusHeight);
-    SKSpriteNode *content = [[SKSpriteNode alloc]init];
-    content.size = CGSizeMake(explain.size.width*0.9,explain.size.height*0.92);
-    content.position = CGPointMake(0,0);
-    content.texture = [BWUtility getCardTexture:[BWUtility getMyRoleId:infoDic]];
-    [explain addChild:content];
+    explain.texture = [BWUtility getCardTexture:[BWUtility getMyRoleId:infoDic]];
     [backgroundNode addChild:explain];
     
     timer.size = CGSizeMake(timerHeight*2.4, timerHeight);
