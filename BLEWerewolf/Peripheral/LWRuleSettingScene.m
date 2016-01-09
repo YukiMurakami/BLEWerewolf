@@ -138,8 +138,8 @@
 }
 
 -(void)setDefaultInfo {
-    [infoDic setObject:@5 forKey:@"timer"];
-    [infoDic setObject:@3 forKey:@"nightTimer"];
+    [infoDic setObject:@1 forKey:@"timer"];
+    [infoDic setObject:@1 forKey:@"nightTimer"];
     [infoDic setObject:@(FortuneTellerModeFree) forKeyedSubscript:@"fortuneMode"];
     [infoDic setObject:@NO forKeyedSubscript:@"isLacking"];
     [infoDic setObject:@YES forKeyedSubscript:@"canContinuousGuard"];

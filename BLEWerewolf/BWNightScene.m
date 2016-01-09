@@ -10,18 +10,32 @@
 #import "BWUtility.h"
 #import "NSObject+BlocksWait.h"
 
+typedef NS_ENUM(NSInteger,Phase) {
+    PhaseNight,
+    PhaseNightFinish,
+    PhaseAfternoon,
+};
+
 @implementation BWNightScene {
     //リフレッシュ必要変数
     BOOL didAction;
     NSMutableArray *didActionPeripheralArray;
     SKSpriteNode *actionButtonNode;
+    SKSpriteNode *explain;//役職カード
     NSInteger day;
+    Phase phase;
+    
+    NSMutableArray *checkList;//全員の夜終了を確認する
     
     UITableView *table;
     NSMutableArray *tableArray;
     
+    //この辺のゲーム進行用変数は基本的にペリフェラルのみ
     NSInteger targetIndex;
     NSInteger wolfTargetIndex;
+    NSMutableArray *victimArray;//これは情報をセントラルでも共有する
+    NSMutableArray *bodyguardArray;
+    
     
     UIView *coverView;
     UIView *afternoonView;
@@ -35,7 +49,25 @@
     return self;
 }
 
--(void)setCentralOrPeripheral:(BOOL)_isPeripheral :(NSMutableDictionary*)_infoDic {
+-(void)resetCheckList {//ペリフェラルのみ
+    checkList = [NSMutableArray array];
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        [checkList addObject:@NO];
+    }
+}
+
+-(BOOL)isAllOkCheckList {//ペリフェラルのみ (チェックは生存者のみとする)
+    BOOL isAllOk = YES;
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        if([infoDic[@"players"][i][@"isLive"]boolValue] && ![checkList[i]boolValue]) {
+            isAllOk = NO;
+            break;
+        }
+    }
+    return isAllOk;
+}
+
+-(void)setCentralOrPeripheral:(BOOL)_isPeripheral :(NSMutableDictionary*)_infoDic {//共通　情報をリレーする
     isPeripheral = _isPeripheral;
     
     infoDic = _infoDic;
@@ -43,12 +75,14 @@
     if(isPeripheral) {
         peripheralManager = [BWPeripheralManager sharedInstance];
         peripheralManager.delegate = self;
+        [self resetCheckList];
     } else {
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
     }
     
     day = 1;
+    phase = PhaseNight;
     
     CGFloat margin = self.size.height*0.02;
     CGFloat statusHeight = 22;
@@ -80,7 +114,7 @@
     [self nightStart];
 }
 
--(void)initBackground {
+-(void)initBackground {//共通　背景の描画
     backgroundNode = [[SKSpriteNode alloc]init];
     backgroundNode.size = self.size;
     backgroundNode.position = CGPointMake(self.size.width/2, self.size.height/2);
@@ -91,7 +125,7 @@
     CGFloat timerHeight = self.size.height*0.1;
     CGFloat statusHeight = 22;
     
-    SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
+    explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
     explain.size = CGSizeMake(timerHeight*5/6,timerHeight);
     explain.position = CGPointMake(-self.size.width/2+explain.size.width/2+margin,self.size.height/2-timerHeight/2-margin-statusHeight);
     explain.texture = [BWUtility getCardTexture:[BWUtility getMyRoleId:infoDic]];
@@ -128,16 +162,22 @@
 
 -(void)nightStart {
     //リフレッシュ操作を行う
-    //GMメッセージを時間差で送信する
+    phase = PhaseNight;
+    victimArray = [NSMutableArray array];
+    if(isPeripheral) {
+        bodyguardArray = [NSMutableArray array];
+        wolfTargetIndex = -1;
+    }
     didAction = NO;
-    
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
     if([[BWUtility getCardInfofromId:(int)roleId][@"hasTable"]boolValue]) {
         if(!actionButtonNode.parent) {
             [backgroundNode addChild:actionButtonNode];
         }
     }
+    explain.texture = [BWUtility getCardTexture:roleId];
     
+    //GMメッセージを時間差で送信する
     if(isPeripheral) {
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
             didActionPeripheralArray[i] = @NO;
@@ -164,10 +204,53 @@
 }
 
 -(void)afternoonStart {
+    if(isPeripheral) {
+        [self resetCheckList];
+        //TODO::朝の犠牲者処理 きつねとかは占いアクション中に処理してしまう
+        if(![bodyguardArray containsObject:@(wolfTargetIndex)]) {
+            //護衛失敗の場合は死亡
+            [victimArray addObject:@(wolfTargetIndex)];
+        }
+        
+        //ペリフェラルはセントラルに朝開始と犠牲者を通知
+        //TODO::勝利判定を行い、ゲーム終了の場合は終了通知を送る
+        
+        //朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
+        NSString *mes = [NSString stringWithFormat:@"afternoonStart:%@",[victimArray componentsJoinedByString:@","]];
+        [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:30.0];
+    }
+    
     //リフレッシュ操作を行う
     day++;
+    phase = PhaseAfternoon;
     backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
+    explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
+    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
     
+}
+
+
+
+-(void)finishNight {
+    //夜終了
+    phase = PhaseNightFinish;
+    messageViewController.view.hidden = YES;
+    if(actionButtonNode.parent) {
+        [actionButtonNode removeFromParent];
+    }
+    
+    if(isPeripheral) {
+        //ペリフェラルは直接夜時間終了処理を行う
+        NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
+        checkList[myPlayerId] = @YES;
+        if([self isAllOkCheckList]) {
+            [self afternoonStart];
+        }
+    } else {
+        //セントラルは夜時間終了を通知「nightFinish:A..A」
+        [centralManager sendNormalMessage:[NSString stringWithFormat:@"nightFinish:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+        //ペリフェラルからの朝通知を待つ
+    }
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -288,7 +371,7 @@
 
 #pragma mark - messageDelegate
 
--(void)didReceivedMessage:(NSString *)message {
+-(void)didReceivedMessage:(NSString *)message {//ペリフェラル->セントラル受信処理
     //central
     //ペリフェラルから受け取ったメッセージから、自分と同じグループチャットがあったら反映
     //ただし自分自信はすでに反映されているのでむし
@@ -316,9 +399,21 @@
             }
         }
     }
+    
+    //セントラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
+    if([[BWUtility getCommand:message] isEqualToString:@"afternoonStart"]) {
+        if(phase == PhaseNightFinish) {
+            //TODO::ここでセントラル側のvictimArrayを更新
+            NSArray *victimString = [[BWUtility getCommandContents:message][0] componentsSeparatedByString:@","];
+            for(NSInteger i=0;i<victimString.count;i++) {
+                [victimArray addObject:@([victimString[i]integerValue])];
+            }
+            [self afternoonStart];
+        }
+    }
 }
 
--(void)didReceiveMessage:(NSString *)message {
+-(void)didReceiveMessage:(NSString *)message {//セントラル->ペリフェラル受信処理
     //peripheral
     //セントラルから受け取ったメッセージを送るべき相手に送信
     //その後自分と同じグループと同じグループチャットがあったら反映（ただし自分はむし）
@@ -355,6 +450,16 @@
         NSInteger actionTargetId = [contents[2]integerValue];
         
         [self processRoleAction:actionRoleId actionPlayerId:actionPlayerId targetPlayerId:actionTargetId];
+    }
+    
+    //セントラルによる夜時間終了通知「nightFinish:A..A」
+    if([[BWUtility getCommand:message] isEqualToString:@"nightFinish"]) {
+        NSString *identificationId = [BWUtility getCommandContents:message][0];
+        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+        checkList[playerId] = @YES;
+        if([self isAllOkCheckList]) {
+            [self afternoonStart];
+        }
     }
 }
 
@@ -400,7 +505,12 @@
 
 #pragma mark - TimerDelegate
 -(void)didDecreaseTime:(NSInteger)seconds {
-    
+    if(seconds == 0) {
+        if(phase == PhaseNight) {
+            [self finishNight];
+            return;
+        }
+    }
 }
 
 #pragma mark - tableDelegate

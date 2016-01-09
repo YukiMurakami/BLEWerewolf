@@ -51,6 +51,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・全員分の役職確認通知を回収後、初日夜を通知「firstNight:」
 ・チャット（peripheral->central)「chatreceive:A..A/M...M」M...Mは内容
 ・GMメッセージ（peripheral(gm)->central）「chatreceive:G..G/A..A/T..T」G..GはgmId
+・朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
  
  
  --------受信完了通知--------ok
@@ -67,6 +68,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・役職確認完了通知「roleCheck:A..A」
 ・役職アクションを実行「action:1/0/3」1は役職ID、0は実行者、3は対象者
 ・チャット（central->peripheral)「chatsend:A..A/M...M」M...Mは内容
+・夜時間終了を通知「nightFinish:A..A」
  
  
  --------受信完了通知--------ok
