@@ -53,6 +53,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・チャット（peripheral->central)「chatreceive:A..A/M...M」M...Mは内容
 ・GMメッセージ（peripheral(gm)->central）「chatreceive:G..G/A..A/T..T」G..GはgmId
 ・朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
+・全員の犠牲者受信完了を通知「victimCheckFinish:」
 ・投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
 ・夜開始を通知「nightStart:」
 ・ゲーム終了を通知「gameEnd:W」Wは処理者チームID (utilityを参照）
@@ -74,6 +75,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・チャット（central->peripheral)「chatsend:A..A/M...M」M...Mは内容
 ・夜時間終了を通知「nightFinish:A..A」
 ・投票結果確認通知「checkVoting:A..A」
+・犠牲者確認通知「checkVictim:A..A」
  
  
  --------受信完了通知--------ok

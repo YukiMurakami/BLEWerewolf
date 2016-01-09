@@ -17,6 +17,7 @@
 typedef NS_ENUM(NSInteger,Phase) {
     PhaseNight,
     PhaseNightFinish,
+    PhaseMorning,
     PhaseAfternoon,
     PhaseAfternoonFinish,
     PhaseVotingFinish,
@@ -43,6 +44,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     SKSpriteNode *checkButton;//投票確認用ぼたんなど
     SKLabelNode *waitLabelNode;//かくにん待ち表示用
     SKSpriteNode *voteCheckNode;
+    SKSpriteNode *victimCheckNode;
     
     NSInteger excutionerId;
     
@@ -341,13 +343,90 @@ typedef NS_ENUM(NSInteger,Phase) {
 
 -(void)afternoonStart {
     phase = PhaseAfternoon;
+    [victimCheckNode removeFromParent];
+    [waitLabelNode removeFromParent];
+    //リフレッシュ操作を行う
+    excutionerId = -1;
+    
+    //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
+    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
+    explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
+    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
+    votingArray = [NSMutableArray array];
+    
+    if(isPeripheral) {
+        //ペリフェラルは昼開始を通知
+        
+        //TODO::勝利判定を行い、ゲーム終了の場合は終了通知を送る
+        if([self checkWinner] != WinnerNone) {
+            //ゲームセット
+            //ゲーム終了を通知「gameEnd:W」
+            winner = [self checkWinner];
+            NSString *mes = [NSString stringWithFormat:@"gameEnd:%d",(int)winner];
+            [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:60.0];
+            [self gameEnd];
+            return;
+        }
+        
+        //全員の犠牲者受信完了を通知「victimCheckFinish:」
+        [peripheralManager sendNormalMessageEveryClient:@"victimCheckFinish:" infoDic:infoDic interval:3.0 timeOut:30.0];
+    }
+}
+
+
+-(void)backgroundMorphing :(SKTexture*)nextTexture time:(double)time {
+    SKSpriteNode *old = [[SKSpriteNode alloc]initWithTexture:backgroundNode.texture];
+    backgroundNode.texture = nextTexture;
+    old.size = backgroundNode.size;
+    [backgroundNode addChild:old];
+    old.zPosition = 0.0;
+    SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:time],[SKAction removeFromParent]]];
+    [old runAction:fadeOut];
+}
+
+
+-(void)finishNight {
+    //夜終了
+    phase = PhaseNightFinish;
+    messageViewController.view.hidden = YES;
+    table.hidden = YES;
+    [coverView removeFromSuperview];
+    [messageViewController eraseKeyboard];
+    if(actionButtonNode.parent) {
+        [actionButtonNode removeFromParent];
+    }
+    
+    
+    //[self backgroundMorphing:[SKTexture textureWithImageNamed:@"morning.jpg"] time:1.0];
+    //backgroundNode.texture = [SKTexture textureWithImageNamed:@"morning.jpg"];
+    
+    if(isPeripheral) {
+        //ペリフェラルは直接夜時間終了処理を行う
+        NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
+        checkList[myPlayerId] = @YES;
+        if([self isAllOkCheckList]) {
+            [self morning];
+        }
+    } else {
+        //セントラルは夜時間終了を通知「nightFinish:A..A」
+        [centralManager sendNormalMessage:[NSString stringWithFormat:@"nightFinish:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+        //ペリフェラルからの朝通知を待つ
+    }
+}
+
+-(void)morning {
+    //犠牲者を全員で確認して同期を取ってからafternoonに行く
+    phase = PhaseMorning;
+    day++;
+    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"morning.jpg"] time:1.0];
+    
     if(isPeripheral) {
         [self resetCheckList];
         
         [self resetDidActionPeripheralArray];
         
         //TODO::朝の犠牲者処理 きつねとかは占いアクション中に処理してしまう
-        if(wolfTargetIndex == -1 && day != 1) {
+        if(wolfTargetIndex == -1 && day != 2) {
             //ランダムに襲撃先を決める
             NSMutableArray *candidates = [NSMutableArray array];
             //生存者で人狼以外が候補
@@ -377,74 +456,28 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     if(isPeripheral) {
         //ペリフェラルはセントラルに朝開始と犠牲者を通知
-        //TODO::勝利判定を行い、ゲーム終了の場合は終了通知を送る
-        if([self checkWinner] != WinnerNone) {
-            //ゲームセット
-            //ゲーム終了を通知「gameEnd:W」
-            winner = [self checkWinner];
-            NSString *mes = [NSString stringWithFormat:@"gameEnd:%d",(int)winner];
-            [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:60.0];
-            [self gameEnd];
-            return;
-        }
+        
         
         //朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
         NSString *mes = [NSString stringWithFormat:@"afternoonStart:%@",[victimArray componentsJoinedByString:@","]];
         [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:30.0];
     }
     
-
-    
-    //リフレッシュ操作を行う
-    day++;
-    excutionerId = -1;
-    
-    //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
-    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
-    explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
-    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
-    votingArray = [NSMutableArray array];
-}
-
-
--(void)backgroundMorphing :(SKTexture*)nextTexture time:(double)time {
-    SKSpriteNode *old = [[SKSpriteNode alloc]initWithTexture:backgroundNode.texture];
-    backgroundNode.texture = nextTexture;
-    old.size = backgroundNode.size;
-    [backgroundNode addChild:old];
-    old.zPosition = 0.0;
-    SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:time],[SKAction removeFromParent]]];
-    [old runAction:fadeOut];
-}
-
-
--(void)finishNight {
-    //夜終了
-    phase = PhaseNightFinish;
-    messageViewController.view.hidden = YES;
-    table.hidden = YES;
-    [coverView removeFromSuperview];
-    [messageViewController eraseKeyboard];
-    if(actionButtonNode.parent) {
-        [actionButtonNode removeFromParent];
+    //犠牲者を表示　＋　確認ボタン これを全員が押したら昼に移動
+    CGSize size = CGSizeMake(self.size.width*0.8, self.size.width*0.8/2);
+    NSString *victimString = @"いません";
+    for(NSInteger i=0;i<victimArray.count;i++) {
+        if(i==0) victimString = [NSString stringWithFormat:@"「%@」さん",infoDic[@"players"][[victimArray[i]integerValue]][@"name"]];
+        if(i > 0) victimString = [NSString stringWithFormat:@"%@「%@」さん",victimString,infoDic[@"players"][[victimArray[i]integerValue]][@"name"]];
     }
+    victimCheckNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%d日目の朝になりました。昨晩の犠牲者は%@でした。",(int)day,victimString] fontSize:size.height*0.09];
+    victimCheckNode.position = CGPointMake(0, 0);
+    [backgroundNode addChild:victimCheckNode];
     
-    
-    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"morning.jpg"] time:1.0];
-    //backgroundNode.texture = [SKTexture textureWithImageNamed:@"morning.jpg"];
-    
-    if(isPeripheral) {
-        //ペリフェラルは直接夜時間終了処理を行う
-        NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
-        checkList[myPlayerId] = @YES;
-        if([self isAllOkCheckList]) {
-            [self afternoonStart];
-        }
-    } else {
-        //セントラルは夜時間終了を通知「nightFinish:A..A」
-        [centralManager sendNormalMessage:[NSString stringWithFormat:@"nightFinish:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
-        //ペリフェラルからの朝通知を待つ
-    }
+    CGFloat margin = self.size.height*0.05;
+    CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
+    checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"victimCheck" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
+    [backgroundNode addChild:checkButton];
 }
 
 -(void)finishAfternoon {
@@ -555,8 +588,9 @@ typedef NS_ENUM(NSInteger,Phase) {
 -(void)dead:(BOOL)isExcute {
     SKTexture *deadTexture = [SKTexture textureWithImageNamed:@"bg_dead.png"];
     if(isExcute) {
-        deadTexture = [SKTexture textureWithImageNamed:@"bg_batankyu.png"];
+        deadTexture = [SKTexture textureWithImageNamed:@"bg_batankyu.jpg"];
     }
+    SKTexture *hevenTexture = [SKTexture textureWithImageNamed:@"bg_heaven.jpg"];
     
     if(isPeripheral) {
         //ペリフェラルは死亡後も信号のやり取りを行う必要がある
@@ -568,19 +602,19 @@ typedef NS_ENUM(NSInteger,Phase) {
         SKSpriteNode *coverBackgroundNode = [[SKSpriteNode alloc]init];
         coverBackgroundNode.size = coverScene.size;
         coverBackgroundNode.position = CGPointMake(coverScene.size.width/2, coverScene.size.height/2);
-        coverBackgroundNode.texture = deadTexture;
+        coverBackgroundNode.texture = hevenTexture;
         [coverScene addChild:coverBackgroundNode];
 
         
-        CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
+        CGSize size = CGSizeMake(self.size.width*0.7, self.size.width*0.7*0.5);
         NSString *mes = @"あなたは襲撃されました。";
-        if(isExcute) mes = @"あなたは処刑されました。";
+        if(isExcute) mes = @"あなたは追放されました。";
         SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.09];
-        messageNode.position = CGPointMake(0, -messageNode.size.height*0.8);
+        messageNode.position = CGPointMake(0, messageNode.size.height*0.8);
         [coverBackgroundNode addChild:messageNode];
         
         SKSpriteNode *heven = [[SKSpriteNode alloc]init];
-        heven.texture = [SKTexture textureWithImageNamed:@"bg_heaven.jpg"];
+        heven.texture = deadTexture;
         heven.size = coverBackgroundNode.size;
         [coverBackgroundNode addChild:heven];
         SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:20.0],[SKAction removeFromParent]]];
@@ -592,16 +626,16 @@ typedef NS_ENUM(NSInteger,Phase) {
         messageViewController.view.hidden = YES;
         
         //セントラルはこっち
-        backgroundNode.texture = deadTexture;
+        backgroundNode.texture = hevenTexture;
         
-        CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
+        CGSize size = CGSizeMake(self.size.width*0.7, self.size.width*0.7*0.5);
         NSString *mes = @"あなたは襲撃されました。";
-        if(isExcute) mes = @"あなたは処刑されました。";
+        if(isExcute) mes = @"あなたは追放されました。";
         SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.09];
-        messageNode.position = CGPointMake(0, -messageNode.size.height*0.8);
+        messageNode.position = CGPointMake(0, messageNode.size.height*0.8);
         [backgroundNode addChild:messageNode];
         
-        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"heaven.jpg"] time:20.0];
+        [self backgroundMorphing:deadTexture time:20.0];
     }
 }
 
@@ -620,6 +654,28 @@ typedef NS_ENUM(NSInteger,Phase) {
             [self.view addSubview:table];
         }
         table.hidden = NO;
+    }
+    
+    if([node.name isEqualToString:@"victimCheck"]) {
+        [checkButton removeFromParent];
+        waitLabelNode = [[SKLabelNode alloc]init];
+        waitLabelNode.text = @"全員の確認待ち";
+        waitLabelNode.fontColor = [UIColor blackColor];
+        waitLabelNode.fontSize = checkButton.size.height*0.9;
+        waitLabelNode.position = checkButton.position;
+        [backgroundNode addChild:waitLabelNode];
+        
+        if(isPeripheral) {
+            //ペリフェラルは直接処理
+            checkList[[BWUtility getMyPlayerId:infoDic]] = @YES;
+            if([self isAllOkCheckList]) {
+                [self afternoonStart];
+            }
+        } else {
+            //セントラルはかくにん通知を送る
+            //犠牲者確認通知「checkVictim:A..A」
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"checkVictim:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+        }
     }
     
     if([node.name isEqualToString:@"check"]) {
@@ -815,7 +871,7 @@ typedef NS_ENUM(NSInteger,Phase) {
                     if([victimString[i] isEqualToString:@""]) continue;
                     [victimArray addObject:@([victimString[i]integerValue])];
                 }
-                [self afternoonStart];
+                [self morning];
             }
         }
         
@@ -843,6 +899,13 @@ typedef NS_ENUM(NSInteger,Phase) {
         if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
             if(phase == PhaseVotingFinish) {
                 [self nightStart];
+            }
+        }
+        
+        //ペリフェラルからの犠牲者受信完了を通知「victimCheckFinish:」
+        if([[BWUtility getCommand:message] isEqualToString:@"victimCheckFinish"]) {
+            if(phase == PhaseMorning) {
+                [self afternoonStart];
             }
         }
     }
@@ -898,6 +961,16 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     //セントラルによる夜時間終了通知「nightFinish:A..A」
     if([[BWUtility getCommand:message] isEqualToString:@"nightFinish"]) {
+        NSString *identificationId = [BWUtility getCommandContents:message][0];
+        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+        checkList[playerId] = @YES;
+        if([self isAllOkCheckList]) {
+            [self morning];
+        }
+    }
+    
+    //セントラルによる犠牲者確認通知「checkVictim:A..A」
+    if([[BWUtility getCommand:message] isEqualToString:@"checkVictim"]) {
         NSString *identificationId = [BWUtility getCommandContents:message][0];
         NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
         checkList[playerId] = @YES;
