@@ -210,7 +210,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     if(roleId == RoleWerewolf) buttonTitle = @"噛む";
     if(roleId == RoleFortuneTeller) buttonTitle = @"占う";
-    if(roleId == RoleFortuneTeller) buttonTitle = @"守る";
+    if(roleId == RoleBodyguard) buttonTitle = @"守る";
     
     CGFloat buttonSizeWidth = self.size.width-(margin*4+explain.size.width+timer.size.width);
     actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
@@ -1001,6 +1001,9 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
     if(tableRoleId == RoleFortuneTeller) {
         message = [NSString stringWithFormat:@"「%@」さんを占いますか？",infoDic[@"players"][targetIndex][@"name"]];
+    }
+    if(tableRoleId == RoleBodyguard) {
+        message = [NSString stringWithFormat:@"「%@」さんを守りますか？",infoDic[@"players"][targetIndex][@"name"]];
     }
     if(tableRoleId == -1) {
         message = [NSString stringWithFormat:@"「%@」さんに投票しますか？",infoDic[@"players"][targetIndex][@"name"]];
