@@ -49,6 +49,13 @@
         [backgroundNode addChild:buttonNode];
     }
     
+    for(NSInteger i=0;i<[BWUtility getMaxRoleCount];i++) {
+        SKTexture *texture = [BWUtility getCardTexture:i];
+        SKSpriteNode *node = [[SKSpriteNode alloc]initWithTexture:texture];
+        [backgroundNode addChild:node];
+        [node removeFromParent];
+    }
+    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
