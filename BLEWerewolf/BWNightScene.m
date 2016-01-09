@@ -238,6 +238,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     if(actionButtonNode.parent) {
         [actionButtonNode removeFromParent];
     }
+    backgroundNode.texture = [SKTexture textureWithImageNamed:@"morning.jpg"];
     
     if(isPeripheral) {
         //ペリフェラルは直接夜時間終了処理を行う

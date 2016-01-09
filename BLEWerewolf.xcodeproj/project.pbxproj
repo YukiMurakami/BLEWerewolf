@@ -51,6 +51,8 @@
 		B6BA9D541C3E659E00F75065 /* BWSenderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6BA9D531C3E659E00F75065 /* BWSenderNode.m */; };
 		B6CF75151C2640C70078309A /* NSObject+BlocksWait.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */; };
 		B6D1037C1C404DD30007D6AB /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D1037B1C404DD30007D6AB /* SpriteKit.framework */; };
+		B6D1037F1C40C7720007D6AB /* evening.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D1037D1C40C7720007D6AB /* evening.jpg */; };
+		B6D103801C40C7720007D6AB /* morning.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D1037E1C40C7720007D6AB /* morning.jpg */; };
 		D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B305F111B76436C68C48C08 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -140,6 +142,8 @@
 		B6CF75131C2640C70078309A /* NSObject+BlocksWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+BlocksWait.h"; sourceTree = "<group>"; };
 		B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+BlocksWait.m"; sourceTree = "<group>"; };
 		B6D1037B1C404DD30007D6AB /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
+		B6D1037D1C40C7720007D6AB /* evening.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = evening.jpg; sourceTree = "<group>"; };
+		B6D1037E1C40C7720007D6AB /* morning.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = morning.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +282,8 @@
 			children = (
 				B69ED59E1B6B2C2E00A9C355 /* afternoon.jpg */,
 				B67CC3931C37650700546FC0 /* night.jpg */,
+				B6D1037D1C40C7720007D6AB /* evening.jpg */,
+				B6D1037E1C40C7720007D6AB /* morning.jpg */,
 				B69ED59F1B6B2C2E00A9C355 /* button.png */,
 				B69ED5A01B6B2C2E00A9C355 /* card0.png */,
 				B69ED5A11B6B2C2E00A9C355 /* card1.png */,
@@ -417,6 +423,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6D103801C40C7720007D6AB /* morning.jpg in Resources */,
 				B69ED5A81B6B2C2E00A9C355 /* card0.png in Resources */,
 				B69ED5AB1B6B2C2E00A9C355 /* card3.png in Resources */,
 				B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */,
@@ -435,6 +442,7 @@
 				B67CC3941C37650700546FC0 /* night.jpg in Resources */,
 				B614DD941C381C28006BB3C8 /* card6.png in Resources */,
 				B63D90491B60DD35000E366B /* Images.xcassets in Resources */,
+				B6D1037F1C40C7720007D6AB /* evening.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
