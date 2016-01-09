@@ -169,6 +169,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         wolfTargetIndex = -1;
     }
     didAction = NO;
+    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"night.jpg"] time:1.0];
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
     if([[BWUtility getCardInfofromId:(int)roleId][@"hasTable"]boolValue]) {
         if(!actionButtonNode.parent) {
@@ -223,12 +224,23 @@ typedef NS_ENUM(NSInteger,Phase) {
     //リフレッシュ操作を行う
     day++;
     phase = PhaseAfternoon;
-    backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
+    //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
+    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
     [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
     
 }
 
+
+-(void)backgroundMorphing :(SKTexture*)nextTexture time:(double)time {
+    SKSpriteNode *old = [[SKSpriteNode alloc]initWithTexture:backgroundNode.texture];
+    backgroundNode.texture = nextTexture;
+    old.size = backgroundNode.size;
+    [backgroundNode addChild:old];
+    old.zPosition = 0.0;
+    SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:time],[SKAction removeFromParent]]];
+    [old runAction:fadeOut];
+}
 
 
 -(void)finishNight {
@@ -240,7 +252,9 @@ typedef NS_ENUM(NSInteger,Phase) {
     if(actionButtonNode.parent) {
         [actionButtonNode removeFromParent];
     }
-    backgroundNode.texture = [SKTexture textureWithImageNamed:@"morning.jpg"];
+    
+    [self backgroundMorphing:[SKTexture textureWithImageNamed:@"morning.jpg"] time:1.0];
+    //backgroundNode.texture = [SKTexture textureWithImageNamed:@"morning.jpg"];
     
     if(isPeripheral) {
         //ペリフェラルは直接夜時間終了処理を行う
