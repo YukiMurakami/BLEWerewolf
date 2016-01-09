@@ -473,10 +473,10 @@
     NSString *excutioner = infoDic[@"players"][excutionerId][@"name"];
     NSInteger nLabel = (voteArray.count+2);
     
-    CGFloat labelHeight = size.height/nLabel*0.8;
+    CGFloat labelHeight = size.height/nLabel*0.6;
     for(NSInteger i=0;i<nLabel;i++) {
         SKLabelNode *node = [[SKLabelNode alloc]init];
-        node.fontSize = labelHeight*0.6;
+        node.fontSize = labelHeight*0.4;
         node.fontColor = [UIColor blackColor];
         node.position = CGPointMake(0, (nLabel/2.0-0.5-i)*labelHeight);
         if(i==0) {

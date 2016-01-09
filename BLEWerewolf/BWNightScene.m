@@ -37,6 +37,8 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     
     SKSpriteNode *checkButton;//投票確認用ぼたんなど
+    SKLabelNode *waitLabelNode;//かくにん待ち表示用
+    SKSpriteNode *voteCheckNode;
     
     NSInteger excutionerId;
     
@@ -121,7 +123,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     messageViewController.delegate = self;
     
     timer = [[BWTimer alloc]init];
-    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*60];
+    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*20];
     timer.delegate = self;
     
     CGFloat tableMargin = self.size.height*0.05;
@@ -206,6 +208,17 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
     explain.texture = [BWUtility getCardTexture:roleId];
     
+    if(day >= 2) {
+        [voteCheckNode removeFromParent];
+        messageViewController.view.hidden = NO;
+        [waitLabelNode removeFromParent];
+        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*20];
+        
+        if([[BWUtility getCardInfofromId:[BWUtility getMyRoleId:infoDic]][@"hasTable"]boolValue] && !didAction) {
+            actionButtonNode.hidden = NO;
+        }
+    }
+    
     //GMメッセージを時間差で送信する
     if(isPeripheral) {
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
@@ -228,6 +241,19 @@ typedef NS_ENUM(NSInteger,Phase) {
                     } afterDelay:0.1*i];
                 }
             } afterDelay:5.0];
+        }
+        if(day != 1) {
+            [NSObject performBlock:^{
+                for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+                    [NSObject performBlock:^{
+                        [self sendGMMessage:[NSString stringWithFormat:@"%d日目の夜になりました。",day] receiverId:infoDic[@"players"][i][@"identificationId"]];
+                    } afterDelay:0.1*i];
+                }
+            } afterDelay:5.0];
+            
+            //２日目以降は夜開始を通知「nightStart:」
+            [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
+            [self resetCheckList];
         }
     }
 }
@@ -259,7 +285,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
-    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
+    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*20];
     votingArray = [NSMutableArray array];
 }
 
@@ -365,8 +391,13 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
     
     //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
-    SKSpriteNode *voteResultNode = [BWUtility makeVoteResultNode:CGSizeMake(self.size.width*0.8, self.size.height*0.8) position:CGPointMake(0, 0) texture:[SKTexture textureWithImageNamed:@"frame.png"] day:day voteCount:voteCount excutionerId:excutionerId voteArray:votingArray infoDic:infoDic];
-    [backgroundNode addChild:voteResultNode];
+    voteCheckNode = [BWUtility makeVoteResultNode:CGSizeMake(self.size.width*0.8, self.size.height*0.8) position:CGPointMake(0, 0) texture:[SKTexture textureWithImageNamed:@"frame.png"] day:day voteCount:voteCount excutionerId:excutionerId voteArray:votingArray infoDic:infoDic];
+    [backgroundNode addChild:voteCheckNode];
+    
+    CGFloat margin = self.size.height*0.05;
+    CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
+    checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"check" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
+    [backgroundNode addChild:checkButton];
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -384,6 +415,28 @@ typedef NS_ENUM(NSInteger,Phase) {
             [self.view addSubview:table];
         }
         table.hidden = NO;
+    }
+    
+    if([node.name isEqualToString:@"check"]) {
+        [checkButton removeFromParent];
+        waitLabelNode = [[SKLabelNode alloc]init];
+        waitLabelNode.text = @"全員の確認待ち";
+        waitLabelNode.fontColor = [UIColor blackColor];
+        waitLabelNode.fontSize = checkButton.size.height*0.9;
+        waitLabelNode.position = checkButton.position;
+        [backgroundNode addChild:waitLabelNode];
+        
+        if(isPeripheral) {
+            //ペリフェラルは直接処理
+            checkList[[BWUtility getMyPlayerId:infoDic]] = @YES;
+            if([self isAllOkCheckList]) {
+                [self nightStart];
+            }
+        } else {
+            //セントラルはかくにん通知を送る
+            //投票結果確認通知「checkVoting:A..A」
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"checkVoting:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+        }
     }
 }
 
@@ -559,6 +612,13 @@ typedef NS_ENUM(NSInteger,Phase) {
             [self finishVoting];
         }
     }
+    
+    //ペリフェラルからの夜開始通知「nightStart:」
+    if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
+        if(phase == PhaseVotingFinish) {
+            [self nightStart];
+        }
+    }
 }
 
 -(void)didReceiveMessage:(NSString *)message {//セントラル->ペリフェラル受信処理
@@ -607,6 +667,16 @@ typedef NS_ENUM(NSInteger,Phase) {
         checkList[playerId] = @YES;
         if([self isAllOkCheckList]) {
             [self afternoonStart];
+        }
+    }
+    
+    //セントラルによる投票結果確認通知「checkVoting:A..A」
+    if([[BWUtility getCommand:message] isEqualToString:@"checkVoting"]) {
+        NSString *identificationId = [BWUtility getCommandContents:message][0];
+        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+        checkList[playerId] = @YES;
+        if([self isAllOkCheckList]) {
+            [self nightStart];
         }
     }
 }
@@ -663,8 +733,8 @@ typedef NS_ENUM(NSInteger,Phase) {
         }
     }
     
-    if(seconds == 30 && phase == PhaseAfternoon) {
-        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"evening.jpg"] time:30.0];
+    if(seconds == 10 && phase == PhaseAfternoon) {
+        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"evening.jpg"] time:10.0];
     }
 }
 
