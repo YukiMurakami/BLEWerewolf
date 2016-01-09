@@ -175,12 +175,13 @@
             explain = @"狂人は何も能力を持っていませんが、人狼が勝つと勝利します。";
             break;
         case RoleBodyguard:
-            name = @"ボディーガード";//実装済み
+            name = @"狩人";//実装済み
             token = @"狩";
             surfaceRole = RoleBodyguard;
             hasTable = true;
             tableString = @"護衛先を選択してください。";
-            explain = @"ボディーガードは毎晩誰かを一人指定してその人物を人狼の襲撃から守ります。ただし、自分自身を守ることはできません。";
+            explain = @"狩人は毎晩誰かを一人指定してその人物を人狼の襲撃から守ります。ただし、自分自身を守ることはできません。";
+            firstNightMessage = @"あなたは「狩人」です。よる時間中に護衛先を選択してください。選択しなかった場合はランダムで護衛します。";
             break;
         case RoleJointOwner:
             name = @"共有者";//実装済み

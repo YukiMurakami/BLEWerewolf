@@ -210,11 +210,12 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     if(roleId == RoleWerewolf) buttonTitle = @"噛む";
     if(roleId == RoleFortuneTeller) buttonTitle = @"占う";
+    if(roleId == RoleFortuneTeller) buttonTitle = @"守る";
     
     CGFloat buttonSizeWidth = self.size.width-(margin*4+explain.size.width+timer.size.width);
     actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
     if(![buttonTitle isEqualToString:@""] && !didAction) {
-        if(!(roleId == RoleWerewolf && day == 1)) {//人狼の初日襲撃はなし
+        if(!((roleId == RoleWerewolf || roleId == RoleBodyguard) && day == 1)) {//人狼の初日襲撃はなし
             [backgroundNode addChild:actionButtonNode];
         }
     }
@@ -245,7 +246,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
     if([[BWUtility getCardInfofromId:(int)roleId][@"hasTable"]boolValue]) {
         if(!actionButtonNode.parent) {
-            if(!(roleId == RoleWerewolf && day == 1)) {//人狼の初日襲撃はなし
+            if(!((roleId == RoleWerewolf || roleId == RoleBodyguard) && day == 1)) {//人狼の初日襲撃はなし
                 [backgroundNode addChild:actionButtonNode];
             }
         }
@@ -661,7 +662,7 @@ typedef NS_ENUM(NSInteger,Phase) {
                 [tableArray addObject:playerArray[i]];
             }
         }
-        if(myRoleId == RoleFortuneTeller || myRoleId == -1) {
+        if(myRoleId == RoleFortuneTeller || myRoleId == RoleBodyguard || myRoleId == -1) {
             if(i != myPlayerId) {
                 [tableArray addObject:playerArray[i]];
             }
@@ -715,6 +716,14 @@ typedef NS_ENUM(NSInteger,Phase) {
                 } afterDelay:0.1*i];
             }
         }
+    }
+    if(roleId == RoleBodyguard) {
+        [bodyguardArray addObject:@(targetPlayerId)];
+        //メッセージを送信
+        NSMutableArray *playerArray = infoDic[@"players"];
+        NSString *message = [NSString stringWithFormat:@"「%@」さんを守ります。",playerArray[targetPlayerId][@"name"]];
+        
+        [self sendGMMessage:message receiverId:playerArray[actionPlayerId][@"identificationId"]];
     }
     if(roleId == -1) {//投票アクション
         NSMutableDictionary *voteDic = [@{@"voter":@(actionPlayerId),@"voteder":@(targetPlayerId),@"count":@0}mutableCopy];

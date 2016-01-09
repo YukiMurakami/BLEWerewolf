@@ -20,6 +20,7 @@
 + (UIColor *)villagerBubbleColor;
 + (UIColor *)fortuneTellerBubbleColor;
 + (UIColor *)shamanBubbleColor;
++ (UIColor *)bodyguardBubbleColor;
 
 + (UIColor *)getPlayerColor:(NSInteger)id;//gm は-1
 @end
