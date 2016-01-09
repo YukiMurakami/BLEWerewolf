@@ -505,11 +505,11 @@
             }
             [receivedSignalIds addObject:[NSString stringWithFormat:@"%@-%d",identificationId,(int)gotSignalId]];
             
-            BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-            BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
-            [viewController addRecieveMessage:message];
             
             if([gameIdString isEqualToString:gotGameId]) {
+                BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+                [viewController addRecieveMessage:message];
                 //受信
                 for(NSInteger i=4;i<array.count;i++) {
                     if(i == 4) {

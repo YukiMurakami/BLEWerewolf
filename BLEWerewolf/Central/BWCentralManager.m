@@ -371,9 +371,7 @@
         
         NSLog(@"[data] %@",receivedString);
         
-        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-        BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
-        [viewController addRecieveMessage:receivedString];
+        
         
         //TODO::受信振り分け、受信完了通知が必要な場合は返す
         SignalKind kind = [[BWUtility getCommand:receivedString]integerValue];
@@ -382,6 +380,10 @@
         //「0:message」
             message = [receivedString substringFromIndex:2];
             [_delegate didReceivedMessage:message];
+            
+            BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+            BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+            [viewController addRecieveMessage:receivedString];
         }
         if(kind == SignalKindReceived) {
             //「2:NNNNNN:T..T:A..A」
@@ -391,6 +393,10 @@
             if([gotGameId isEqualToString:gameIdString] && [identificationId isEqualToString:[BWUtility getIdentificationString]]) {
                 BWSenderNode *node = [self getSenderNodeWithSignalId:gotSignalId];
                 node.isReceived = YES;
+                
+                BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+                [viewController addRecieveMessage:receivedString];
             }
         }
         if(kind == SignalKindNormal) {
@@ -406,6 +412,10 @@
             
             NSString *identificationId = array[3];
             if([identificationId isEqualToString:[BWUtility getIdentificationString]] && [gameIdString isEqualToString:gotGameId]) {
+                
+                BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
+                [viewController addRecieveMessage:receivedString];
                 //受信
                 for(NSInteger i=4;i<array.count;i++) {
                     if(i == 4) {

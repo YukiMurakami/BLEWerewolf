@@ -277,10 +277,10 @@
     NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
     NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
     for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
-        NSInteger targetId = [infoDic[@"players"][i][@"roleId"]integerValue];
+        NSInteger targetRoleId = [infoDic[@"players"][i][@"roleId"]integerValue];
         //人狼同士
-        if(roleId == RoleWerewolf && targetId == RoleWerewolf) {
-            [shouldSenderId addObject:@(i)];
+        if(roleId == RoleWerewolf && targetRoleId == RoleWerewolf) {
+            [shouldSenderId addObject:infoDic[@"players"][i][@"identificationId"]];
         }
     }
     return [shouldSenderId copy];
@@ -384,7 +384,7 @@
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",[BWUtility getIdentificationString],array[j]];
             NSArray *shouldSendIds = [self getSameChatroomMemberId:[BWUtility getIdentificationString]];
             for(NSInteger i=0;i<shouldSendIds.count;i++) {
-                [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0 firstWait:i*0.05+j*0.1];
+                [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0 firstWait:i*0.07+j*0.1];
             }
         } else {
             //まずはペリフェラルに知らせる

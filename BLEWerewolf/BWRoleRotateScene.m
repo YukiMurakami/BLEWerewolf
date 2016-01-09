@@ -260,7 +260,7 @@
 
 -(void)goFirstNight {
     //ペリフェラルのみ
-    [peripheralManager sendNormalMessageEveryClient:@"firstNight:" infoDic:infoDic interval:5.0 timeOut:30.0];
+    [peripheralManager sendNormalMessageEveryClient:@"firstNight:" infoDic:infoDic interval:2.0 timeOut:30.0];
     
     BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:isPeripheral :infoDic];
