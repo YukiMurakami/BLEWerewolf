@@ -28,7 +28,7 @@
     
     self.viewForSenderNodes = [[SKView alloc]initWithFrame:CGRectMake(0,0, skView.bounds.size.width, skView.bounds.size.height)];
     [self.view addSubview:self.viewForSenderNodes];
-    self.viewForSenderNodes.alpha = 0.85;
+    self.viewForSenderNodes.alpha = 0.8;
     self.viewForSenderNodes.userInteractionEnabled = NO;
     self.sceneForSenderNodes = [SKScene sceneWithSize:self.viewForSenderNodes.bounds.size];
     [self.viewForSenderNodes presentScene:self.sceneForSenderNodes];

@@ -48,7 +48,7 @@
         centralManager.delegate = self;
     }
     
-    day = 0;
+    day = 1;
     
     CGFloat margin = self.size.height*0.02;
     CGFloat statusHeight = 22;
@@ -134,7 +134,6 @@
     //リフレッシュ操作を行う
     //GMメッセージを時間差で送信する
     didAction = NO;
-    day++;
     
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
     if([[BWUtility getCardInfofromId:(int)roleId][@"hasTable"]boolValue]) {
@@ -166,6 +165,13 @@
             } afterDelay:5.0];
         }
     }
+}
+
+-(void)afternoonStart {
+    //リフレッシュ操作を行う
+    day++;
+    backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
+    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
