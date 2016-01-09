@@ -56,6 +56,7 @@
 		B6D103851C413A680007D6AB /* ui_frameTable.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103821C413A680007D6AB /* ui_frameTable.png */; };
 		B6D103861C413A680007D6AB /* ui_frameTitle.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103831C413A680007D6AB /* ui_frameTitle.png */; };
 		B6D103871C413A680007D6AB /* ui_nowLoading.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103841C413A680007D6AB /* ui_nowLoading.png */; };
+		B6D1038A1C414B3A0007D6AB /* heven.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D103891C414B3A0007D6AB /* heven.jpg */; };
 		D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B305F111B76436C68C48C08 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -150,6 +151,7 @@
 		B6D103821C413A680007D6AB /* ui_frameTable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameTable.png; sourceTree = "<group>"; };
 		B6D103831C413A680007D6AB /* ui_frameTitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameTitle.png; sourceTree = "<group>"; };
 		B6D103841C413A680007D6AB /* ui_nowLoading.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_nowLoading.png; sourceTree = "<group>"; };
+		B6D103891C414B3A0007D6AB /* heven.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = heven.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -292,6 +294,7 @@
 				B67CC3931C37650700546FC0 /* night.jpg */,
 				B6D1037D1C40C7720007D6AB /* evening.jpg */,
 				B6D1037E1C40C7720007D6AB /* morning.jpg */,
+				B6D103891C414B3A0007D6AB /* heven.jpg */,
 				B69ED59F1B6B2C2E00A9C355 /* button.png */,
 				B614DD961C3821D6006BB3C8 /* frame.png */,
 				B60A67A11C38C03900FFD0E5 /* gm.jpg */,
@@ -470,6 +473,7 @@
 				B67CC3941C37650700546FC0 /* night.jpg in Resources */,
 				B614DD941C381C28006BB3C8 /* card6.png in Resources */,
 				B63D90491B60DD35000E366B /* Images.xcassets in Resources */,
+				B6D1038A1C414B3A0007D6AB /* heven.jpg in Resources */,
 				B6D1037F1C40C7720007D6AB /* evening.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

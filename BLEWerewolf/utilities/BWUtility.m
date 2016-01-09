@@ -489,6 +489,15 @@
     return frameNode;
 }
 
++(SKSpriteNode*)makeMessageNodeWithBoldrate:(CGFloat)boldRate size:(CGSize)size text:(NSString*)text fontSize:(CGFloat)fontSize {
+    SKSpriteNode *frameNode = [BWUtility makeFrameNodeWithBoldrate:boldRate size:size];
+    BWMultipleLineLabelNode *node = [[BWMultipleLineLabelNode alloc]init];
+    node.size = CGSizeMake(size.width*0.9, size.height*0.9);
+    [node setText:text fontSize:fontSize fontColor:[UIColor blackColor]];
+    [frameNode addChild:node];
+    return frameNode;
+}
+
 +(NSString*)getVoteResultFormatString:(NSMutableDictionary*)voteDic infoDic:(NSMutableDictionary*)infoDic {
     NSInteger voter = [voteDic[@"voter"]integerValue];
     NSInteger voteder = [voteDic[@"voteder"]integerValue];

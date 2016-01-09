@@ -51,7 +51,8 @@ typedef NS_ENUM(NSInteger,Phase) {
     UIView *coverView;
     UIView *afternoonView;
     
-   
+    SKView *deadPeripheralCoverView;
+    
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -171,6 +172,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     if(roleId == RoleWerewolf) buttonTitle = @"噛む";
     if(roleId == RoleFortuneTeller) buttonTitle = @"占う";
+    
     CGFloat buttonSizeWidth = self.size.width-(margin*4+explain.size.width+timer.size.width);
     actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
     if(![buttonTitle isEqualToString:@""] && !didAction) {
@@ -216,6 +218,15 @@ typedef NS_ENUM(NSInteger,Phase) {
         
         if([[BWUtility getCardInfofromId:[BWUtility getMyRoleId:infoDic]][@"hasTable"]boolValue] && !didAction) {
             actionButtonNode.hidden = NO;
+        }
+        
+        //TODO::ここで生存判定を書き換える（処刑による死亡）
+        infoDic[@"players"][excutionerId][@"isLive"] = @NO;
+        if([BWUtility getMyPlayerId:infoDic] == excutionerId) {
+            [self dead:YES];
+            if(!isPeripheral) {
+                return;
+            }
         }
     }
     
@@ -266,6 +277,17 @@ typedef NS_ENUM(NSInteger,Phase) {
         [self resetDidActionPeripheralArray];
         
         //TODO::朝の犠牲者処理 きつねとかは占いアクション中に処理してしまう
+        if(wolfTargetIndex == -1) {
+            //ランダムに襲撃先を決める
+            NSMutableArray *candidates = [NSMutableArray array];
+            //生存者で人狼以外が候補
+            for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+                if(![infoDic[@"players"][i][@"isLive"]boolValue]) continue;
+                if([infoDic[@"players"][i][@"roleId"]integerValue] == RoleWerewolf) continue;
+                [candidates addObject:@(i)];
+            }
+            wolfTargetIndex = [candidates[[BWUtility getRandInteger:candidates.count]]integerValue];
+        }
         if(![bodyguardArray containsObject:@(wolfTargetIndex)]) {
             //護衛失敗の場合は死亡
             [victimArray addObject:@(wolfTargetIndex)];
@@ -277,6 +299,17 @@ typedef NS_ENUM(NSInteger,Phase) {
         //朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
         NSString *mes = [NSString stringWithFormat:@"afternoonStart:%@",[victimArray componentsJoinedByString:@","]];
         [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:30.0];
+    }
+    
+    //TODO::ここで生存判定を書き換える（夜間死亡者）
+    for(NSInteger i=0;i<victimArray.count;i++) {
+        infoDic[@"players"][[victimArray[i]integerValue]][@"isLive"] = @NO;
+        if([BWUtility getMyPlayerId:infoDic] == [victimArray[i]integerValue]) {
+            [self dead:NO];
+            if(!isPeripheral) {
+                return;
+            }
+        }
     }
     
     //リフレッシュ操作を行う
@@ -311,6 +344,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     if(actionButtonNode.parent) {
         [actionButtonNode removeFromParent];
     }
+    
     
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"morning.jpg"] time:1.0];
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"morning.jpg"];
@@ -390,6 +424,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:30.0];
     }
     
+    
     //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
     voteCheckNode = [BWUtility makeVoteResultNode:CGSizeMake(self.size.width*0.8, self.size.height*0.8) position:CGPointMake(0, 0) texture:[SKTexture textureWithImageNamed:@"frame.png"] day:day voteCount:voteCount excutionerId:excutionerId voteArray:votingArray infoDic:infoDic];
     [backgroundNode addChild:voteCheckNode];
@@ -398,6 +433,51 @@ typedef NS_ENUM(NSInteger,Phase) {
     CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
     checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"check" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
+}
+
+-(void)dead:(BOOL)isExcute {
+    
+    if(isPeripheral) {
+        //ペリフェラルは死亡後も信号のやり取りを行う必要がある
+        deadPeripheralCoverView = [[SKView alloc]initWithFrame:self.view.frame];
+        SKScene *coverScene = [[SKScene alloc]initWithSize:self.size];
+        [self.view addSubview:deadPeripheralCoverView];
+        [deadPeripheralCoverView presentScene:coverScene];
+        
+        SKSpriteNode *coverBackgroundNode = [[SKSpriteNode alloc]init];
+        coverBackgroundNode.size = coverScene.size;
+        coverBackgroundNode.position = CGPointMake(coverScene.size.width/2, coverScene.size.height/2);
+        coverBackgroundNode.texture = [SKTexture textureWithImageNamed:@"heven.jpg"];
+        [coverScene addChild:coverBackgroundNode];
+
+        
+        CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
+        NSString *mes = @"あなたは襲撃されました。";
+        if(isExcute) mes = @"あなたは処刑されました。";
+        SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.15];
+        messageNode.position = CGPointMake(0, 0);
+        [coverBackgroundNode addChild:messageNode];
+        
+        SKSpriteNode *heven = [[SKSpriteNode alloc]init];
+        heven.texture = [SKTexture textureWithImageNamed:@"heven.jpg"];
+        heven.size = coverBackgroundNode.size;
+        [coverBackgroundNode addChild:heven];
+        SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:10.0],[SKAction removeFromParent]]];
+        [heven runAction:fadeOut];
+        
+    } else {
+        //セントラルはこっち
+        backgroundNode.texture = [SKTexture textureWithImageNamed:@"heven.jpg"];
+        
+        CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
+        NSString *mes = @"あなたは襲撃されました。";
+        if(isExcute) mes = @"あなたは処刑されました。";
+        SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.2];
+        messageNode.position = CGPointMake(0, 0);
+        [backgroundNode addChild:messageNode];
+        
+        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"heven.jpg"] time:10.0];
+    }
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -438,6 +518,7 @@ typedef NS_ENUM(NSInteger,Phase) {
             [centralManager sendNormalMessage:[NSString stringWithFormat:@"checkVoting:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
         }
     }
+
 }
 
 -(void)setTableData :(NSInteger)myRoleId {
@@ -558,66 +639,71 @@ typedef NS_ENUM(NSInteger,Phase) {
     //ただし自分自信はすでに反映されているのでむし
     //chatreceive:A..A/T...T
     //chatreceive:G..G/A..A/T..T
-    if([[BWUtility getCommand:message] isEqualToString:@"chatreceive"]) {
-        NSArray *contents = [BWUtility getCommandContents:message];
-        if([messageViewController isMember:contents[0]] && ![contents[0] isEqualToString:[BWUtility getIdentificationString]]) {
-            //メッセージを反映
-            //ただしGMメッセージの場合は振り分ける
-            if([[messageViewController getGmId] isEqualToString:contents[0]]) {
-                if([[BWUtility getIdentificationString] isEqualToString:contents[1]]) {
+    //セントラルは自分が死んだら、ゲーム終了後まで信号を受信しない
+    if([infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
+        if([[BWUtility getCommand:message] isEqualToString:@"chatreceive"]) {
+            NSArray *contents = [BWUtility getCommandContents:message];
+            if([messageViewController isMember:contents[0]] && ![contents[0] isEqualToString:[BWUtility getIdentificationString]]) {
+                //メッセージを反映
+                //ただしGMメッセージの場合は振り分ける
+                if([[messageViewController getGmId] isEqualToString:contents[0]]) {
+                    if([[BWUtility getIdentificationString] isEqualToString:contents[1]]) {
+                        NSString *text = @"";
+                        for(NSInteger i=2;i<contents.count;i++) {
+                            text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
+                        }
+                        [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
+                    }
+                } else {
                     NSString *text = @"";
-                    for(NSInteger i=2;i<contents.count;i++) {
+                    for(NSInteger i=1;i<contents.count;i++) {
                         text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
                     }
                     [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
                 }
-            } else {
-                NSString *text = @"";
-                for(NSInteger i=1;i<contents.count;i++) {
-                    text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
+            }
+        }
+        
+        //ペリフェラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
+        if([[BWUtility getCommand:message] isEqualToString:@"afternoonStart"]) {
+            if(phase == PhaseNightFinish) {
+                //TODO::ここでセントラル側のvictimArrayを更新
+                NSArray *victimString = [[BWUtility getCommandContents:message][0] componentsSeparatedByString:@","];
+                for(NSInteger i=0;i<victimString.count;i++) {
+                    [victimArray addObject:@([victimString[i]integerValue])];
                 }
-                [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
+                [self afternoonStart];
             }
         }
-    }
-    
-    //ペリフェラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
-    if([[BWUtility getCommand:message] isEqualToString:@"afternoonStart"]) {
-        if(phase == PhaseNightFinish) {
-            //TODO::ここでセントラル側のvictimArrayを更新
-            NSArray *victimString = [[BWUtility getCommandContents:message][0] componentsSeparatedByString:@","];
-            for(NSInteger i=0;i<victimString.count;i++) {
-                [victimArray addObject:@([victimString[i]integerValue])];
+        
+        //ペリフェラルからの投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
+        if([[BWUtility getCommand:message] isEqualToString:@"voteResult"]) {
+            if(phase == PhaseAfternoonFinish) {
+                //ここで投票履歴を取得
+                votingArray = [NSMutableArray array];
+                NSArray *components = [BWUtility getCommandContents:message];
+                excutionerId = [components[1]integerValue];
+                voteCount = [components[0]integerValue];
+                for(NSInteger i=2;i<[components count];i++) {
+                    NSArray *idStrings = [components[i] componentsSeparatedByString:@","];
+                    NSInteger voterId = [idStrings[0]integerValue];
+                    NSInteger votederId = [idStrings[1]integerValue];
+                    NSInteger count = [idStrings[2]integerValue];
+                    [votingArray addObject:[@{@"voter":@(voterId),@"voteder":@(votederId),@"count":@(count)}mutableCopy]];
+                }
+                
+                [self finishVoting];
             }
-            [self afternoonStart];
         }
-    }
-    
-    //ペリフェラルからの投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
-    if([[BWUtility getCommand:message] isEqualToString:@"voteResult"]) {
-        if(phase == PhaseAfternoonFinish) {
-            //ここで投票履歴を取得
-            votingArray = [NSMutableArray array];
-            NSArray *components = [BWUtility getCommandContents:message];
-            excutionerId = [components[1]integerValue];
-            voteCount = [components[0]integerValue];
-            for(NSInteger i=2;i<[components count];i++) {
-                NSArray *idStrings = [components[i] componentsSeparatedByString:@","];
-                NSInteger voterId = [idStrings[0]integerValue];
-                NSInteger votederId = [idStrings[1]integerValue];
-                NSInteger count = [idStrings[2]integerValue];
-                [votingArray addObject:[@{@"voter":@(voterId),@"voteder":@(votederId),@"count":@(count)}mutableCopy]];
+        
+        //ペリフェラルからの夜開始通知「nightStart:」
+        if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
+            if(phase == PhaseVotingFinish) {
+                [self nightStart];
             }
-            
-            [self finishVoting];
         }
-    }
-    
-    //ペリフェラルからの夜開始通知「nightStart:」
-    if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
-        if(phase == PhaseVotingFinish) {
-            [self nightStart];
-        }
+    } else {
+        //死亡後
     }
 }
 
@@ -625,6 +711,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     //peripheral
     //セントラルから受け取ったメッセージを送るべき相手に送信
     //その後自分と同じグループと同じグループチャットがあったら反映（ただし自分はむし）
+    
     //chatsend:A..A/T...T
     if([[BWUtility getCommand:message] isEqualToString:@"chatsend"]) {
         NSArray *contents = [BWUtility getCommandContents:message];

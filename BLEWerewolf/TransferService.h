@@ -19,7 +19,8 @@ typedef NS_ENUM(NSInteger,SignalKind) {
     SignalKindReceived,
 };
 
-
+//ゲームオーバーになったプレイヤーは天国背景を表示してゲーム終了まで放置する
+//ただしペリフェラル担当のプレイヤーはゲーム進行に必要な動作は行う
 
 
 /*
