@@ -235,6 +235,8 @@ typedef NS_ENUM(NSInteger,Phase) {
     //夜終了
     phase = PhaseNightFinish;
     messageViewController.view.hidden = YES;
+    table.hidden = YES;
+    [messageViewController eraseKeyboard];
     if(actionButtonNode.parent) {
         [actionButtonNode removeFromParent];
     }

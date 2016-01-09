@@ -147,6 +147,10 @@ NSString *gmId = @"aaaaaa";
     [self hiddenKeyboard];
 }
 
+- (void)eraseKeyboard {
+    [self hiddenKeyboard];
+}
+
 #pragma mark - JSQMessagesCollectionViewDataSource
 
 // ④ アイテムごとに参照するメッセージデータを返す
