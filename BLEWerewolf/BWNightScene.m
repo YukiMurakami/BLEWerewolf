@@ -14,6 +14,8 @@ typedef NS_ENUM(NSInteger,Phase) {
     PhaseNight,
     PhaseNightFinish,
     PhaseAfternoon,
+    PhaseAfternoonFinish,
+    PhaseVotingFinish,
 };
 
 @implementation BWNightScene {
@@ -24,17 +26,24 @@ typedef NS_ENUM(NSInteger,Phase) {
     SKSpriteNode *explain;//役職カード
     NSInteger day;
     Phase phase;
-    
     NSMutableArray *checkList;//全員の夜終了を確認する
-    
-    UITableView *table;
-    NSMutableArray *tableArray;
-    
     //この辺のゲーム進行用変数は基本的にペリフェラルのみ
     NSInteger targetIndex;
     NSInteger wolfTargetIndex;
+    NSInteger voteCount;
     NSMutableArray *victimArray;//これは情報をセントラルでも共有する
     NSMutableArray *bodyguardArray;
+    NSMutableArray *votingArray;//投票履歴1日分 (リフレッシュ時にinfoDic[@"voting"]に書き込んでいく)
+    
+    
+    SKSpriteNode *checkButton;//投票確認用ぼたんなど
+    
+    NSInteger excutionerId;
+    
+    UITableView *table;
+    NSMutableArray *tableArray;
+    NSString *tableHeaderString;
+    NSInteger tableRoleId;
     
     
     UIView *coverView;
@@ -56,10 +65,29 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
 }
 
+-(void)resetDidActionPeripheralArray {//ペリフェラルのみ
+    didActionPeripheralArray = [NSMutableArray array];
+    NSMutableArray *playerArray = infoDic[@"players"];
+    for(NSInteger i=0;i<[playerArray count];i++) {
+        [didActionPeripheralArray addObject:@(NO)];
+    }
+}
+
 -(BOOL)isAllOkCheckList {//ペリフェラルのみ (チェックは生存者のみとする)
     BOOL isAllOk = YES;
     for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
         if([infoDic[@"players"][i][@"isLive"]boolValue] && ![checkList[i]boolValue]) {
+            isAllOk = NO;
+            break;
+        }
+    }
+    return isAllOk;
+}
+
+-(BOOL)isAllVoting {//ペリフェラルのみ（チェックは生存者のみ）
+    BOOL isAllOk = YES;
+    for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+        if([infoDic[@"players"][i][@"isLive"]boolValue] && ![didActionPeripheralArray[i]boolValue]) {
             isAllOk = NO;
             break;
         }
@@ -76,6 +104,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         peripheralManager = [BWPeripheralManager sharedInstance];
         peripheralManager.delegate = self;
         [self resetCheckList];
+        voteCount = 1;
     } else {
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
@@ -102,11 +131,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     table.dataSource = self;
     
     didAction = NO;
-    didActionPeripheralArray = [NSMutableArray array];
-    NSMutableArray *playerArray = infoDic[@"players"];
-    for(NSInteger i=0;i<[playerArray count];i++) {
-        [didActionPeripheralArray addObject:@(NO)];
-    }
+    [self resetDidActionPeripheralArray];
     
     [self initBackground];
     
@@ -169,6 +194,9 @@ typedef NS_ENUM(NSInteger,Phase) {
         wolfTargetIndex = -1;
     }
     didAction = NO;
+    if(isPeripheral) {
+        [self resetDidActionPeripheralArray];
+    }
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"night.jpg"] time:1.0];
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
     if([[BWUtility getCardInfofromId:(int)roleId][@"hasTable"]boolValue]) {
@@ -205,8 +233,12 @@ typedef NS_ENUM(NSInteger,Phase) {
 }
 
 -(void)afternoonStart {
+    phase = PhaseAfternoon;
     if(isPeripheral) {
         [self resetCheckList];
+        
+        [self resetDidActionPeripheralArray];
+        
         //TODO::朝の犠牲者処理 きつねとかは占いアクション中に処理してしまう
         if(![bodyguardArray containsObject:@(wolfTargetIndex)]) {
             //護衛失敗の場合は死亡
@@ -223,12 +255,12 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     //リフレッシュ操作を行う
     day++;
-    phase = PhaseAfternoon;
+    
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
     [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
-    
+    votingArray = [NSMutableArray array];
 }
 
 
@@ -248,6 +280,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     phase = PhaseNightFinish;
     messageViewController.view.hidden = YES;
     table.hidden = YES;
+    [coverView removeFromSuperview];
     [messageViewController eraseKeyboard];
     if(actionButtonNode.parent) {
         [actionButtonNode removeFromParent];
@@ -270,6 +303,72 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
 }
 
+-(void)finishAfternoon {
+    //昼終了
+    didAction = NO;
+    phase = PhaseAfternoonFinish;
+    //全員処刑投票用のテーブルを表示する
+    [self setTableData:-1];
+    if(!table.superview) {
+        [self.view addSubview:table];
+    }
+    table.hidden = NO;
+}
+
+-(void)finishVoting {
+    //投票終了　投票結果確認フェーズ
+    phase = PhaseVotingFinish;
+    if(isPeripheral) {
+        [self resetDidActionPeripheralArray];
+        [self resetCheckList];
+        //TODO::処刑による犠牲者処理
+        
+        //ペリフェラルはセントラルに処刑者と投票結果を通知
+        //投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
+       
+        //集計
+        NSMutableArray *counter = [NSMutableArray array];
+        for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+            [counter addObject:@(0)];
+        }
+        for(NSInteger i=0;i<votingArray.count;i++) {
+            NSInteger votederId = [votingArray[i][@"voteder"]integerValue];
+            counter[votederId] = @([counter[votederId]integerValue]+1);
+        }
+        NSMutableArray *maxIndices = [NSMutableArray array];
+        NSInteger maxCount = 0;
+        for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+            NSInteger count = [counter[i]integerValue];
+            if(maxCount < count) {
+                [maxIndices removeAllObjects];
+                [maxIndices addObject:@(i)];
+                maxCount = count;
+            } else if(maxCount == count) {
+                [maxIndices addObject:@(i)];
+            }
+        }
+        for(NSInteger i=0;i<votingArray.count;i++) {//ここで辞書に集計結果を保存
+            NSInteger voterId = [votingArray[i][@"voter"]integerValue];
+            [votingArray[i] setObject:@([counter[voterId]integerValue]) forKey:@"count"];
+        }
+        
+        //TODO::決選投票について（今はランダムに選ぶ）
+        excutionerId = [maxIndices[[BWUtility getRandInteger:maxIndices.count]]integerValue];
+        NSString *message = [NSString stringWithFormat:@"voteResult:%d/%d",(int)voteCount,(int)excutionerId];
+        for(NSInteger i=0;i<votingArray.count;i++) {
+            NSInteger votederId = [votingArray[i][@"voteder"]integerValue];
+            NSInteger voterId = [votingArray[i][@"voter"]integerValue];
+            NSInteger count = [counter[voterId]integerValue];
+            message = [NSString stringWithFormat:@"%@/%d,%d,%d",message,(int)voterId,(int)votederId,(int)count];
+        }
+        [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:30.0];
+    }
+    
+    //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
+    SKSpriteNode *voteResultNode = [BWUtility makeVoteResultNode:CGSizeMake(self.size.width*0.8, self.size.height*0.8) position:CGPointMake(0, 0) texture:[SKTexture textureWithImageNamed:@"frame.png"] day:day voteCount:voteCount excutionerId:excutionerId voteArray:votingArray infoDic:infoDic];
+    [backgroundNode addChild:voteResultNode];
+}
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [touches anyObject];
     CGPoint location = [touch locationInNode:self];
@@ -280,30 +379,36 @@ typedef NS_ENUM(NSInteger,Phase) {
         coverView.backgroundColor = [UIColor blackColor];
         coverView.alpha = 0.8;
         [self.view addSubview:coverView];
-        [self setTableData];
-        [self.view addSubview:table];
+        [self setTableData:[BWUtility getMyRoleId:infoDic]];
+        if(!table.superview) {
+            [self.view addSubview:table];
+        }
+        table.hidden = NO;
     }
 }
 
--(void)setTableData {
-    //TODO::夜のアクションテーブルデータ
+-(void)setTableData :(NSInteger)myRoleId {
+    //TODO::テーブルデータ 基本的には役職のIDだが、処刑投票は-1となっている
     tableArray = [NSMutableArray array];
-    NSInteger myRoleId = [BWUtility getMyRoleId:infoDic];
     NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
     NSMutableArray *playerArray = infoDic[@"players"];
     for(NSInteger i=0;i<playerArray.count;i++) {
+        if(![playerArray[i][@"isLive"]boolValue]) continue;//死亡者は含めない
+        
         NSInteger roleId = [playerArray[i][@"roleId"]integerValue];
         if(myRoleId == RoleWerewolf) {//人狼の場合は仲間の人狼以外の襲撃対象を入れる
             if(roleId != RoleWerewolf) {
                 [tableArray addObject:playerArray[i]];
             }
         }
-        if(myRoleId == RoleFortuneTeller) {
+        if(myRoleId == RoleFortuneTeller || myRoleId == -1) {
             if(i != myPlayerId) {
                 [tableArray addObject:playerArray[i]];
             }
         }
     }
+    tableRoleId = myRoleId;
+    tableHeaderString = [BWUtility getCardInfofromId:(int)myRoleId][@"tableString"];
     
     [table reloadData];
 }
@@ -313,12 +418,11 @@ typedef NS_ENUM(NSInteger,Phase) {
     [coverView removeFromSuperview];
     if(!isPeripheral) {
         //セントラルは命令をペリフェラルに送信
-        NSInteger myRoleId = [BWUtility getMyRoleId:infoDic];
-        NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)myRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
+        NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)tableRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
         [centralManager sendNormalMessage:message interval:5.0 timeOut:15.0 firstWait:0.0];
     } else {
         //ペリフェラルは即実行
-        [self processRoleAction:[BWUtility getMyRoleId:infoDic] actionPlayerId:[BWUtility getMyPlayerId:infoDic] targetPlayerId:targetIndex];
+        [self processRoleAction:tableRoleId actionPlayerId:[BWUtility getMyPlayerId:infoDic] targetPlayerId:targetIndex];
     }
     didAction = YES;
     
@@ -350,6 +454,13 @@ typedef NS_ENUM(NSInteger,Phase) {
                     [self sendGMMessage:message receiverId:playerArray[i][@"identificationId"]];
                 } afterDelay:0.1*i];
             }
+        }
+    }
+    if(roleId == -1) {//投票アクション
+        NSMutableDictionary *voteDic = [@{@"voter":@(actionPlayerId),@"voteder":@(targetPlayerId),@"count":@0}mutableCopy];
+        [votingArray addObject:voteDic];
+        if([self isAllVoting]) {
+            [self finishVoting];
         }
     }
 }
@@ -417,7 +528,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         }
     }
     
-    //セントラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
+    //ペリフェラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
     if([[BWUtility getCommand:message] isEqualToString:@"afternoonStart"]) {
         if(phase == PhaseNightFinish) {
             //TODO::ここでセントラル側のvictimArrayを更新
@@ -426,6 +537,26 @@ typedef NS_ENUM(NSInteger,Phase) {
                 [victimArray addObject:@([victimString[i]integerValue])];
             }
             [self afternoonStart];
+        }
+    }
+    
+    //ペリフェラルからの投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
+    if([[BWUtility getCommand:message] isEqualToString:@"voteResult"]) {
+        if(phase == PhaseAfternoonFinish) {
+            //ここで投票履歴を取得
+            votingArray = [NSMutableArray array];
+            NSArray *components = [BWUtility getCommandContents:message];
+            excutionerId = [components[1]integerValue];
+            voteCount = [components[0]integerValue];
+            for(NSInteger i=2;i<[components count];i++) {
+                NSArray *idStrings = [components[i] componentsSeparatedByString:@","];
+                NSInteger voterId = [idStrings[0]integerValue];
+                NSInteger votederId = [idStrings[1]integerValue];
+                NSInteger count = [idStrings[2]integerValue];
+                [votingArray addObject:[@{@"voter":@(voterId),@"voteder":@(votederId),@"count":@(count)}mutableCopy]];
+            }
+            
+            [self finishVoting];
         }
     }
 }
@@ -526,7 +657,14 @@ typedef NS_ENUM(NSInteger,Phase) {
         if(phase == PhaseNight) {
             [self finishNight];
             return;
+        } else if(phase == PhaseAfternoon) {
+            [self finishAfternoon];
+            return;
         }
+    }
+    
+    if(seconds == 30 && phase == PhaseAfternoon) {
+        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"evening.jpg"] time:30.0];
     }
 }
 
@@ -552,14 +690,16 @@ typedef NS_ENUM(NSInteger,Phase) {
     //TODO::テーブルタッチ操作
     NSString *targetIdentificationId = tableArray[indexPath.row][@"identificationId"];
     targetIndex = [BWUtility getPlayerId:infoDic id:targetIdentificationId];
-    NSInteger myRoleId = [BWUtility getMyRoleId:infoDic];
     
     NSString *message = @"";
-    if(myRoleId == RoleWerewolf) {
+    if(tableRoleId == RoleWerewolf) {
         message = [NSString stringWithFormat:@"「%@」さんを噛みますか？",infoDic[@"players"][targetIndex][@"name"]];
     }
-    if(myRoleId == RoleFortuneTeller) {
+    if(tableRoleId == RoleFortuneTeller) {
         message = [NSString stringWithFormat:@"「%@」さんを占いますか？",infoDic[@"players"][targetIndex][@"name"]];
+    }
+    if(tableRoleId == -1) {
+        message = [NSString stringWithFormat:@"「%@」さんに投票しますか？",infoDic[@"players"][targetIndex][@"name"]];
     }
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"確認" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"はい" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -569,6 +709,28 @@ typedef NS_ENUM(NSInteger,Phase) {
         ;
     }]];
     [self.view.window.rootViewController presentViewController:alertController animated:YES completion:nil];
+}
+
+// ヘッダー配置
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    // ヘッダー画像配置
+    UILabel *label = [[UILabel alloc]init];
+    
+    NSString *string = tableHeaderString;
+    
+    label.textColor = [UIColor blackColor];
+    label.text = string;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.backgroundColor = [UIColor groupTableViewBackgroundColor];
+    
+    return label;
+}
+
+// ヘッダーの高さ指定
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 30;
 }
 
 @end

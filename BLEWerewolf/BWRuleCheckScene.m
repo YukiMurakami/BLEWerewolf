@@ -200,6 +200,7 @@
         for(NSInteger i=0;i<components.count;i++) {
             NSArray *strings = [components[i] componentsSeparatedByString:@","];
             [infoDic[@"players"][[strings[0]integerValue]] setObject:@([strings[1]integerValue]) forKey:@"roleId"];
+            [infoDic[@"players"][[strings[0]integerValue]] setObject:@YES forKey:@"isLive"];
         }
         
         BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];

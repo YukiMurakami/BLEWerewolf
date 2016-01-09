@@ -125,6 +125,11 @@
     
     switch (cardId) {
             //roleIdはcellActionなど全て共通で用いられるが、予約語的な例外もある
+        case -1:
+            //処刑用
+            hasTable = true;
+            tableString = @"投票先を選択してください。";
+            break;
         case RoleVillager:
             name = @"村人";//実装済み
             token = @"村";
@@ -450,6 +455,41 @@
 
 
 #pragma mark - ui
+
++(NSString*)getVoteResultFormatString:(NSMutableDictionary*)voteDic infoDic:(NSMutableDictionary*)infoDic {
+    NSInteger voter = [voteDic[@"voter"]integerValue];
+    NSInteger voteder = [voteDic[@"voteder"]integerValue];
+    NSInteger count = [voteDic[@"count"]integerValue];
+    NSString *mes = [NSString stringWithFormat:@"（%d票）%@ → %@",(int)count,infoDic[@"players"][voter][@"name"],infoDic[@"players"][voteder][@"name"]];
+    return mes;
+}
+
++(SKSpriteNode*)makeVoteResultNode:(CGSize)size position:(CGPoint)position texture:(SKTexture*)texture day:(NSInteger)day voteCount:(NSInteger)voteCount excutionerId:(NSInteger)excutionerId voteArray:(NSMutableArray*)voteArray infoDic:(NSMutableDictionary*)infoDic {
+    SKSpriteNode *backNode = [[SKSpriteNode alloc]init];
+    backNode.texture = texture;
+    backNode.size = size;
+    backNode.position = position;
+    
+    NSString *excutioner = infoDic[@"players"][excutionerId][@"name"];
+    NSInteger nLabel = (voteArray.count+2);
+    
+    CGFloat labelHeight = size.height/nLabel*0.8;
+    for(NSInteger i=0;i<nLabel;i++) {
+        SKLabelNode *node = [[SKLabelNode alloc]init];
+        node.fontSize = labelHeight*0.6;
+        node.fontColor = [UIColor blackColor];
+        node.position = CGPointMake(0, (nLabel/2.0-0.5-i)*labelHeight);
+        if(i==0) {
+            node.text = [NSString stringWithFormat:@"%d日目 %d回目の投票",(int)day,(int)voteCount];
+        } else if(i==1) {
+            node.text = [NSString stringWithFormat:@"投票の結果「%@」さんが処刑されました。",excutioner];
+        } else {
+            node.text = [BWUtility getVoteResultFormatString:voteArray[i-2] infoDic:infoDic];
+        }
+        [backNode addChild:node];
+    }
+    return backNode;
+}
 
 +(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture {
     SKSpriteNode *explain = [[SKSpriteNode alloc]initWithImageNamed:@"frame.png"];
