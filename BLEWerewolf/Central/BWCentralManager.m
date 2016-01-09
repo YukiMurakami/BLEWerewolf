@@ -187,6 +187,9 @@
     gameIdString = gameIdStr;
 }
 
+-(void)stopScan {
+    [self.centralManager stopScan];
+}
 
 // --------------------------------
 // CBCentralManagerDelegate
@@ -219,6 +222,7 @@
     } else {
         NSLog(@"disconnect");
     }
+    [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:TRANSFER_SERVICE_UUID]] options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
 }
 
 // Invoked when the central manager fails to create a connection with a peripheral

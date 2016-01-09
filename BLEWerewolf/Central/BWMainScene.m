@@ -89,6 +89,7 @@
     NSString *touchedGameId = [gameIdArray[indexPath.row] substringToIndex:6];
     [centralManager setGameId:touchedGameId];
     //ここでgameIdを確定させる
+    [centralManager stopScan];
     NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
     [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
     

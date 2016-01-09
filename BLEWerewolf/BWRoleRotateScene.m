@@ -147,7 +147,7 @@
         } else {
             SKLabelNode *checkedLabelNode = [[SKLabelNode alloc]init];
             checkedLabelNode.text = @"全員の確認待ち";
-            checkedLabelNode.fontColor = [UIColor blackColor];
+            checkedLabelNode.fontColor = [UIColor whiteColor];
             checkedLabelNode.fontSize = self.size.width*0.2*0.7*0.7;
             checkedLabelNode.position = CGPointMake(0, -self.size.height/2+margin+buttonSize.height/2);
             [backgroundNode addChild:checkedLabelNode];
