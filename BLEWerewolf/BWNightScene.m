@@ -553,6 +553,10 @@ typedef NS_ENUM(NSInteger,Phase) {
 }
 
 -(void)dead:(BOOL)isExcute {
+    SKTexture *deadTexture = [SKTexture textureWithImageNamed:@"bg_dead.png"];
+    if(isExcute) {
+        deadTexture = [SKTexture textureWithImageNamed:@"bg_batankyu.png"];
+    }
     
     if(isPeripheral) {
         //ペリフェラルは死亡後も信号のやり取りを行う必要がある
@@ -564,22 +568,22 @@ typedef NS_ENUM(NSInteger,Phase) {
         SKSpriteNode *coverBackgroundNode = [[SKSpriteNode alloc]init];
         coverBackgroundNode.size = coverScene.size;
         coverBackgroundNode.position = CGPointMake(coverScene.size.width/2, coverScene.size.height/2);
-        coverBackgroundNode.texture = [SKTexture textureWithImageNamed:@"heven.jpg"];
+        coverBackgroundNode.texture = deadTexture;
         [coverScene addChild:coverBackgroundNode];
 
         
         CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
         NSString *mes = @"あなたは襲撃されました。";
         if(isExcute) mes = @"あなたは処刑されました。";
-        SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.11];
-        messageNode.position = CGPointMake(0, 0);
+        SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.09];
+        messageNode.position = CGPointMake(0, -messageNode.size.height*0.8);
         [coverBackgroundNode addChild:messageNode];
         
         SKSpriteNode *heven = [[SKSpriteNode alloc]init];
-        heven.texture = [SKTexture textureWithImageNamed:@"heven.jpg"];
+        heven.texture = [SKTexture textureWithImageNamed:@"bg_heaven.jpg"];
         heven.size = coverBackgroundNode.size;
         [coverBackgroundNode addChild:heven];
-        SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:10.0],[SKAction removeFromParent]]];
+        SKAction *fadeOut = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:20.0],[SKAction removeFromParent]]];
         [heven runAction:fadeOut];
         
     } else {
@@ -588,16 +592,16 @@ typedef NS_ENUM(NSInteger,Phase) {
         messageViewController.view.hidden = YES;
         
         //セントラルはこっち
-        backgroundNode.texture = [SKTexture textureWithImageNamed:@"heven.jpg"];
+        backgroundNode.texture = deadTexture;
         
         CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
         NSString *mes = @"あなたは襲撃されました。";
         if(isExcute) mes = @"あなたは処刑されました。";
-        SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.11];
-        messageNode.position = CGPointMake(0, 0);
+        SKSpriteNode *messageNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@以後ゲームが終了するまで話をすることができません。",mes] fontSize:size.height*0.09];
+        messageNode.position = CGPointMake(0, -messageNode.size.height*0.8);
         [backgroundNode addChild:messageNode];
         
-        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"heven.jpg"] time:10.0];
+        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"heaven.jpg"] time:20.0];
     }
 }
 
