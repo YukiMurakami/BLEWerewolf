@@ -44,6 +44,9 @@
 + (UIColor *)bodyguardBubbleColor {//空色
     return [self colorWithHex:0x00ccff];
 }
++ (UIColor*)madmanBubbleColor {//灰色
+    return [self colorWithHex:0x888888];
+}
 
 + (UIColor *)getPlayerColor:(NSInteger)id {
     NSArray *colors = @[@(0xff1111),

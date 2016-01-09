@@ -173,6 +173,7 @@
             surfaceRole = RoleMadman;
             hasTable = false;
             explain = @"狂人は何も能力を持っていませんが、人狼が勝つと勝利します。";
+            firstNightMessage = @"あなたは「狂人」です。能力はありませんが嘘をついて村を混乱させましょう。";
             break;
         case RoleBodyguard:
             name = @"狩人";//実装済み
