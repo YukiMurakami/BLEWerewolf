@@ -9,10 +9,13 @@
 #import <SpriteKit/SpriteKit.h>
 
 #import "BWSettingScene.h"
+#import "BWRuleButtonNode.h"
+#import "BWButtonNode.h"
 
-@interface LWRuleSettingScene : SKScene {
+@interface LWRuleSettingScene : SKScene <BWRuleButtonNodeDelegate,BWButtonNodeDelegate> {
     SKScene *toBackScene;
     NSMutableDictionary *infoDic;
+    NSMutableArray *buttons;
 }
 
 -(void) setBackScene :(SKScene *)backScene infoDic:(NSMutableDictionary *)_infoDic;
