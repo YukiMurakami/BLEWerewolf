@@ -7,7 +7,8 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
+#import "BWButtonNode.h"
 
-@interface BWTopScene : SKScene
+@interface BWTopScene : SKScene <BWButtonNodeDelegate>
 
 @end

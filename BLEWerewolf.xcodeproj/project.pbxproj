@@ -59,6 +59,13 @@
 		B6D1038D1C4187E70007D6AB /* bg_batankyu.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D1038B1C4187E70007D6AB /* bg_batankyu.jpg */; };
 		B6D1038E1C4187E70007D6AB /* bg_dead.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D1038C1C4187E70007D6AB /* bg_dead.png */; };
 		B6D103901C4187FB0007D6AB /* bg_heaven.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B6D1038F1C4187FB0007D6AB /* bg_heaven.jpg */; };
+		B6D103931C421A3B0007D6AB /* ui_button.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103911C421A3B0007D6AB /* ui_button.png */; };
+		B6D103941C421A3B0007D6AB /* ui_buttonPush.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103921C421A3B0007D6AB /* ui_buttonPush.png */; };
+		B6D103991C421A420007D6AB /* ui_frameGorgeous.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103951C421A420007D6AB /* ui_frameGorgeous.png */; };
+		B6D1039A1C421A420007D6AB /* ui_frameIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103961C421A420007D6AB /* ui_frameIcon.png */; };
+		B6D1039B1C421A420007D6AB /* ui_frameNomal.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103971C421A420007D6AB /* ui_frameNomal.png */; };
+		B6D1039C1C421A420007D6AB /* ui_frameQuestion.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103981C421A420007D6AB /* ui_frameQuestion.png */; };
+		B6D1039F1C421B200007D6AB /* BWButtonNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D1039E1C421B200007D6AB /* BWButtonNode.m */; };
 		D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B305F111B76436C68C48C08 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -156,6 +163,14 @@
 		B6D1038B1C4187E70007D6AB /* bg_batankyu.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bg_batankyu.jpg; sourceTree = "<group>"; };
 		B6D1038C1C4187E70007D6AB /* bg_dead.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bg_dead.png; sourceTree = "<group>"; };
 		B6D1038F1C4187FB0007D6AB /* bg_heaven.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bg_heaven.jpg; sourceTree = "<group>"; };
+		B6D103911C421A3B0007D6AB /* ui_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_button.png; sourceTree = "<group>"; };
+		B6D103921C421A3B0007D6AB /* ui_buttonPush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_buttonPush.png; sourceTree = "<group>"; };
+		B6D103951C421A420007D6AB /* ui_frameGorgeous.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameGorgeous.png; sourceTree = "<group>"; };
+		B6D103961C421A420007D6AB /* ui_frameIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameIcon.png; sourceTree = "<group>"; };
+		B6D103971C421A420007D6AB /* ui_frameNomal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameNomal.png; sourceTree = "<group>"; };
+		B6D103981C421A420007D6AB /* ui_frameQuestion.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameQuestion.png; sourceTree = "<group>"; };
+		B6D1039D1C421B200007D6AB /* BWButtonNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWButtonNode.h; sourceTree = "<group>"; };
+		B6D1039E1C421B200007D6AB /* BWButtonNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWButtonNode.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,6 +289,8 @@
 				B69ED5AF1B6B2C6800A9C355 /* BWUtility.m */,
 				B6BA9D521C3E659E00F75065 /* BWSenderNode.h */,
 				B6BA9D531C3E659E00F75065 /* BWSenderNode.m */,
+				B6D1039D1C421B200007D6AB /* BWButtonNode.h */,
+				B6D1039E1C421B200007D6AB /* BWButtonNode.m */,
 				B60A67A51C38C92900FFD0E5 /* UIColor+BWAddtions.h */,
 				B60A67A61C38C92900FFD0E5 /* UIColor+BWAddtions.m */,
 				B6CF75131C2640C70078309A /* NSObject+BlocksWait.h */,
@@ -336,6 +353,12 @@
 				B6D103821C413A680007D6AB /* ui_frameTable.png */,
 				B6D103831C413A680007D6AB /* ui_frameTitle.png */,
 				B6D103841C413A680007D6AB /* ui_nowLoading.png */,
+				B6D103911C421A3B0007D6AB /* ui_button.png */,
+				B6D103921C421A3B0007D6AB /* ui_buttonPush.png */,
+				B6D103951C421A420007D6AB /* ui_frameGorgeous.png */,
+				B6D103961C421A420007D6AB /* ui_frameIcon.png */,
+				B6D103971C421A420007D6AB /* ui_frameNomal.png */,
+				B6D103981C421A420007D6AB /* ui_frameQuestion.png */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -458,11 +481,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6D103851C413A680007D6AB /* ui_frameTable.png in Resources */,
+				B6D103941C421A3B0007D6AB /* ui_buttonPush.png in Resources */,
 				B6D103801C40C7720007D6AB /* morning.jpg in Resources */,
 				B69ED5A81B6B2C2E00A9C355 /* card0.png in Resources */,
 				B6D103901C4187FB0007D6AB /* bg_heaven.jpg in Resources */,
 				B69ED5AB1B6B2C2E00A9C355 /* card3.png in Resources */,
 				B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */,
+				B6D1039C1C421A420007D6AB /* ui_frameQuestion.png in Resources */,
 				B69ED5A91B6B2C2E00A9C355 /* card1.png in Resources */,
 				B6D1038E1C4187E70007D6AB /* bg_dead.png in Resources */,
 				B63D90471B60DD35000E366B /* Main.storyboard in Resources */,
@@ -470,6 +495,9 @@
 				B6D103871C413A680007D6AB /* ui_nowLoading.png in Resources */,
 				B6D103861C413A680007D6AB /* ui_frameTitle.png in Resources */,
 				B69ED5AD1B6B2C2E00A9C355 /* card5.png in Resources */,
+				B6D1039A1C421A420007D6AB /* ui_frameIcon.png in Resources */,
+				B6D1039B1C421A420007D6AB /* ui_frameNomal.png in Resources */,
+				B6D103991C421A420007D6AB /* ui_frameGorgeous.png in Resources */,
 				B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */,
 				B614DD971C3821D6006BB3C8 /* frame.png in Resources */,
 				B60A67A21C38C03900FFD0E5 /* gm.jpg in Resources */,
@@ -481,6 +509,7 @@
 				B67CC3941C37650700546FC0 /* night.jpg in Resources */,
 				B614DD941C381C28006BB3C8 /* card6.png in Resources */,
 				B63D90491B60DD35000E366B /* Images.xcassets in Resources */,
+				B6D103931C421A3B0007D6AB /* ui_button.png in Resources */,
 				B6D1037F1C40C7720007D6AB /* evening.jpg in Resources */,
 				B6D1038D1C4187E70007D6AB /* bg_batankyu.jpg in Resources */,
 			);
@@ -553,6 +582,7 @@
 				B67CC3911C36D3D300546FC0 /* BWWaitConnectionScene.m in Sources */,
 				B60A67A71C38C92900FFD0E5 /* UIColor+BWAddtions.m in Sources */,
 				B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */,
+				B6D1039F1C421B200007D6AB /* BWButtonNode.m in Sources */,
 				B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */,
 				B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */,
 				B60A679A1C38ACED00FFD0E5 /* BWNightScene.m in Sources */,
