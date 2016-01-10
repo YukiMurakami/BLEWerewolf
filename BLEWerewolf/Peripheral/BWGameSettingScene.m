@@ -22,7 +22,7 @@
     BWGorgeousTableView *tableView;
     NSMutableArray *registeredPlayersArray;
     
-    SKSpriteNode *buttonNode;
+    BWButtonNode *bwbuttonNode;
     
     NSInteger sendGlobalId;
     NSInteger memberAllCheckId;
@@ -64,28 +64,25 @@
     backgroundNode.position = CGPointMake(self.size.width/2, self.size.height/2);
     [self addChild:backgroundNode];
     
+    SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width*0.8, self.size.width*0.8/4) title:@"プレイヤー登録画面"];
+    titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - self.size.width*0.1);
+    [backgroundNode addChild:titleNode];
     
-    SKLabelNode *title = [[SKLabelNode alloc]init];
-    title.fontSize = self.size.height*0.05;
-    title.text = [NSString stringWithFormat:@"プレイヤー登録画面"];
-    SKLabelNode *title2 = [[SKLabelNode alloc]init];
-    title2.fontSize = self.size.height*0.05;
-    title2.text = [NSString stringWithFormat:@"ゲームID:%06ld（%ld人）",(long)gameId,registeredPlayersArray.count];
-    title2.fontName = @"HiraKakuProN-W3";
+    SKSpriteNode *numberNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width*0.3, self.size.width*0.8/5) title:[NSString stringWithFormat:@"%d人",(int)registeredPlayersArray.count]];
+    numberNode.position = CGPointMake(0, titleNode.position.y - titleNode.size.height/2 - numberNode.size.height/2 - self.size.width*0.1/2);
     
-    
-    title.position = CGPointMake(0, self.size.height*0.4);
-    title2.position = CGPointMake(0, self.size.height*0.3);
-    [backgroundNode addChild:title];
-    [backgroundNode addChild:title2];
+    [backgroundNode addChild:numberNode];
     
     CGFloat margin = self.size.height * 0.05;
     
-    buttonNode = [BWUtility makeButton:@"参加締め切り" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" position:CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2)];
-    [backgroundNode addChild:buttonNode];
+    bwbuttonNode = [[BWButtonNode alloc]init];
+    [bwbuttonNode makeButtonWithSize:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" title:@"参加締め切り" boldRate:1.0];
+    bwbuttonNode.position = CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2);
+    bwbuttonNode.delegate = self;
+    [backgroundNode addChild:bwbuttonNode];
     
     if(!tableView) {
-        tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, title.fontSize*2+margin*3, self.size.width-margin*2, self.size.height-margin*5-title.fontSize*2-buttonNode.size.height)];
+        tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, titleNode.size.height+numberNode.size.height+margin*2.2, self.size.width-margin*2, self.size.height - (titleNode.size.height+numberNode.size.height+margin*2.2 + margin*2+bwbuttonNode.size.height))];
         [tableView setViewDesign:self];
         tableView.tableView.rowHeight = tableView.tableView.frame.size.height/6;
     }
@@ -121,21 +118,20 @@
     NSString *name = registeredPlayersArray[indexPath.row][@"name"];
     
     cell.textLabel.text = name;
+    if(indexPath.row == 0) cell.textLabel.text = [NSString stringWithFormat:@"%@ (gameId:%06d)",name,(int)gameId];
     
     //cell.backgroundView.alpha = 0.4;
     
     return cell;
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInNode:self];
-    SKNode *node = [self nodeAtPoint:location];
-    
-    if([node.name isEqualToString:@"next"]) {
+
+
+-(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
+    if([name isEqualToString:@"next"]) {
         [manager stopGlobalSignal:sendGlobalId];
         
-        [buttonNode removeFromParent];
+        [bwbuttonNode removeFromParent];
         
         NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
         //member:0/A..A/S..S/12

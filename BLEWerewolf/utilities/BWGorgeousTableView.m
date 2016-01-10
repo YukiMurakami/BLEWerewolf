@@ -43,13 +43,16 @@
     if(colorId == 1) filename = @"ui_plate_red.png";
     UIImage *image = [UIImage imageNamed:filename];
     
-    UIImage *resizedImage = [image resizableImageWithCapInsets:UIEdgeInsetsMake(28, 28, 28, 28)];
+    UIImage *resizedImage = [image resizableImageWithCapInsets:UIEdgeInsetsMake(15, 15, 15, 15)];
     UIImageView *resizableView = [[UIImageView alloc] initWithImage:resizedImage];
     [resizableView setContentMode:UIViewContentModeScaleToFill];
     [resizableView setFrame:CGRectMake(0, 0, cell.frame.size.width,cell.frame.size.height)];
     
     cell.backgroundView = resizableView;
     cell.backgroundColor = nil;
+    cell.textLabel.textColor = [UIColor whiteColor];
+    cell.textLabel.textAlignment = NSTextAlignmentCenter;
+    
     return cell;
 }
 

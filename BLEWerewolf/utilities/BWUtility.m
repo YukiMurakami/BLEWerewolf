@@ -490,6 +490,7 @@
     labelNode.fontColor = [UIColor blackColor];
     labelNode.color = [UIColor grayColor];
     labelNode.verticalAlignmentMode = SKLabelVerticalAlignmentModeCenter;
+    labelNode.fontName = @"HiraKakuProN-W3";
     [frameNode addChild:labelNode];
     return frameNode;
 }

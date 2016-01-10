@@ -10,7 +10,8 @@
 #import "BWPeripheralManager.h"
 
 #import "BWGorgeousTableView.h"
+#import "BWButtonNode.h"
 
-@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource, BWPeripheralManagerDelegate>
+@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource, BWPeripheralManagerDelegate,BWButtonNodeDelegate>
 
 @end
