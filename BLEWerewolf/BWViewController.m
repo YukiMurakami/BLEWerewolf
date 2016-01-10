@@ -31,6 +31,7 @@
     [self.view addSubview:self.viewForSenderNodes];
     self.viewForSenderNodes.alpha = 0.75;
     self.viewForSenderNodes.userInteractionEnabled = NO;
+    self.viewForSenderNodes.hidden = YES;
     self.sceneForSenderNodes = [SKScene sceneWithSize:self.viewForSenderNodes.bounds.size];
     [self.viewForSenderNodes presentScene:self.sceneForSenderNodes];
     

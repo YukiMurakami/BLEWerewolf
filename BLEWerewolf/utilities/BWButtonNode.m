@@ -27,7 +27,7 @@
     buttonNode.xScale = size.width/64/boldRate;
     buttonNode.yScale = size.height/64/boldRate;
     NSLog(@"%f,%f",buttonNode.xScale,buttonNode.yScale);
-    CGFloat margin = 0.45;
+    CGFloat margin = 0.49;
     buttonNode.centerRect = CGRectMake(margin, margin, 1.0-margin*2,1.0-margin*2);
     buttonNode.position = CGPointMake(0, 0);
     

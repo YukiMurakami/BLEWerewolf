@@ -66,6 +66,9 @@
 		B6D1039B1C421A420007D6AB /* ui_frameNomal.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103971C421A420007D6AB /* ui_frameNomal.png */; };
 		B6D1039C1C421A420007D6AB /* ui_frameQuestion.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103981C421A420007D6AB /* ui_frameQuestion.png */; };
 		B6D1039F1C421B200007D6AB /* BWButtonNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D1039E1C421B200007D6AB /* BWButtonNode.m */; };
+		B6D103A21C4233CD0007D6AB /* BWGorgeousTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = B6D103A11C4233CD0007D6AB /* BWGorgeousTableView.m */; };
+		B6D103A41C424E500007D6AB /* ui_plate_red.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103A31C424E500007D6AB /* ui_plate_red.png */; };
+		B6D103A61C424E540007D6AB /* ui_plate.png in Resources */ = {isa = PBXBuildFile; fileRef = B6D103A51C424E540007D6AB /* ui_plate.png */; };
 		D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B305F111B76436C68C48C08 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -171,6 +174,10 @@
 		B6D103981C421A420007D6AB /* ui_frameQuestion.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_frameQuestion.png; sourceTree = "<group>"; };
 		B6D1039D1C421B200007D6AB /* BWButtonNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWButtonNode.h; sourceTree = "<group>"; };
 		B6D1039E1C421B200007D6AB /* BWButtonNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWButtonNode.m; sourceTree = "<group>"; };
+		B6D103A01C4233CD0007D6AB /* BWGorgeousTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWGorgeousTableView.h; sourceTree = "<group>"; };
+		B6D103A11C4233CD0007D6AB /* BWGorgeousTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWGorgeousTableView.m; sourceTree = "<group>"; };
+		B6D103A31C424E500007D6AB /* ui_plate_red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate_red.png; sourceTree = "<group>"; };
+		B6D103A51C424E540007D6AB /* ui_plate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +298,8 @@
 				B6BA9D531C3E659E00F75065 /* BWSenderNode.m */,
 				B6D1039D1C421B200007D6AB /* BWButtonNode.h */,
 				B6D1039E1C421B200007D6AB /* BWButtonNode.m */,
+				B6D103A01C4233CD0007D6AB /* BWGorgeousTableView.h */,
+				B6D103A11C4233CD0007D6AB /* BWGorgeousTableView.m */,
 				B60A67A51C38C92900FFD0E5 /* UIColor+BWAddtions.h */,
 				B60A67A61C38C92900FFD0E5 /* UIColor+BWAddtions.m */,
 				B6CF75131C2640C70078309A /* NSObject+BlocksWait.h */,
@@ -359,6 +368,8 @@
 				B6D103961C421A420007D6AB /* ui_frameIcon.png */,
 				B6D103971C421A420007D6AB /* ui_frameNomal.png */,
 				B6D103981C421A420007D6AB /* ui_frameQuestion.png */,
+				B6D103A31C424E500007D6AB /* ui_plate_red.png */,
+				B6D103A51C424E540007D6AB /* ui_plate.png */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -482,9 +493,11 @@
 			files = (
 				B6D103851C413A680007D6AB /* ui_frameTable.png in Resources */,
 				B6D103941C421A3B0007D6AB /* ui_buttonPush.png in Resources */,
+				B6D103A61C424E540007D6AB /* ui_plate.png in Resources */,
 				B6D103801C40C7720007D6AB /* morning.jpg in Resources */,
 				B69ED5A81B6B2C2E00A9C355 /* card0.png in Resources */,
 				B6D103901C4187FB0007D6AB /* bg_heaven.jpg in Resources */,
+				B6D103A41C424E500007D6AB /* ui_plate_red.png in Resources */,
 				B69ED5AB1B6B2C2E00A9C355 /* card3.png in Resources */,
 				B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */,
 				B6D1039C1C421A420007D6AB /* ui_frameQuestion.png in Resources */,
@@ -571,6 +584,7 @@
 				B69ED5B01B6B2C6800A9C355 /* BWUtility.m in Sources */,
 				B67CC39D1C3789C700546FC0 /* LWRuleSettingScene.m in Sources */,
 				B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */,
+				B6D103A21C4233CD0007D6AB /* BWGorgeousTableView.m in Sources */,
 				B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */,
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
 				B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */,

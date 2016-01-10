@@ -12,12 +12,14 @@
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
 
+
+
 @interface BWGameSettingScene () {
     BWPeripheralManager *manager;
     
     NSInteger gameId;
     
-    UITableView *tableView;
+    BWGorgeousTableView *tableView;
     NSMutableArray *registeredPlayersArray;
     
     SKSpriteNode *buttonNode;
@@ -83,10 +85,9 @@
     [backgroundNode addChild:buttonNode];
     
     if(!tableView) {
-        tableView = [[UITableView alloc]initWithFrame:CGRectMake(margin, title.fontSize*2+margin*3, self.size.width-margin*2, self.size.height-margin*5-title.fontSize*2-buttonNode.size.height)];
-        tableView.delegate = self;
-        tableView.dataSource = self;
-        tableView.rowHeight = tableView.frame.size.height/6;
+        tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, title.fontSize*2+margin*3, self.size.width-margin*2, self.size.height-margin*5-title.fontSize*2-buttonNode.size.height)];
+        [tableView setViewDesign:self];
+        tableView.tableView.rowHeight = tableView.tableView.frame.size.height/6;
     }
     
     
@@ -100,7 +101,7 @@
 -(void)didMoveToView:(SKView *)view {
     
     [self.view addSubview:tableView];
-    [tableView reloadData];
+    [tableView.tableView reloadData];
 }
 
 #pragma mark - tableViewDelegate
@@ -112,12 +113,16 @@
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
+        NSInteger colorid = 0;
+        if(indexPath.row == 0) colorid = 1;
+        cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:colorid];
     }
     
     NSString *name = registeredPlayersArray[indexPath.row][@"name"];
     
     cell.textLabel.text = name;
+    
+    //cell.backgroundView.alpha = 0.4;
     
     return cell;
 }
@@ -170,7 +175,7 @@
             if(isNew) {
                 NSMutableDictionary *dic = [@{@"identificationId":identificationIdString,@"name":userNameString}mutableCopy];
                 [registeredPlayersArray addObject:dic];
-                [tableView reloadData];
+                [tableView.tableView reloadData];
                 [self initBackground];
             }
         }

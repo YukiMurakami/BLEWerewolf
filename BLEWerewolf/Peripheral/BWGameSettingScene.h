@@ -9,6 +9,8 @@
 #import <SpriteKit/SpriteKit.h>
 #import "BWPeripheralManager.h"
 
-@interface BWGameSettingScene : SKScene <UITableViewDataSource, UITableViewDelegate, BWPeripheralManagerDelegate>
+#import "BWGorgeousTableView.h"
+
+@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource, BWPeripheralManagerDelegate>
 
 @end
