@@ -9,6 +9,7 @@
 #import "BWSettingScene.h"
 #import "BWUtility.h"
 
+
 @interface BWSettingScene () {
     SKLabelNode *playCount;
     
@@ -51,48 +52,38 @@
     background.position = CGPointMake(self.size.width/2,self.size.height/2);
     [self addChild:background];
     
-    NSInteger nButton = 4;
+    CGFloat margin = self.size.width*0.1;
+    
+    SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width-margin*2, (self.size.width-margin*2)/4) title:@"ゲーム設定"];
+    titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - margin);
+    [background addChild:titleNode];
+    
+    SKSpriteNode *titleNode2 = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake((self.size.width-margin*2)*0.8, (self.size.width-margin*2)/4*0.8) title:[NSString stringWithFormat:@"プレイヤー：%d人",(int)[informations[@"players"] count] ]];
+    titleNode2.position = CGPointMake(0, titleNode.position.y - titleNode.size.height/2 - titleNode2.size.height/2 - margin);
+    [background addChild:titleNode2];
+    
+    NSInteger nButton = 3;
     for(int i=0;i<nButton;i++) {
         NSString *name;
         NSString *text;
-        if(i==0) {name = @"explain"; text = @"役職一覧";}
-        if(i==1) {name = @"role"; text = @"配役設定";}
-        if(i==2) {name = @"rule"; text = @"ルール設定";}
-        if(i==3) {name = @"start"; text = @"スタート";}
+        if(i==0) {name = @"role"; text = @"配役設定";}
+        if(i==1) {name = @"rule"; text = @"ルール設定";}
+        if(i==2) {name = @"start"; text = @"スタート";}
         
         CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.height*0.1);
-        CGPoint buttonPosition = CGPointMake(0, -self.size.height*0.5+buttonSize.height+buttonSize.height * 1.2 * (nButton-1-i));
+        CGPoint buttonPosition = CGPointMake(0, -self.size.height*0.5+buttonSize.height/2+ margin+(buttonSize.height+margin) * (nButton-1-i));
         
-        SKSpriteNode *playerButton = [BWUtility makeButton:text size:buttonSize name:name position:buttonPosition];
-        [background addChild:playerButton];
+        BWButtonNode *buttonNode = [[BWButtonNode alloc]init];
+        [buttonNode makeButtonWithSize:buttonSize name:name title:text boldRate:1.0];
+        buttonNode.position = buttonPosition;
+        buttonNode.delegate = self;
+        [background addChild:buttonNode];
     }
     
-    
-    playCount = [[SKLabelNode alloc]init];
-    playCount.text = [NSString stringWithFormat:@"プレイヤー数：%d人",(int)[informations[@"players"] count] ];
-    playCount.fontName = @"HiraKakuProN-W6";
-    playCount.position = CGPointMake(0,self.size.height/2-70);
-    [background addChild:playCount];
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInNode:self];
-    SKNode *node = [self nodeAtPoint:location];
-    
-    
-    if([node.name isEqualToString:@"explain"]) {
-        /*
-        LWRoleTableScene *scene = [LWRoleTableScene sceneWithSize:self.size];
-        
-        
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:0.5];
-        [scene setBackScene:self];
-        [self.view presentScene:scene transition:transition];
-         */
-    }
-    
-    if([node.name isEqualToString:@"role"]) {
+-(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
+    if([name isEqualToString:@"role"]) {
         
         if(!rollSettingScene) {
             rollSettingScene = [LWRoleSettingScene sceneWithSize:self.size];
@@ -108,23 +99,23 @@
     }
     
     
-    if([node.name isEqualToString:@"rule"]) {
+    if([name isEqualToString:@"rule"]) {
         
         if(!ruleSettingScene) {
             ruleSettingScene = [LWRuleSettingScene sceneWithSize:self.size];
         }
-       
+        
         NSMutableDictionary *info = informations[@"rules"];
         [(LWRuleSettingScene *) ruleSettingScene setBackScene:self infoDic:info];
         
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:0.5];
         
         [self.view presentScene:ruleSettingScene transition:transition];
-         
+        
     }
     
     
-    if([node.name isEqualToString:@"start"]) {
+    if([name isEqualToString:@"start"]) {
         NSArray *role = informations[@"roles"];
         int sum = 0;
         for(int i=0;i<role.count;i++) {
@@ -137,22 +128,20 @@
             [alert show];
             return;
         }
-        /*
-        if(([roll[RollFortuneTeller]integerValue] <= 0 || [roll[RollWerewolf]integerValue]+[roll[RollBossWerewolf]integerValue] <= 0 || [roll[RollShaman]integerValue] <= 0 || [roll[RollBodyguard]integerValue] <= 0) && [roll[RollDetective]integerValue] >= 1) {
-            UIAlertView *alert =
-            [[UIAlertView alloc] initWithTitle:@"確認" message:[NSString stringWithFormat:@"名探偵を入れる場合は「占い師」「霊媒師」「ボディーガード」「人狼（大狼）」を各一人以上入れる必要があります。"]
-                                      delegate:self cancelButtonTitle:nil otherButtonTitles:@"はい", nil];
-            [alert show];
-            return;
-        }
-         */
-        
         
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:YES :informations];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
     }
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInNode:self];
+    SKNode *node = [self nodeAtPoint:location];
+    
+    
 }
 
 

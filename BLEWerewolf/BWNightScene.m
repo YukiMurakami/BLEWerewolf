@@ -14,6 +14,8 @@
 #import "BWAppDelegate.h"
 #import "BWViewController.h"
 
+#import "BWGorgeousTableView.h"
+
 typedef NS_ENUM(NSInteger,Phase) {
     PhaseNight,
     PhaseNightFinish,
@@ -48,7 +50,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     NSInteger excutionerId;
     
-    UITableView *table;
+    BWGorgeousTableView *table;
     NSMutableArray *tableArray;
     NSString *tableHeaderString;
     NSInteger tableRoleId;
@@ -172,10 +174,10 @@ typedef NS_ENUM(NSInteger,Phase) {
     timer.delegate = self;
     
     CGFloat tableMargin = self.size.height*0.05;
-    table = [[UITableView alloc]initWithFrame:CGRectMake(tableMargin, tableMargin + statusHeight, self.size.width-tableMargin*2,self.size.height - (statusHeight+tableMargin*3+self.size.height*0.1))];
-    table.rowHeight = table.frame.size.height/6;
-    table.delegate = self;
-    table.dataSource = self;
+    table = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(tableMargin, tableMargin + statusHeight, self.size.width-tableMargin*2,self.size.height - (statusHeight+tableMargin*3+self.size.height*0.1))];
+    [table setViewDesign:self];
+    
+    table.tableView.rowHeight = table.frame.size.height/6;
     
     didAction = NO;
     [self resetDidActionPeripheralArray];
@@ -739,7 +741,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     tableRoleId = myRoleId;
     tableHeaderString = [BWUtility getCardInfofromId:(int)myRoleId][@"tableString"];
     
-    [table reloadData];
+    [table.tableView reloadData];
 }
 
 -(void)doRoleAction {
@@ -1077,7 +1079,8 @@ typedef NS_ENUM(NSInteger,Phase) {
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
+        cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:0];
+        //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
     }
     
     NSString *name = tableArray[indexPath.row][@"name"];
@@ -1088,6 +1091,7 @@ typedef NS_ENUM(NSInteger,Phase) {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
     //TODO::テーブルタッチ操作
     NSString *targetIdentificationId = tableArray[indexPath.row][@"identificationId"];
     targetIndex = [BWUtility getPlayerId:infoDic id:targetIdentificationId];

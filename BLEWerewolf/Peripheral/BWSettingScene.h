@@ -12,11 +12,12 @@
 #import "LWRuleSettingScene.h"
 
 #import "BWRuleCheckScene.h"
+#import "BWButtonNode.h"
 
 //#import "LWGameScene.h"
 //#import "LWRoleTableScene.h"
 
-@interface BWSettingScene : SKScene <BWPeripheralManagerDelegate> {
+@interface BWSettingScene : SKScene <BWPeripheralManagerDelegate,BWButtonNodeDelegate> {
     NSInteger player;
     
     SKScene *rollSettingScene;
