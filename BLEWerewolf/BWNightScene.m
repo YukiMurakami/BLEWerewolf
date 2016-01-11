@@ -182,7 +182,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
     messageViewController.delegate = self;
     
     timer = [[BWTimer alloc]init];
-    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*10];
+    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*20];
     timer.delegate = self;
     
     CGFloat tableMargin = self.size.height*0.05;
@@ -201,6 +201,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
 }
 
 -(void)initBackground {//共通　背景の描画
+    //今の実装では初日の夜にしか呼ばれない
     backgroundNode = [[SKSpriteNode alloc]init];
     backgroundNode.size = self.size;
     backgroundNode.position = CGPointMake(self.size.width/2, self.size.height/2);
@@ -234,11 +235,8 @@ typedef NS_ENUM(NSInteger,TableMode) {
     
     CGFloat buttonSizeWidth = self.size.width-(margin*4+explain.size.width+timer.size.width);
     actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
-    if(![buttonTitle isEqualToString:@""] && !didAction) {
-        if(!((roleId == RoleWerewolf || roleId == RoleBodyguard) && day == 1)) {//人狼の初日襲撃はなし
-            [backgroundNode addChild:actionButtonNode];
-        }
-    }
+    
+    
     
 }
 
@@ -272,8 +270,19 @@ typedef NS_ENUM(NSInteger,TableMode) {
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
     if([[BWUtility getCardInfofromId:(int)roleId][@"hasTable"]boolValue]) {
         if(!actionButtonNode.parent) {
-            if(!((roleId == RoleWerewolf || roleId == RoleBodyguard) && day == 1)) {//人狼の初日襲撃はなし
+            if(roleId == RoleWerewolf && day != 1) {
                 [backgroundNode addChild:actionButtonNode];
+            }
+            if(roleId == RoleBodyguard && day != 1) {
+                [backgroundNode addChild:actionButtonNode];
+            }
+            if(roleId == RoleFortuneTeller) {
+                if(day == 1 && [infoDic[@"rules"][@"fortuneMode"]integerValue] == FortuneTellerModeFree) {
+                    [backgroundNode addChild:actionButtonNode];
+                }
+                if(day >= 2) {
+                    [backgroundNode addChild:actionButtonNode];
+                }
             }
         }
     }
@@ -285,7 +294,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
             messageViewController.view.hidden = NO;
         }
         [waitLabelNode removeFromParent];
-        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*10];
+        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*20];
         
         if([[BWUtility getCardInfofromId:[BWUtility getMyRoleId:infoDic]][@"hasTable"]boolValue] && !didAction) {
             actionButtonNode.hidden = NO;
@@ -323,6 +332,27 @@ typedef NS_ENUM(NSInteger,TableMode) {
                     [NSObject performBlock:^{
                         [self sendGMMessage:@"初日の夜になりました。" receiverId:infoDic[@"players"][i][@"identificationId"]];
                     } afterDelay:0.1*i];
+                    
+                    if([infoDic[@"players"][i][@"roleId"]integerValue] == RoleFortuneTeller) {
+                        //TODO::占い師　お告げ
+                        //自分以外、狼、狐以外からランダムに選ぶ
+                        NSInteger firstNightFortuneId = 0;
+                        NSMutableArray *indices = [NSMutableArray array];
+                        for(NSInteger j=0;j<[infoDic[@"players"] count];j++) {
+                            if(j == i) continue;
+                            NSInteger roleId = [infoDic[@"players"][j][@"roleId"]integerValue];
+                            if(roleId != RoleWerewolf && roleId != RoleFox) {
+                                [indices addObject:@(j)];
+                            }
+                        }
+                        firstNightFortuneId = [indices[[BWUtility getRandInteger:indices.count]]integerValue];
+                        
+                        [NSObject performBlock:^{
+                            NSString *result = @"「人間 ○」";
+                            NSString *mes = [NSString stringWithFormat:@"お告げ結果「%@」さんは%@でした",infoDic[@"players"][firstNightFortuneId][@"name"],result];
+                            [self sendGMMessage:mes receiverId:infoDic[@"players"][i][@"identificationId"]];
+                        } afterDelay:2.0];
+                    }
                 }
             } afterDelay:5.0];
         }
@@ -377,7 +407,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
-    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*10];
+    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*20];
     votingArray = [NSMutableArray array];
     
     if(isPeripheral) {
