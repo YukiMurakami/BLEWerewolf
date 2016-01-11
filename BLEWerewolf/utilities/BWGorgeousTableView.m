@@ -64,6 +64,10 @@
     cell.backgroundColor = nil;
     cell.textLabel.textColor = [UIColor whiteColor];
     cell.textLabel.textAlignment = NSTextAlignmentCenter;
+    NSLog(@"%f",cell.frame.size.height);
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.frame.size.height*0.5];
+    //cell.textLabel.minimumScaleFactor = 10.f/15.f;
+    cell.textLabel.adjustsFontSizeToFitWidth = YES;
     
     //[cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     

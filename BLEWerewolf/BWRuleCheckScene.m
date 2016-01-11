@@ -9,10 +9,13 @@
 #import "BWRuleCheckScene.h"
 #import "BWUtility.h"
 #import "BWRoleRotateScene.h"
+#import "BWGorgeousTableView.h"
 
 @implementation BWRuleCheckScene {
     BOOL isCheck;
     NSMutableArray *checkList;
+    
+    BWGorgeousTableView *table;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -52,31 +55,34 @@
     backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self addChild:backgroundNode];
 
-    CGFloat margin = self.size.height * 0.05;
+    CGFloat margin = self.size.width * 0.1;
     
-    SKLabelNode *labelNode = [[SKLabelNode alloc]init];
-    labelNode.fontSize = 30.0;
-    labelNode.position = CGPointMake(0,self.size.height/2 - labelNode.fontSize - margin);
-    labelNode.text = @"ルール";
-    labelNode.fontColor = [UIColor blackColor];
-    [backgroundNode addChild:labelNode];
+    SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width-margin*2, (self.size.width-margin*2)/4) title:@"ルール確認"];
+    titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - margin);
+    [backgroundNode addChild:titleNode];
+    
+    CGSize size = CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2);
     
     if(!isCheck) {
-        SKSpriteNode *buttonNode = [BWUtility makeButton:@"確認" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" position:CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2)];
+        BWButtonNode *buttonNode = [[BWButtonNode alloc]init];
+        [buttonNode makeButtonWithSize:size name:@"next" title:@"確認" boldRate:1.0];
+        buttonNode.delegate = self;
         [backgroundNode addChild:buttonNode];
+        buttonNode.position = CGPointMake(0, -self.size.height/2 + margin + buttonNode.size.height/2);
     } else {
         SKLabelNode *checkedLabelNode = [[SKLabelNode alloc]init];
         checkedLabelNode.text = @"全員の確認待ち";
         checkedLabelNode.fontColor = [UIColor blackColor];
-        checkedLabelNode.fontSize = self.size.width*0.2*0.7*0.7;
-        checkedLabelNode.position = CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2);
+        checkedLabelNode.fontSize = size.height*0.7;
+        checkedLabelNode.position = CGPointMake(0, -self.size.height/2+margin+size.height/2);
         [backgroundNode addChild:checkedLabelNode];
     }
     if(!table) {
-        table = [[UITableView alloc]initWithFrame:CGRectMake(margin,labelNode.fontSize + margin*2,self.size.width-margin*2,self.size.height-margin*4-self.size.width*0.2*0.7-labelNode.fontSize)];
-        table.delegate = self;
-        table.dataSource = self;
-        table.rowHeight = table.frame.size.height/6;
+        table = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin,titleNode.size.height + margin*2,self.size.width-margin*2,self.size.height-margin*4-size.height-titleNode.size.height)];
+        [table setViewDesign:self];
+        table.tableView.rowHeight = table.tableView.frame.size.height/6;
+        table.tableView.allowsSelection = NO;
+        table.tableView.scrollEnabled = NO;
     }
 }
 
@@ -86,7 +92,7 @@
 
 -(void)didMoveToView:(SKView *)view {
     [self.view addSubview:table];
-    [table reloadData];
+    [table.tableView reloadData];
     
     if(isPeripheral) {
         //setting:/6,3,1,1,1,1/7,3,0,1,1
@@ -111,12 +117,8 @@
     }
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInNode:self];
-    SKNode *node = [self nodeAtPoint:location];
-    
-    if([node.name isEqualToString:@"next"]) {
+-(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
+    if([name isEqualToString:@"next"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //settingCheck:A..A
             [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
@@ -141,6 +143,13 @@
     }
 }
 
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInNode:self];
+    SKNode *node = [self nodeAtPoint:location];
+    
+}
+
 #pragma mark - tableViewDelegate
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -150,43 +159,47 @@
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
+        cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:0];
+        //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
     }
-    
+    NSString *title = @"";
+    NSString *detailTitle = @"";
     if(indexPath.row == 0) {
-        cell.textLabel.text = @"配役";
-        cell.detailTextLabel.text = [BWUtility getRoleSetString:infoDic[@"roles"]];
+        title = @"配役";
+        detailTitle = [BWUtility getRoleSetString:infoDic[@"roles"]];
     }
     if(indexPath.row == 1) {
-        cell.textLabel.text = @"昼時間";
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@分",infoDic[@"rules"][@"timer"]];
+        title = @"昼時間";
+        detailTitle = [NSString stringWithFormat:@"%@分",infoDic[@"rules"][@"timer"]];
     }
     if(indexPath.row == 2) {
-        cell.textLabel.text = @"夜時間";
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@分",infoDic[@"rules"][@"nightTimer"]];
+        title = @"夜時間";
+        detailTitle = [NSString stringWithFormat:@"%@分",infoDic[@"rules"][@"nightTimer"]];
     }
     if(indexPath.row == 3) {
-        cell.textLabel.text = @"初日占い";
-        cell.detailTextLabel.text = [BWUtility getFortuneButtonString:[infoDic[@"rules"][@"fortuneMode"]integerValue]];
+        title = @"初日占い";
+        detailTitle = [[BWUtility getFortuneButtonString:[infoDic[@"rules"][@"fortuneMode"]integerValue]] substringFromIndex:5];
     }
     if(indexPath.row == 4) {
-        cell.textLabel.text = @"連続護衛";
+        title = @"連続護衛";
         BOOL canGuard = [infoDic[@"rules"][@"canContinuousGuard"]boolValue];
         if(canGuard) {
-            cell.detailTextLabel.text = @"あり";
+            detailTitle = @"あり";
         } else {
-            cell.detailTextLabel.text = @"なし";
+            detailTitle = @"なし";
         }
     }
     if(indexPath.row == 5) {
-        cell.textLabel.text = @"役かけ";
+        title = @"役かけ";
         BOOL isLack = [infoDic[@"rules"][@"isLacking"]boolValue];
         if(isLack) {
-            cell.detailTextLabel.text = @"あり";
+            detailTitle = @"あり";
         } else {
-            cell.detailTextLabel.text = @"なし";
+            detailTitle = @"なし";
         }
     }
+    
+    cell.textLabel.text = [NSString stringWithFormat:@"%@   %@",title,detailTitle];
     
     return cell;
 }

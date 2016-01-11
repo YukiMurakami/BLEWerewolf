@@ -9,15 +9,16 @@
 #import <SpriteKit/SpriteKit.h>
 #import "BWCentralManager.h"
 #import "BWPeripheralManager.h"
+#import "BWButtonNode.h"
 
-@interface BWRuleCheckScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface BWRuleCheckScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate,UITableViewDataSource,UITableViewDelegate,BWButtonNodeDelegate> {
     SKSpriteNode *backgroundNode;
     BWCentralManager *centralManager;
     BWPeripheralManager *peripheralManager;
     
     NSMutableDictionary *infoDic;
     
-    UITableView *table;
+    
     
     //この画面からはペリフェラル、セントラルで共通で作る
     //ただし、内部処理は区別して行う
