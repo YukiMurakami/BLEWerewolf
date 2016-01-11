@@ -85,6 +85,7 @@
         tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, titleNode.size.height+numberNode.size.height+margin*2.2, self.size.width-margin*2, self.size.height - (titleNode.size.height+numberNode.size.height+margin*2.2 + margin*2+bwbuttonNode.size.height))];
         [tableView setViewDesign:self];
         tableView.tableView.rowHeight = tableView.tableView.frame.size.height/6;
+        tableView.tableView.allowsSelection = NO;
     }
     
     
