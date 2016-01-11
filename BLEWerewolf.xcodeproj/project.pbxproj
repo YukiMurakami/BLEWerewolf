@@ -20,6 +20,7 @@
 		B614DD951C381C28006BB3C8 /* card7.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD931C381C28006BB3C8 /* card7.png */; };
 		B614DD971C3821D6006BB3C8 /* frame.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD961C3821D6006BB3C8 /* frame.png */; };
 		B631DCE91C434AF400BC9D04 /* ui_platePush.png in Resources */ = {isa = PBXBuildFile; fileRef = B631DCE81C434AF400BC9D04 /* ui_platePush.png */; };
+		B631DCEC1C43917A00BC9D04 /* BWVoteCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B631DCEB1C43917A00BC9D04 /* BWVoteCell.m */; };
 		B63D903E1B60DD35000E366B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D903D1B60DD35000E366B /* main.m */; };
 		B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90401B60DD35000E366B /* BWAppDelegate.m */; };
 		B63D90441B60DD35000E366B /* BWViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90431B60DD35000E366B /* BWViewController.m */; };
@@ -109,6 +110,8 @@
 		B614DD931C381C28006BB3C8 /* card7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card7.png; sourceTree = "<group>"; };
 		B614DD961C3821D6006BB3C8 /* frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = frame.png; sourceTree = "<group>"; };
 		B631DCE81C434AF400BC9D04 /* ui_platePush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_platePush.png; sourceTree = "<group>"; };
+		B631DCEA1C43917A00BC9D04 /* BWVoteCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWVoteCell.h; sourceTree = "<group>"; };
+		B631DCEB1C43917A00BC9D04 /* BWVoteCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWVoteCell.m; sourceTree = "<group>"; };
 		B63D90381B60DD34000E366B /* BLEWerewolf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLEWerewolf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B63D903C1B60DD35000E366B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B63D903D1B60DD35000E366B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -307,6 +310,8 @@
 				B69ED5AF1B6B2C6800A9C355 /* BWUtility.m */,
 				B6BA9D521C3E659E00F75065 /* BWSenderNode.h */,
 				B6BA9D531C3E659E00F75065 /* BWSenderNode.m */,
+				B631DCEA1C43917A00BC9D04 /* BWVoteCell.h */,
+				B631DCEB1C43917A00BC9D04 /* BWVoteCell.m */,
 				B6D1039D1C421B200007D6AB /* BWButtonNode.h */,
 				B6D1039E1C421B200007D6AB /* BWButtonNode.m */,
 				B6D103AD1C427A460007D6AB /* BWRuleButtonNode.h */,
@@ -606,6 +611,7 @@
 				B67CC39D1C3789C700546FC0 /* LWRuleSettingScene.m in Sources */,
 				B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */,
 				B6D103A21C4233CD0007D6AB /* BWGorgeousTableView.m in Sources */,
+				B631DCEC1C43917A00BC9D04 /* BWVoteCell.m in Sources */,
 				B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */,
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
 				B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */,

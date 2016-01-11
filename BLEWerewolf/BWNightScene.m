@@ -15,6 +15,7 @@
 #import "BWViewController.h"
 
 #import "BWGorgeousTableView.h"
+#import "BWVoteCell.h"
 
 typedef NS_ENUM(NSInteger,Phase) {
     PhaseNight,
@@ -23,6 +24,12 @@ typedef NS_ENUM(NSInteger,Phase) {
     PhaseAfternoon,
     PhaseAfternoonFinish,
     PhaseVotingFinish,
+};
+
+typedef NS_ENUM(NSInteger,TableMode) {
+    TableModeNormal,
+    TableModeVoteResult,
+    TableModeHistory,
 };
 
 @implementation BWNightScene {
@@ -61,7 +68,11 @@ typedef NS_ENUM(NSInteger,Phase) {
     
     SKView *deadPeripheralCoverView;
     
+    TableMode tableMode;
+    
     Winner winner;
+    
+    NSInteger voteMaxCount;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -161,6 +172,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     day = 1;
     excutionerId = -1;
     phase = PhaseNight;
+    voteMaxCount = 4;
     
     CGFloat margin = self.size.height*0.02;
     CGFloat statusHeight = 22;
@@ -170,7 +182,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     messageViewController.delegate = self;
     
     timer = [[BWTimer alloc]init];
-    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*60];
+    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*10];
     timer.delegate = self;
     
     CGFloat tableMargin = self.size.height*0.05;
@@ -246,6 +258,12 @@ typedef NS_ENUM(NSInteger,Phase) {
         bodyguardArray = [NSMutableArray array];
         wolfTargetIndex = -1;
     }
+    
+    if(table.superview) {
+        [table removeFromSuperview];
+        table.hidden = YES;
+    }
+    
     didAction = NO;
     if(isPeripheral) {
         [self resetDidActionPeripheralArray];
@@ -267,7 +285,7 @@ typedef NS_ENUM(NSInteger,Phase) {
             messageViewController.view.hidden = NO;
         }
         [waitLabelNode removeFromParent];
-        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*60];
+        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*10];
         
         if([[BWUtility getCardInfofromId:[BWUtility getMyRoleId:infoDic]][@"hasTable"]boolValue] && !didAction) {
             actionButtonNode.hidden = NO;
@@ -359,7 +377,7 @@ typedef NS_ENUM(NSInteger,Phase) {
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
-    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*60];
+    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*10];
     votingArray = [NSMutableArray array];
     
     if(isPeripheral) {
@@ -425,6 +443,7 @@ typedef NS_ENUM(NSInteger,Phase) {
 -(void)morning {
     //犠牲者を全員で確認して同期を取ってからafternoonに行く
     phase = PhaseMorning;
+    voteCount = 1;
     day++;
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"morning.jpg"] time:1.0];
     
@@ -497,6 +516,9 @@ typedef NS_ENUM(NSInteger,Phase) {
     if(!table.superview) {
         [self.view addSubview:table];
     }
+    if(waitLabelNode.parent) {
+        [waitLabelNode removeFromParent];
+    }
     if(!isPeripheral || [infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
         table.hidden = NO;
     }
@@ -514,6 +536,7 @@ typedef NS_ENUM(NSInteger,Phase) {
         //投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
        
         //集計
+       
         NSMutableArray *counter = [NSMutableArray array];
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
             [counter addObject:@(0)];
@@ -539,8 +562,16 @@ typedef NS_ENUM(NSInteger,Phase) {
             [votingArray[i] setObject:@([counter[voterId]integerValue]) forKey:@"count"];
         }
         
-        //TODO::決選投票について（今はランダムに選ぶ）
-        excutionerId = [maxIndices[[BWUtility getRandInteger:maxIndices.count]]integerValue];
+        //TODO::決選投票について（4回目の投票は同票ならランダム）
+        if(maxIndices.count >= 2) {
+            excutionerId = -1;
+            if(voteCount >= 4) {
+                excutionerId = [maxIndices[[BWUtility getRandInteger:maxIndices.count]]integerValue];
+            }
+        } else {
+            excutionerId = [maxIndices[0]integerValue];
+        }
+      
         NSString *message = [NSString stringWithFormat:@"voteResult:%d/%d",(int)voteCount,(int)excutionerId];
         for(NSInteger i=0;i<votingArray.count;i++) {
             NSInteger votederId = [votingArray[i][@"voteder"]integerValue];
@@ -552,9 +583,16 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
     
     
+    
     //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
-    voteCheckNode = [BWUtility makeVoteResultNode:CGSizeMake(self.size.width*0.8, self.size.height*0.8) position:CGPointMake(0, 0) texture:[SKTexture textureWithImageNamed:@"frame.png"] day:day voteCount:voteCount excutionerId:excutionerId voteArray:votingArray infoDic:infoDic];
-    [backgroundNode addChild:voteCheckNode];
+    tableMode = TableModeVoteResult;
+    table.tableView.rowHeight = table.frame.size.width/1446*244;
+    if(!table.superview) {
+        [self.view addSubview:table];
+    }
+    table.hidden = NO;
+    [table.tableView reloadData];
+    
     
     CGFloat margin = self.size.height*0.05;
     CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
@@ -701,7 +739,15 @@ typedef NS_ENUM(NSInteger,Phase) {
             //ペリフェラルは直接処理
             checkList[[BWUtility getMyPlayerId:infoDic]] = @YES;
             if([self isAllOkCheckList]) {
-                [self nightStart];
+                if(excutionerId == -1) {
+                    //再投票
+                    voteCount++;
+                    votingArray = [NSMutableArray array];
+                    [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
+                    [self finishAfternoon];
+                } else {
+                    [self nightStart];
+                }
             }
         } else {
             //セントラルはかくにん通知を送る
@@ -719,6 +765,7 @@ typedef NS_ENUM(NSInteger,Phase) {
 }
 
 -(void)setTableData :(NSInteger)myRoleId {
+    tableMode = TableModeNormal;
     //TODO::テーブルデータ 基本的には役職のIDだが、処刑投票は-1となっている
     tableArray = [NSMutableArray array];
     NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
@@ -740,6 +787,10 @@ typedef NS_ENUM(NSInteger,Phase) {
     }
     tableRoleId = myRoleId;
     tableHeaderString = [BWUtility getCardInfofromId:(int)myRoleId][@"tableString"];
+    
+    table.tableView.rowHeight = table.frame.size.height/6;
+    
+    tableMode = TableModeNormal;
     
     [table.tableView reloadData];
 }
@@ -920,7 +971,14 @@ typedef NS_ENUM(NSInteger,Phase) {
         //ペリフェラルからの夜開始通知「nightStart:」
         if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
             if(phase == PhaseVotingFinish) {
-                [self nightStart];
+                if(excutionerId == -1) {
+                    //再投票
+                    votingArray = [NSMutableArray array];
+                    voteCount++;
+                    [self finishAfternoon];
+                } else {
+                    [self nightStart];
+                }
             }
         }
         
@@ -1007,7 +1065,15 @@ typedef NS_ENUM(NSInteger,Phase) {
         NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
         checkList[playerId] = @YES;
         if([self isAllOkCheckList]) {
-            [self nightStart];
+            if(excutionerId == -1) {
+                //再投票
+                votingArray = [NSMutableArray array];
+                voteCount++;
+                [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
+                [self finishAfternoon];
+            } else {
+                [self nightStart];
+            }
         }
     }
 }
@@ -1073,19 +1139,48 @@ typedef NS_ENUM(NSInteger,Phase) {
 
 #pragma mark - tableDelegate
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if(tableMode == TableModeVoteResult) {
+        return votingArray.count;
+    }
     return tableArray.count;
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) {
-        cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:0];
-        //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
+    
+    if(tableMode == TableModeVoteResult) {
+        BWVoteCell *cell = [tableView dequeueReusableCellWithIdentifier:@"votecell"];
+        
+        NSString *voterString = infoDic[@"players"][[votingArray[indexPath.row][@"voter"]integerValue]][@"name"];
+        NSString *votedString = infoDic[@"players"][[votingArray[indexPath.row][@"voteder"]integerValue]][@"name"];
+        NSInteger count = [votingArray[indexPath.row][@"count"]integerValue];
+        
+        if(!cell) {
+            cell = (BWVoteCell*)[[BWVoteCell alloc]init];
+            
+            [cell setVoterString:voterString votedString:votedString count:count];
+        }
+        cell.voter.text = voterString;
+        cell.voteder.text = votedString;
+        cell.counter.text = [NSString stringWithFormat:@"%d票",(int)count];
+        return cell;
     }
     
-    NSString *name = tableArray[indexPath.row][@"name"];
+    UITableViewCell *cell;
     
-    cell.textLabel.text = name;
+    //if(tableMode == TableModeNormal) {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+        if (!cell) {
+            cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:0];
+            //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
+        }
+        
+        NSString *name = tableArray[indexPath.row][@"name"];
+        
+        cell.textLabel.text = name;
+       // return cell;
+    //}
+    
+    
     
     return cell;
 }
@@ -1125,6 +1220,19 @@ typedef NS_ENUM(NSInteger,Phase) {
     // ヘッダー画像配置
     UILabel *label = [[UILabel alloc]init];
     
+    if(tableMode == TableModeVoteResult) {
+        label.textColor = [UIColor blackColor];
+        if(excutionerId == -1) {
+            label.text = [NSString stringWithFormat:@"%d日目%d回目投票結果\r\n同票のため再投票します。（あと%d回)",(int)day,(int)voteCount,(int)voteMaxCount-(int)voteCount];
+        } else {
+            label.text = [NSString stringWithFormat:@"%d日目%d回目投票結果\r\n「%@」さんが追放されました。",(int)day,(int)voteCount,infoDic[@"players"][excutionerId][@"name"]];
+        }
+        label.numberOfLines = 2;
+        label.textAlignment = NSTextAlignmentCenter;
+        label.backgroundColor = [UIColor groupTableViewBackgroundColor];
+        return label;
+    }
+    
     NSString *string = tableHeaderString;
     
     label.textColor = [UIColor blackColor];
@@ -1138,6 +1246,9 @@ typedef NS_ENUM(NSInteger,Phase) {
 // ヘッダーの高さ指定
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
+    if(tableMode == TableModeVoteResult) {
+        return 100.0;
+    }
     return 30;
 }
 
