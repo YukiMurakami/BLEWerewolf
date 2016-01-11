@@ -48,10 +48,26 @@
     [resizableView setContentMode:UIViewContentModeScaleToFill];
     [resizableView setFrame:CGRectMake(0, 0, cell.frame.size.width,cell.frame.size.height)];
     
+    NSString *filename_push = @"";
+    if(colorId == 0) filename_push = @"ui_platePush.png";
+    if(colorId == 1) filename_push = @"ui_plate_red.png";
+    UIImage *image_push = [UIImage imageNamed:filename_push];
+    
+    UIImage *resizedImage_push = [image_push resizableImageWithCapInsets:UIEdgeInsetsMake(15, 15, 15, 15)];
+    UIImageView *resizableView_push = [[UIImageView alloc] initWithImage:resizedImage_push];
+    [resizableView_push setContentMode:UIViewContentModeScaleToFill];
+    [resizableView_push setFrame:CGRectMake(0, 0, cell.frame.size.width,cell.frame.size.height)];
+    
+    
+    
     cell.backgroundView = resizableView;
     cell.backgroundColor = nil;
     cell.textLabel.textColor = [UIColor whiteColor];
     cell.textLabel.textAlignment = NSTextAlignmentCenter;
+    
+    //[cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+    
+    cell.selectedBackgroundView = resizableView_push;
     
     return cell;
 }

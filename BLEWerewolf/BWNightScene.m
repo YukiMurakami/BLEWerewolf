@@ -838,6 +838,10 @@ typedef NS_ENUM(NSInteger,Phase) {
         if(roleId == RoleJointOwner && targetRoleId == RoleJointOwner) {
             [shouldSenderId addObject:infoDic[@"players"][i][@"identificationId"]];
         }
+        //狐同士
+        if(roleId == RoleFox && targetRoleId == RoleFox) {
+            [shouldSenderId addObject:infoDic[@"players"][i][@"identificationId"]];
+        }
     }
     return [shouldSenderId copy];
 }

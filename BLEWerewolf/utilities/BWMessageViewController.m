@@ -113,6 +113,11 @@ NSString *gmId = @"aaaaaa";
                 [self.membersId addObject:infoDic[@"players"][i][@"identificationId"]];
             }
         }
+        if(myRoleId == RoleFox) {//妖狐なら妖狐を追加
+            if(targetRoleId == RoleFox) {
+                [self.membersId addObject:infoDic[@"players"][i][@"identificationId"]];
+            }
+        }
     }
     
 }
