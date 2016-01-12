@@ -414,13 +414,12 @@
     
     int count = (int)array.count;
     
-    for(int i=0;i<count*1000;i++) {
-        int f1 = (int) arc4random_uniform(count);
-        int f2 = (int) arc4random_uniform(count);
+    for(int i=count-1;i>0;i--) {
+        int j = (int)arc4random_uniform(i+1);
         
-        id object = array[f1];
-        array[f1] = array[f2];
-        array[f2] = object;
+        id object = array[i];
+        array[i] = array[j];
+        array[j] = object;
     }
     
     for(int i=0;i<count;i++) {
