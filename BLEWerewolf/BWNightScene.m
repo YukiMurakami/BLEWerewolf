@@ -73,6 +73,8 @@ typedef NS_ENUM(NSInteger,TableMode) {
     Winner winner;
     
     NSInteger voteMaxCount;
+    
+    NSInteger lastNightGuardIndex;//連続護衛禁止用の変数 セントラル側で管理しておく
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -173,6 +175,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
     excutionerId = -1;
     phase = PhaseNight;
     voteMaxCount = 4;
+    lastNightGuardIndex = -1;
     
     CGFloat margin = self.size.height*0.02;
     CGFloat statusHeight = 22;
@@ -828,6 +831,12 @@ typedef NS_ENUM(NSInteger,TableMode) {
 -(void)doRoleAction {
     [table removeFromSuperview];
     [coverView removeFromSuperview];
+    
+    if(tableRoleId == RoleBodyguard) {
+        //ボディーガードは今日の護衛先を記憶しておく
+        lastNightGuardIndex = targetIndex;
+    }
+    
     if(!isPeripheral) {
         //セントラルは命令をペリフェラルに送信
         NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)tableRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
@@ -1211,6 +1220,13 @@ typedef NS_ENUM(NSInteger,TableMode) {
     //}
     
     
+    if(tableRoleId == RoleBodyguard && ![infoDic[@"rules"][@"canContinuousGuard"]boolValue] && lastNightGuardIndex != -1) {
+        NSString *targetIdentificationId = tableArray[indexPath.row][@"identificationId"];
+        targetIndex = [BWUtility getPlayerId:infoDic id:targetIdentificationId];
+        if(targetIndex == lastNightGuardIndex) {
+            cell.detailTextLabel.text = @"連続護衛禁止";
+        }
+    }
     
     return cell;
 }
@@ -1220,6 +1236,11 @@ typedef NS_ENUM(NSInteger,TableMode) {
     //TODO::テーブルタッチ操作
     NSString *targetIdentificationId = tableArray[indexPath.row][@"identificationId"];
     targetIndex = [BWUtility getPlayerId:infoDic id:targetIdentificationId];
+    
+    //連続護衛禁止
+    if(tableRoleId == RoleBodyguard && lastNightGuardIndex == targetIndex && ![infoDic[@"rules"][@"canContinuousGuard"]boolValue]) {
+        return;
+    }
     
     NSString *message = @"";
     if(tableRoleId == RoleWerewolf) {
