@@ -333,7 +333,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
                         [self sendGMMessage:@"初日の夜になりました。" receiverId:infoDic[@"players"][i][@"identificationId"]];
                     } afterDelay:0.1*i];
                     
-                    if([infoDic[@"players"][i][@"roleId"]integerValue] == RoleFortuneTeller) {
+                    if([infoDic[@"players"][i][@"roleId"]integerValue] == RoleFortuneTeller && [infoDic[@"rules"][@"fortuneMode"]integerValue] == FortuneTellerModeRevelation) {
                         //TODO::占い師　お告げ
                         //自分以外、狼、狐以外からランダムに選ぶ
                         NSInteger firstNightFortuneId = 0;
