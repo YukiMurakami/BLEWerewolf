@@ -20,6 +20,7 @@
 @property (nonatomic) id<BWMessageViewControllerDelegate> delegate;
 
 + (instancetype)sharedInstance:(NSMutableDictionary*)infoDic;
++ (void)resetSharedInstance;
 
 -(BOOL)isMember:(NSString*)id;
 

@@ -24,6 +24,7 @@
 @property (nonatomic) id<BWPeripheralManagerDelegate> delegate;
 
 + (instancetype)sharedInstance;
++ (void)resetSharedInstance;
 - (void)setScene:(SKScene*)_scene;
 
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;

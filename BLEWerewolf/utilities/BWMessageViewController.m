@@ -29,16 +29,17 @@ NSString *gmId = @"aaaaaa";
 @implementation BWMessageViewController
 @synthesize delegate = _delegate;
 
+static BWMessageViewController *sharedInstance = nil;
+
 #pragma mark - Singleton
 + (instancetype)sharedInstance:(NSMutableDictionary*)infoDic
 {
-    static BWMessageViewController *sharedInstance = nil;
-    
-    static dispatch_once_t once;
-    dispatch_once( &once, ^{
-        sharedInstance = [[BWMessageViewController alloc] initSharedInstance:infoDic];
-        
-    });
+
+    @synchronized(self) {
+        if(!sharedInstance) {
+            sharedInstance = [[BWMessageViewController alloc] initSharedInstance:infoDic];
+        }
+    }
     
     return sharedInstance;
 }
@@ -50,6 +51,10 @@ NSString *gmId = @"aaaaaa";
         [self setMessageParams:infoDic];
     }
     return self;
+}
+
++ (void)resetSharedInstance {
+    sharedInstance = nil;
 }
 
 - (id)init {

@@ -41,16 +41,16 @@
 @implementation BWPeripheralManager
 @synthesize delegate = _delegate;
 
+static BWPeripheralManager *sharedInstance = nil;
+
 #pragma mark - Singleton
 + (instancetype)sharedInstance
 {
-    static BWPeripheralManager *sharedInstance = nil;
-
-    static dispatch_once_t once;
-    dispatch_once( &once, ^{
-        sharedInstance = [[BWPeripheralManager alloc] initSharedInstance];
-        
-    });
+    @synchronized(self) {
+        if(!sharedInstance) {
+            sharedInstance = [[BWPeripheralManager alloc] initSharedInstance];
+        }
+    }
 
     return sharedInstance;
 }
@@ -305,6 +305,10 @@
 - (id)init {
     [self doesNotRecognizeSelector:_cmd];
     return nil;
+}
+
++ (void)resetSharedInstance {
+    sharedInstance = nil;
 }
 
 

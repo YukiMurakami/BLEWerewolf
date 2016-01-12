@@ -37,22 +37,25 @@
 @implementation BWCentralManager
 @synthesize delegate = _delegate;
 
+static BWCentralManager *sharedInstance = nil;
+
 #pragma mark - Singleton
 + (instancetype)sharedInstance
 {
-    static BWCentralManager *sharedInstance = nil;
-    
-    static dispatch_once_t once;
-    dispatch_once( &once, ^{
-        sharedInstance = [[BWCentralManager alloc] initSharedInstance];
+    @synchronized(self) {
+        if(!sharedInstance) {
         
-        sharedInstance.centralManager = [[CBCentralManager alloc] initWithDelegate:sharedInstance queue:nil];
+            sharedInstance = [[BWCentralManager alloc] initSharedInstance];
+        
+            sharedInstance.centralManager = [[CBCentralManager alloc] initWithDelegate:sharedInstance queue:nil];
     
-        sharedInstance.data = [[NSMutableData alloc] init];
-    });
+            sharedInstance.data = [[NSMutableData alloc] init];
+        }
+    }
     
     return sharedInstance;
 }
+
 
 - (id)initSharedInstance {
     self = [super init];
@@ -64,6 +67,10 @@
         receivedSignalIds = [NSMutableArray array];
     }
     return self;
+}
+
++ (void)resetSharedInstance {
+    sharedInstance = nil;
 }
 
 - (id)init {

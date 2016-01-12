@@ -14,5 +14,5 @@
 @property (nonatomic) UILabel *voter;
 @property (nonatomic) UILabel *voteder;
 
--(void)setVoterString:(NSString*)voterString votedString:(NSString*)votedString count:(NSInteger)count;
+-(void)setVoterString:(NSString*)voterString votedString:(NSString*)votedString count:(NSInteger)count cellSize:(CGSize)cellSize;
 @end

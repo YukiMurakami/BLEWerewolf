@@ -620,6 +620,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
     //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
     tableMode = TableModeVoteResult;
     table.tableView.rowHeight = table.frame.size.width/1446*244;
+    table.tableView.allowsSelection = NO;
     if(!table.superview) {
         [self.view addSubview:table];
     }
@@ -790,6 +791,12 @@ typedef NS_ENUM(NSInteger,TableMode) {
     }
     
     if([node.name isEqualToString:@"end"]) {
+        if(isPeripheral) {
+            [BWPeripheralManager resetSharedInstance];
+        } else {
+            [BWCentralManager resetSharedInstance];
+        }
+        [BWMessageViewController resetSharedInstance];
         BWTopScene *scene = [[BWTopScene alloc]initWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.5];
         [self.view presentScene:scene transition:transition];
@@ -799,6 +806,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
 
 -(void)setTableData :(NSInteger)myRoleId {
     tableMode = TableModeNormal;
+    table.tableView.allowsSelection = YES;
     //TODO::テーブルデータ 基本的には役職のIDだが、処刑投票は-1となっている
     tableArray = [NSMutableArray array];
     NSInteger myPlayerId = [BWUtility getMyPlayerId:infoDic];
@@ -1196,7 +1204,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
         if(!cell) {
             cell = (BWVoteCell*)[[BWVoteCell alloc]init];
             
-            [cell setVoterString:voterString votedString:votedString count:count];
+            [cell setVoterString:voterString votedString:votedString count:count cellSize:CGSizeMake(table.tableView.frame.size.width, table.tableView.frame.size.width/1446*244)];
         }
         cell.voter.text = voterString;
         cell.voteder.text = votedString;
