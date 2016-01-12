@@ -307,6 +307,17 @@ static BWPeripheralManager *sharedInstance = nil;
     return nil;
 }
 
+- (void)stopAllSignals {
+    for(NSInteger i=0;i<signals.count;i++) {
+        BWSenderNode *node = signals[i];
+        [node removeAllActions];
+        if(node.parent) {
+            [node removeFromParent];
+        }
+    }
+    [signals removeAllObjects];
+}
+
 + (void)resetSharedInstance {
     sharedInstance = nil;
 }

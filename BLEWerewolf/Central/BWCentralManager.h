@@ -27,6 +27,7 @@
 
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;
+- (void)stopAllSignals;
 - (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait;
 -(void)setGameId :(NSString*)gameIdStr;
 -(NSString*)getGameId;

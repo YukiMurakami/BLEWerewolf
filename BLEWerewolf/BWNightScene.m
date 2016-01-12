@@ -792,8 +792,10 @@ typedef NS_ENUM(NSInteger,TableMode) {
     
     if([node.name isEqualToString:@"end"]) {
         if(isPeripheral) {
+            [peripheralManager stopAllSignals];
             [BWPeripheralManager resetSharedInstance];
         } else {
+            [centralManager stopAllSignals];
             [BWCentralManager resetSharedInstance];
         }
         [BWMessageViewController resetSharedInstance];

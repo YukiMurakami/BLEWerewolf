@@ -25,6 +25,7 @@
 
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;
+- (void)stopAllSignals;
 - (void)setScene:(SKScene*)_scene;
 
 @property (nonatomic, strong) CBPeripheralManager *peripheralManager;
