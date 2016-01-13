@@ -798,6 +798,11 @@ typedef NS_ENUM(NSInteger,TableMode) {
             [centralManager stopAllSignals];
             [BWCentralManager resetSharedInstance];
         }
+        [timer stopTimer];
+        timer.delegate = nil;
+        [timer removeAllActions];
+        [timer removeFromParent];
+        timer = nil;
         [BWMessageViewController resetSharedInstance];
         BWTopScene *scene = [[BWTopScene alloc]initWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.5];

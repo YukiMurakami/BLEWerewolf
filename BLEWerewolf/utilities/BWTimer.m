@@ -11,6 +11,7 @@
 @implementation BWTimer {
     NSInteger lastTimer;
     SKLabelNode *timeLabel;
+    NSTimer *nstimer;
 }
 @synthesize delegate = _delegate;
 
@@ -29,12 +30,18 @@
 -(void)setSeconds:(NSInteger)second {
     start = [NSDate date];
     end = [NSDate dateWithTimeIntervalSinceNow:second];
-    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateSeconds) userInfo:nil repeats:YES];
+    nstimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateSeconds) userInfo:nil repeats:YES];
 }
 
 -(NSInteger)getSeconds {
     NSInteger seconds = (NSInteger)[end timeIntervalSinceNow];
     return seconds;
+}
+
+-(void)stopTimer {
+    if ([nstimer isValid]) {
+        [nstimer invalidate];
+    }
 }
 
 -(void)updateSeconds {

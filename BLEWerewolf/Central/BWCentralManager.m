@@ -81,6 +81,7 @@ static BWCentralManager *sharedInstance = nil;
 }
 
 + (void)resetSharedInstance {
+    sharedInstance.centralManager = nil;
     sharedInstance = nil;
 }
 

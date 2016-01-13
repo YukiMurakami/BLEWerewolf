@@ -280,6 +280,7 @@ static BWPeripheralManager *sharedInstance = nil;
 - (void)updateSendMessage :(NSString*)sendMessage {
     [sendingMessageQueue addObject:sendMessage];
     NSData *data = [sendMessage dataUsingEncoding:NSUTF8StringEncoding];
+    if(!self.characteristic) return;
     if([self.peripheralManager updateValue:data forCharacteristic:self.characteristic onSubscribedCentrals:nil]) {
         NSLog(@"特性値更新:%@",sendingMessageQueue[0]);
         [sendingMessageQueue removeObjectAtIndex:0];
@@ -319,6 +320,7 @@ static BWPeripheralManager *sharedInstance = nil;
 }
 
 + (void)resetSharedInstance {
+    sharedInstance.peripheralManager = nil;
     sharedInstance = nil;
 }
 

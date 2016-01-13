@@ -24,5 +24,6 @@
 -(void)setSeconds:(NSInteger)second;
 -(NSInteger)getSeconds;
 -(void)initNodeWithFontColor:(UIColor*)color;
+-(void)stopTimer;
 
 @end
