@@ -32,6 +32,8 @@ typedef NS_ENUM(NSInteger,TableMode) {
     TableModeHistory,
 };
 
+const NSInteger minuteSeconds = 20;
+
 @implementation BWNightScene {
     //リフレッシュ必要変数
     BOOL didAction;
@@ -185,7 +187,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
     messageViewController.delegate = self;
     
     timer = [[BWTimer alloc]init];
-    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*20];
+    [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*minuteSeconds];
     timer.delegate = self;
     
     CGFloat tableMargin = self.size.height*0.05;
@@ -219,12 +221,14 @@ typedef NS_ENUM(NSInteger,TableMode) {
     explain.size = CGSizeMake(timerHeight*5/6,timerHeight);
     explain.position = CGPointMake(-self.size.width/2+explain.size.width/2+margin,self.size.height/2-timerHeight/2-margin-statusHeight);
     explain.texture = [BWUtility getCardTexture:[BWUtility getMyRoleId:infoDic]];
+    explain.zPosition = 1.0;
     [backgroundNode addChild:explain];
     
     timer.size = CGSizeMake(timerHeight*2.4, timerHeight);
     [timer initNodeWithFontColor:[UIColor whiteColor]];
     timer.position = CGPointMake(explain.position.x + explain.size.width/2 + timer.size.width/2 + margin, explain.position.y);
     [timer removeFromParent];
+    timer.zPosition = 1.0;
     [backgroundNode addChild:timer];
     
     
@@ -237,8 +241,9 @@ typedef NS_ENUM(NSInteger,TableMode) {
     if(roleId == RoleBodyguard) buttonTitle = @"守る";
     
     CGFloat buttonSizeWidth = self.size.width-(margin*4+explain.size.width+timer.size.width);
-    actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
     
+    actionButtonNode = [BWUtility makeButton:buttonTitle size:CGSizeMake(buttonSizeWidth,timer.size.height*0.9) name:buttonName position:CGPointMake(self.size.width/2-buttonSizeWidth/2-margin, explain.position.y)];
+    actionButtonNode.zPosition = 1.0;
     
     
 }
@@ -297,7 +302,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
             messageViewController.view.hidden = NO;
         }
         [waitLabelNode removeFromParent];
-        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*20];
+        [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*minuteSeconds];
         
         if([[BWUtility getCardInfofromId:[BWUtility getMyRoleId:infoDic]][@"hasTable"]boolValue] && !didAction) {
             actionButtonNode.hidden = NO;
@@ -410,7 +415,7 @@ typedef NS_ENUM(NSInteger,TableMode) {
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
-    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*20];
+    [timer setSeconds:[infoDic[@"rules"][@"timer"]integerValue]*minuteSeconds];
     votingArray = [NSMutableArray array];
     
     if(isPeripheral) {
@@ -1186,8 +1191,9 @@ typedef NS_ENUM(NSInteger,TableMode) {
         }
     }
     
-    if(seconds == 10 && phase == PhaseAfternoon) {
-        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"evening.jpg"] time:10.0];
+    int afternoonTime = [infoDic[@"rules"][@"timer"]intValue] * minuteSeconds;
+    if(seconds == (int)(afternoonTime*0.9)  && phase == PhaseAfternoon) {
+        [self backgroundMorphing:[SKTexture textureWithImageNamed:@"evening.jpg"] time:afternoonTime*0.9];
     }
 }
 
