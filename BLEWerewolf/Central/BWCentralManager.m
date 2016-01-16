@@ -112,7 +112,13 @@ static BWCentralManager *sharedInstance = nil;
         //「1:NNNNNN:T..T:A..A:message」T..Tは自分のsignalID,A..Aは自分のidentificationID
         if([gameIdString isEqualToString:@""]) exit(0);
         NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,[BWUtility getIdentificationString],senderNode.message];
-        [self sendMessageFromClient:sendMessage];
+        NSString *command = [BWUtility getCommand:senderNode.message];
+        //participateRequest:NNNNNN/A..A/S...S
+        if([command isEqualToString:@"participateRequest"]) {
+            [self sendMessageFromClientWithResponse:sendMessage];
+        } else {
+            [self sendMessageFromClient:sendMessage];
+        }
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
         [viewController addSendMessage:senderNode.message];
@@ -183,8 +189,15 @@ static BWCentralManager *sharedInstance = nil;
 -(void)sendMessageFromClient:(NSString*)message {
     NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
     NSLog(@"send message :%@",message);
+    //[self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithResponse];
     [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithoutResponse];
     
+}
+
+-(void)sendMessageFromClientWithResponse:(NSString*)message {
+    NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
+    NSLog(@"send message withResponse :%@",message);
+    [self.peripheral writeValue:data forCharacteristic:self.interestingCharacteristic type:CBCharacteristicWriteWithResponse];
 }
 
 - (BWSenderNode*)getSenderNodeWithSignalId:(NSInteger)_signalId {
