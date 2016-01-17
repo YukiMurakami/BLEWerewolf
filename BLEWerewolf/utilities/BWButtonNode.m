@@ -35,6 +35,7 @@
     labelNode.text = title;
     labelNode.fontSize = self.size.height*0.4;
     labelNode.fontColor = [UIColor blackColor];
+    labelNode.fontName = @"HiraKaku-ProW3";
     labelNode.color = [UIColor grayColor];
     labelNode.verticalAlignmentMode = SKLabelVerticalAlignmentModeCenter;
     

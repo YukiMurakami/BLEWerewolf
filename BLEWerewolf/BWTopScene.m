@@ -41,11 +41,12 @@
     
     NSArray *buttons = @[@{@"title":@"サーバ",@"name":@"server"},
                          @{@"title":@"クライアント",@"name":@"client"},
-                         @{@"title":@"ユーザ設定",@"name":@"setting"}];
+                         @{@"title":@"ユーザ設定",@"name":@"setting"},
+                         @{@"title":@"サブサーバ(9人以上)",@"name":@"subserver"}];
     
     CGSize buttonSize = CGSizeMake(self.size.width*0.8,self.size.width*0.8*0.2);
     if([BWUtility wasSetting]) {
-        for(NSInteger i=0;i<3;i++) {
+        for(NSInteger i=0;i<buttons.count;i++) {
             BWButtonNode *buttonNode = [[BWButtonNode alloc]init];
             [buttonNode makeButtonWithSize:buttonSize name:buttons[i][@"name"] title:buttons[i][@"title"] boldRate:1.0];
             buttonNode.position = CGPointMake(0, buttonSize.width*0.3*(1-i));

@@ -214,9 +214,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B617547C1C4B211E0088A209 /* SubPeripheral */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = SubPeripheral;
+			path = BLEWerewolf/SubPeripheral;
+			sourceTree = "<group>";
+		};
 		B63D902F1B60DD34000E366B = {
 			isa = PBXGroup;
 			children = (
+				B617547C1C4B211E0088A209 /* SubPeripheral */,
 				B69ED59D1B6B2BDD00A9C355 /* images */,
 				B67CC3921C375D1E00546FC0 /* Central */,
 				B69ED5B71B6B4B8E00A9C355 /* Peripheral */,

@@ -27,6 +27,8 @@
     backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self addChild:backgroundNode];
     
+    
+    
     SKLabelNode *identificationStringNode = [[SKLabelNode alloc]init];
     identificationStringNode.text = [NSString stringWithFormat:@"ID:%@",[BWUtility getIdentificationString]];
     identificationStringNode.fontSize = 30.0;
