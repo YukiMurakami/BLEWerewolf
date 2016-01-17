@@ -550,8 +550,8 @@ static BWPeripheralManager *sharedInstance = nil;
                 BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
                 [viewController addRecieveMessage:message];
                 //受信
-                for(NSInteger i=4;i<array.count;i++) {
-                    if(i == 4) {
+                for(NSInteger i=5;i<array.count;i++) {
+                    if(i == 5) {
                         contentMessage = [NSString stringWithFormat:@"%@%@",contentMessage,array[i]];
                     } else {
                         contentMessage = [NSString stringWithFormat:@"%@:%@",contentMessage,array[i]];
