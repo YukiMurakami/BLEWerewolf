@@ -630,6 +630,33 @@
     return userData[@"name"];
 }
 
++ (void)setServerMode:(ServerMode)mode {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setInteger:mode forKey:@"serverMode"];
+}
+
++ (ServerMode)getServerMode {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    ServerMode mode = (ServerMode)[ud integerForKey:@"serverMode"];
+    return mode;
+}
+
++ (BOOL)isPeripheral {
+    ServerMode mode = [BWUtility getServerMode];
+    if(mode == ServerModePeripheral || mode == ServerModeSubPeripheral) {
+        return YES;
+    }
+    return NO;
+}
+
++ (BOOL)isCentral {
+    ServerMode mode = [BWUtility getServerMode];
+    if(mode == ServerModeCentral || mode == ServerModeSubPeripheral) {
+        return YES;
+    }
+    return NO;
+}
+
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command {

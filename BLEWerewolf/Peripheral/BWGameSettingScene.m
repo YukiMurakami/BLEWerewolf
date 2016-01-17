@@ -50,7 +50,8 @@
     
     [self initBackground];
     
-    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
+    //serveId:NNNNNN/S...S/B...B
+    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@/%@",(long)gameId,[BWUtility getUserName],[BWUtility getIdentificationString]];
     sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
     
     return self;

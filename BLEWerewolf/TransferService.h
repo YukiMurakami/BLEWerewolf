@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ------------全体外部に通知（ゲーム参加登録に使う）----------------------ok
 「基本的に送りっぱなし（停止メソッドを呼ぶまで一定間隔で送信し続ける）」
 「0:message」の形式で送信する
-・ゲーム部屋のID通知「serveId:NNNNNN/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、S...Sはユーザ名
+・ゲーム部屋のID通知「serveId:NNNNNN/S...S/B...B」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、S...Sはユーザ名 B...Bは自分の固有識別ID
  
  
 ------------個人宛に通知------------ok
@@ -76,6 +76,8 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・夜時間終了を通知「nightFinish:A..A」
 ・投票結果確認通知「checkVoting:A..A」
 ・犠牲者確認通知「checkVictim:A..A」
+ 
+
  
  
  --------受信完了通知--------ok

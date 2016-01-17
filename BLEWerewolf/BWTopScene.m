@@ -9,6 +9,7 @@
 #import "BWTopScene.h"
 #import "BWMainScene.h"
 #import "BWGameSettingScene.h"
+
 #import "BWUtility.h"
 #import "BWUserSettingScene.h"
 
@@ -84,12 +85,14 @@
 
 -(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
     if([name isEqualToString:@"server"]) {
+        [BWUtility setServerMode:ServerModePeripheral];
         BWGameSettingScene *scene = [BWGameSettingScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
         return;
     }
     if([name isEqualToString:@"client"]) {
+        [BWUtility setServerMode:ServerModeCentral];
         BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
@@ -97,6 +100,13 @@
     }
     if([name isEqualToString:@"setting"]) {
         BWUserSettingScene *scene = [BWUserSettingScene sceneWithSize:self.size];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
+        return;
+    }
+    if([name isEqualToString:@"subserver"]) {
+        [BWUtility setServerMode:ServerModeSubPeripheral];
+        BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
         return;

@@ -36,6 +36,13 @@ typedef NS_ENUM(NSInteger,Winner) {
     WinnerNone,//ゲーム続行
 };
 
+typedef NS_ENUM(NSInteger,ServerMode) {
+    ServerModeNone,
+    ServerModePeripheral,
+    ServerModeCentral,
+    ServerModeSubPeripheral,
+};
+
 @interface BWUtility : NSObject
 
 +(SKSpriteNode *) makeButton :(NSString*) text
@@ -76,6 +83,11 @@ typedef NS_ENUM(NSInteger,Winner) {
 //ユーザデータを設定していたかどうか
 + (BOOL)wasSetting;
 + (NSString*)getUserName;
+
++ (void)setServerMode:(ServerMode)mode;
++ (ServerMode)getServerMode ;
++ (BOOL)isPeripheral;
++ (BOOL)isCentral;
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command;

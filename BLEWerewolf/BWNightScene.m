@@ -157,18 +157,18 @@ const NSInteger minuteSeconds = 20;
 }
 
 -(void)setCentralOrPeripheral:(BOOL)_isPeripheral :(NSMutableDictionary*)_infoDic {//共通　情報をリレーする
-    isPeripheral = _isPeripheral;
     
     infoDic = _infoDic;
     
     winner = WinnerNone;
     
-    if(isPeripheral) {
+    if([BWUtility isPeripheral]) {
         peripheralManager = [BWPeripheralManager sharedInstance];
         peripheralManager.delegate = self;
         [self resetCheckList];
         voteCount = 1;
-    } else {
+    }
+    if([BWUtility isCentral]){
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
     }
