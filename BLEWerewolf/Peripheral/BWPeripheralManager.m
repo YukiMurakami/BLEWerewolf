@@ -113,6 +113,12 @@ static BWPeripheralManager *sharedInstance = nil;
 }
 
 - (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait {
+    
+    //担当するセントラル以外には送らない
+    if(!([[BWUtility getCentralIdentifications] containsObject:toIdentificationId])) {
+        return -1;
+    }
+    
     NSInteger _signalId = signalId;
     signalId++;
     
@@ -131,9 +137,9 @@ static BWPeripheralManager *sharedInstance = nil;
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *firstWaitAction = [SKAction waitForDuration:firstWait];
     SKAction *send = [SKAction runBlock:^{
-        //「1:NNNNNN:T..T:A..A:message」
+        //「1:NNNNNN:T..T:A..A:B..B:message」の形式で送信する（NNNNNNはゲームID,T..TはシグナルID,A..Aは送り先ID,B..Bは送り元）
         if([gameIdString isEqualToString:@""]) exit(0);
-        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,senderNode.toIdentificationId,senderNode.message];
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,senderNode.toIdentificationId,[BWUtility getIdentificationString],senderNode.message];
         [self updateSendMessage:sendMessage];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;

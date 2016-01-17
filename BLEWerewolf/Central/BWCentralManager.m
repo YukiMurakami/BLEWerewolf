@@ -436,8 +436,14 @@ static BWCentralManager *sharedInstance = nil;
             }
         }
         if(kind == SignalKindNormal) {
-        //「1:NNNNNN:T..T:A..A:message」
+        //「1:NNNNNN:T..T:A..A:B..B:message」の形式で送信する（NNNNNNはゲームID,T..TはシグナルID,A..Aは送り先ID,B..Bは送り元）
             NSArray *array = [receivedString componentsSeparatedByString:@":"];
+            
+            NSString *peripheralId = array[4];
+            if(!([peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]])) {
+                return;//関係ないペリフェラルの信号は受信しない
+            }
+            
             NSString *gotGameId = array[1];
             NSInteger gotSignalId = [array[2]integerValue];
             
@@ -453,8 +459,8 @@ static BWCentralManager *sharedInstance = nil;
                 BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
                 [viewController addRecieveMessage:receivedString];
                 //受信
-                for(NSInteger i=4;i<array.count;i++) {
-                    if(i == 4) {
+                for(NSInteger i=5;i<array.count;i++) {
+                    if(i == 5) {
                         message = [NSString stringWithFormat:@"%@%@",message,array[i]];
                     } else {
                         message = [NSString stringWithFormat:@"%@:%@",message,array[i]];

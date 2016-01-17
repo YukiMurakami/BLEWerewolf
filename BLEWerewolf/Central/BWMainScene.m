@@ -88,9 +88,13 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
     NSString *touchedGameId = gameIdArray[indexPath.row][@"gameId"];
+    NSString *peripheralIdentificationId = gameIdArray[indexPath.row][@"identificationId"];
     [centralManager setGameId:touchedGameId];
-    //ここでgameIdを確定させる
+    //ここでgameIdと接続先ペリフェラルを確定させる
     [centralManager stopScan];
+    
+    [BWUtility setPeripheralIdentificationId:peripheralIdentificationId];
+    
     NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
     [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
     

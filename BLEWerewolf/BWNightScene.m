@@ -157,6 +157,7 @@ const NSInteger minuteSeconds = 20;
 }
 
 -(void)setCentralOrPeripheral:(BOOL)_isPeripheral :(NSMutableDictionary*)_infoDic {//共通　情報をリレーする
+    isPeripheral = _isPeripheral;
     
     infoDic = _infoDic;
     
@@ -1138,7 +1139,7 @@ const NSInteger minuteSeconds = 20;
 }
 
 -(NSArray*)divideMessage :(NSString*)message {
-    NSInteger limit = 36;
+    NSInteger limit = 33;
     NSMutableArray *array = [NSMutableArray array];
    
     while([message length] > limit) {

@@ -657,9 +657,37 @@
     return NO;
 }
 
++ (void)setPeripheralIdentificationId:(NSString*)identificationId {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:identificationId forKey:@"peripheralIdentificationId"];
+}
+
++ (NSString*)getPeripheralIdentificationId {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSString *id = [ud objectForKey:@"peripheralIdentificationId"];
+    return id;
+}
+
++ (void)setCentralIdentifications:(NSMutableArray*)ids {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:[ids copy] forKey:@"centralIdentificationIds"];
+}
+
++ (NSMutableArray*)getCentralIdentifications {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [ud objectForKey:@"centralIdentificationIds"];
+    return [array mutableCopy];
+}
+
++ (void)resetPeripheralAndCentralIds {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:@"" forKey:@"peripheralIdentificationId"];
+    [ud setObject:@{} forKey:@"centralIdentificationIds"];
+}
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command {
+    if(command == nil) return @"-1";
     NSString *result = @"";
     NSArray *array = [command componentsSeparatedByString:@":"];
     if(array.count >= 1) {

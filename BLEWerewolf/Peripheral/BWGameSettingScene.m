@@ -139,6 +139,12 @@
         
         [bwbuttonNode removeFromParent];
         
+        NSMutableArray *centralIds = [NSMutableArray array];
+        for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
+            [centralIds addObject:registeredPlayersArray[i][@"identificationId"]];
+        }
+        [BWUtility setCentralIdentifications:centralIds];
+        
         NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
         //member:0/A..A/S..S/12
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
@@ -155,15 +161,12 @@
 
 #pragma mark - BWPeripheralManagerDelegate
 -(void)didReceiveMessage:(NSString *)message {
-    //participateRequest:NNNNNN/A..A(32)/S...S
+    //participateRequest:NNNNNN/C..C/S...S
     if([[BWUtility getCommand:message] isEqualToString:@"participateRequest"]) {
         NSArray *params = [BWUtility getCommandContents:message];
         NSString *identificationIdString = params[1];
         NSString *gameIdString = params[0];
         NSString *userNameString = params[2];
-        
-        //participateAllow:A..A
-        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0 firstWait:0.0];
         
         if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
             
@@ -179,7 +182,15 @@
                 [registeredPlayersArray addObject:dic];
                 [tableView.tableView reloadData];
                 [self initBackground];
+                NSMutableArray *centralIds = [NSMutableArray array];
+                for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
+                    [centralIds addObject:registeredPlayersArray[i][@"identificationId"]];
+                }
+                [BWUtility setCentralIdentifications:centralIds];
             }
+            
+            //participateAllow:C..C
+            [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0 firstWait:0.0];
         }
     }
 }
