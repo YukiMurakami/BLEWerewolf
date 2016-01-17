@@ -495,13 +495,22 @@ static BWPeripheralManager *sharedInstance = nil;
         
         //TODO::セントラルからの受信を処理
         //「1:NNNNNN:T..T:A..A:message」T..TはセントラルのシグナルID
-        //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
+        //「2:NNNNNN:T..T:C..C:P..P」T..Tは先ほどペリフェラルが送ったシグナルID
+        
         NSString *contentMessage = @"";
         SignalKind kind = [[BWUtility getCommand:message]integerValue];
         if(kind == SignalKindReceived) {
-            //「2:NNNNNN:T..T」
-            NSString *gotGameId = [message componentsSeparatedByString:@":"][1];
-            NSInteger gotSignalId = [[message componentsSeparatedByString:@":"][2]integerValue];
+            //「2:NNNNNN:T..T:C..C:P..P」
+            NSArray *array = [message componentsSeparatedByString:@":"];
+            NSString *gotGameId = array[1];
+            NSInteger gotSignalId = [array[2]integerValue];
+            NSString *centralId = array[3];
+            NSString *peripheralId = array[4];
+            
+            if(![peripheralId isEqualToString:[BWUtility getIdentificationString]] || ![[BWUtility getCentralIdentifications] containsObject:centralId]) {
+                return;//ペリフェラル対象が自分以外、あるいはセントラルが対象外の場合は無視
+            }
+            
             if([gotGameId isEqualToString:gameIdString]) {
                 if([receivedReceiveNotifyIds containsObject:@(gotSignalId)]) {
                     return;//２重受信を防ぐ

@@ -82,6 +82,6 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  
  --------受信完了通知--------ok
  「タイムアウト時間を過ぎるまで無条件で一定間隔で送信し続ける」
- central「2:NNNNNN:T..T:」(T..Tは受け取ったsignalId)
+ central「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId)
  
 */

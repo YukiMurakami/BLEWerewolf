@@ -160,9 +160,13 @@ static BWCentralManager *sharedInstance = nil;
     
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *send = [SKAction runBlock:^{
-        //「2:NNNNNN:T..T」
+        //central「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId)
         if([gameIdString isEqualToString:@""]) exit(0);
-        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId];
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,
+                                 gameIdString,
+                                 (int)receivedSignalId,
+                                 [BWUtility getIdentificationString],
+                                 [BWUtility getPeripheralIdentificationId]];
         [self sendMessageFromClient:sendMessage];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;

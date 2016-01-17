@@ -1139,7 +1139,7 @@ const NSInteger minuteSeconds = 20;
 }
 
 -(NSArray*)divideMessage :(NSString*)message {
-    NSInteger limit = 33;
+    NSInteger limit = 32;
     NSMutableArray *array = [NSMutableArray array];
    
     while([message length] > limit) {
