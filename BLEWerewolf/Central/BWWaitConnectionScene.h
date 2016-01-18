@@ -8,12 +8,17 @@
 
 #import <SpriteKit/SpriteKit.h>
 #import "BWCentralManager.h"
+#import "BWPeripheralManager.h"
 
-@interface BWWaitConnectionScene : SKScene <BWCentralManagerDelegate>{
+@interface BWWaitConnectionScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate>{
     SKSpriteNode *backgroundNode;
     BWCentralManager *centralManager;
+    BWPeripheralManager *peripheralManager;
     
     NSString *printMessage;
+    
 }
+
+-(void)settingSubServer:(NSMutableArray*)_playerInfo;
 
 @end

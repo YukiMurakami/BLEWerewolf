@@ -17,6 +17,10 @@
     NSDate *timeoutDate;
     
     NSInteger timeoutCount;
+    
+    
+    //サブサーバ用
+    NSInteger memberAllCheckId;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -32,6 +36,32 @@
     [self initBackground];
     
     return self;
+}
+
+-(void)settingSubServer:(NSMutableArray*)_playerInfo {
+    playerInfos = _playerInfo;
+    printMessage = @"プレイヤー情報受信中";
+    
+    peripheralManager = [BWPeripheralManager sharedInstance];
+    peripheralManager.delegate = self;
+    
+    NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
+    NSMutableArray *registeredPlayersArray = [BWUtility getCentralIdentifications];
+    //member:0/A..A/S..S/12
+    for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
+        NSString *toIdentificationId = registeredPlayersArray[i];
+       
+        for(NSInteger j=0;j<playerInfos.count;j++) {
+            NSString *identificationId = playerInfos[j][@"identificationId"];
+            NSString *name = playerInfos[j][@"name"];
+            NSString *message = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)j,identificationId,name,(int)playerInfos.count];
+            [messagesAndIdentificationIds addObject:@{@"message":message,@"identificationId":toIdentificationId}];
+        }
+    }
+    memberAllCheckId = [peripheralManager sendNeedSynchronizeMessage:messagesAndIdentificationIds];
+    
+    
+    [self initBackground];
 }
 
 -(void)didMoveToView:(SKView *)view {
@@ -101,6 +131,10 @@
         
         NSMutableDictionary *infoDic = [@{@"rules":ruleDic,@"roles":roleArray,@"players":playerInfos}mutableCopy];
         
+        if([BWUtility isSubPeripheral]) {
+            [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:20.0];
+        }
+        
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
@@ -137,8 +171,20 @@
             [self initBackground];
         }
     }
-    
-    
+}
+
+#pragma mark - peripheralDelegate
+
+-(void)gotAllReceiveMessage:(NSInteger)id {
+    if(id == memberAllCheckId) {
+        //セントラルが全て情報を受信したら、そのことをペリフェラルに通知して、待機
+        printMessage = @"ルール設定待ち";
+        [self initBackground];
+        
+        //・サブサーバ担当のセントラル全員にプレイヤー情報を送信完了したことをペリフェラル（サーバ）に通知「memberCheckSubServer:NNNNNN/C..C/P..P」
+        NSString *message = [NSString stringWithFormat:@"memberCheckSubServer:%@/%@/%@",[centralManager getGameId],[BWUtility getIdentificationString],[BWUtility getPeripheralIdentificationId]];
+        [centralManager sendNormalMessage:message interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
 }
 
 @end

@@ -11,6 +11,7 @@
 #import "BWUtility.h"
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
+#import "BWWaitConnectionScene.h"
 
 const NSInteger connectLimit = 4;
 
@@ -63,7 +64,6 @@ typedef NS_ENUM(NSInteger,UserType) {
     //サブサーバはセントラルも使う
     centralmanager = [BWCentralManager sharedInstance];
     centralmanager.delegate = self;
-    playerInfos = [NSMutableArray array];
     
     isFinishRequest = NO;
     isAllCentralReady = NO;
@@ -215,9 +215,9 @@ typedef NS_ENUM(NSInteger,UserType) {
         //member:0/A..A/S..S/12
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
             NSString *toIdentificationId = registeredPlayersArray[i][@"identificationId"];
-            for(NSInteger j=0;j<registeredPlayersArray.count;j++) {
-                NSString *identificationId = registeredPlayersArray[j][@"identificationId"];
-                NSString *message = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)j,identificationId,registeredPlayersArray[j][@"name"],(int)registeredPlayersArray.count];
+            for(NSInteger j=0;j<registeredAllPlayersArray.count;j++) {
+                NSString *identificationId = registeredAllPlayersArray[j][@"identificationId"];
+                NSString *message = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)j,identificationId,registeredAllPlayersArray[j][@"name"],(int)registeredAllPlayersArray.count];
                 [messagesAndIdentificationIds addObject:@{@"message":message,@"identificationId":toIdentificationId}];
             }
         }
@@ -342,8 +342,9 @@ typedef NS_ENUM(NSInteger,UserType) {
        
         if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]] && [peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
             for(NSInteger i=0;i<registeredSubServerArray.count;i++) {
-                if(![registeredSubServerArray[i][@"identificationId"] isEqualToString:centralId]) {
+                if([registeredSubServerArray[i][@"identificationId"] isEqualToString:centralId]) {
                     registeredSubServerArray[i][@"flag"] = @YES;
+                    break;
                 }
             }
             
@@ -378,9 +379,12 @@ typedef NS_ENUM(NSInteger,UserType) {
 #pragma mark - centralDelegate
 -(void)didReceivedMessage:(NSString *)message {
     //central サブサーバ用
-    //member:0/A..A/S..S/12/
-/*
+    //member:0/A..A/S..S/12
+    
+    if(![BWUtility isSubPeripheral]) return;
+
     if([[BWUtility getCommand:message] isEqualToString:@"member"]) {
+
         NSArray *contents = [BWUtility getCommandContents:message];
         NSInteger nPlayer = [contents[3]integerValue];
         NSInteger playerId = [contents[0]integerValue];
@@ -405,11 +409,22 @@ typedef NS_ENUM(NSInteger,UserType) {
             }
         }
         if(isAllReceived) {
-            printMessage = @"ルール設定待ち";
-            [self initBackground];
+            [manager stopGlobalSignal:sendGlobalId];
+            isFinishRequest = YES;
+            
+            NSMutableArray *centralIds = [NSMutableArray array];
+            for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
+                [centralIds addObject:registeredPlayersArray[i][@"identificationId"]];
+            }
+            [BWUtility setCentralIdentifications:centralIds];
+            
+            
+            BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
+            [scene settingSubServer:playerInfos];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
         }
     }
- */
 }
 
 @end
