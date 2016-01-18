@@ -245,9 +245,9 @@ static BWPeripheralManager *sharedInstance = nil;
     
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *send = [SKAction runBlock:^{
-        //「2:NNNNNN:T..T:A..A」
+        //peripheral「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId C..Cは受け取った識別ID)
         if([gameIdString isEqualToString:@""]) exit(0);
-        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId,senderNode.toIdentificationId];
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId,senderNode.toIdentificationId,[BWUtility getIdentificationString]];
         [self updateSendMessage:sendMessage];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
@@ -535,8 +535,13 @@ static BWPeripheralManager *sharedInstance = nil;
             NSString *identificationId = array[3];
             NSString *peripheralId = array[4];
             
-            if(![peripheralId isEqualToString:[BWUtility getIdentificationString]] || ![[BWUtility getCentralIdentifications] containsObject:identificationId]) {
-                return;//ペリフェラル対象が自分以外、あるいはセントラルが対象外の場合は無視
+            NSString *command = array[5];
+            
+            if(![peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
+                return;//ペリフェラル対象が自分以外は無視
+            }
+            if(![[BWUtility getCentralIdentifications] containsObject:identificationId] && ![command isEqualToString:@"participateRequest"]) {
+                return;//セントラルが対象外の場合は無視 ただし初回の参加申請だけは通す
             }
             
             if([receivedSignalIds containsObject:[NSString stringWithFormat:@"%@-%d",identificationId,(int)gotSignalId]]) {

@@ -427,11 +427,12 @@ static BWCentralManager *sharedInstance = nil;
             [viewController addRecieveMessage:receivedString];
         }
         if(kind == SignalKindReceived) {
-            //「2:NNNNNN:T..T:A..A」
+            //peripheral「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId C..Cは受け取った識別ID)
             NSString *gotGameId = [receivedString componentsSeparatedByString:@":"][1];
             NSInteger gotSignalId = [[receivedString componentsSeparatedByString:@":"][2]integerValue];
             NSString *identificationId = [receivedString componentsSeparatedByString:@":"][3];
-            if([gotGameId isEqualToString:gameIdString] && [identificationId isEqualToString:[BWUtility getIdentificationString]]) {
+            NSString *peripheralId = [receivedString componentsSeparatedByString:@":"][4];
+            if([gotGameId isEqualToString:gameIdString] && [identificationId isEqualToString:[BWUtility getIdentificationString]] && [peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]]) {
                 BWSenderNode *node = [self getSenderNodeWithSignalId:gotSignalId];
                 node.isReceived = YES;
                 
