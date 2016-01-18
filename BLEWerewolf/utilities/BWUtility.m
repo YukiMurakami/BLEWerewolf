@@ -641,6 +641,11 @@
     return mode;
 }
 
++ (BOOL)isSubPeripheral {
+    ServerMode mode = [BWUtility getServerMode];
+    return mode == ServerModeSubPeripheral;
+}
+
 + (BOOL)isPeripheral {
     ServerMode mode = [BWUtility getServerMode];
     if(mode == ServerModePeripheral || mode == ServerModeSubPeripheral) {

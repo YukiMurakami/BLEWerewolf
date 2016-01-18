@@ -41,6 +41,8 @@
     NSString *filename = @"";
     if(colorId == 0) filename = @"ui_plate.png";
     if(colorId == 1) filename = @"ui_plate_red.png";
+    if(colorId == 2) filename = @"ui_plate_pink_a.png";
+    if(colorId == 3) filename = @"ui_plate_pink.png";
     UIImage *image = [UIImage imageNamed:filename];
     
     UIImage *resizedImage = [image resizableImageWithCapInsets:UIEdgeInsetsMake(15, 15, 15, 15)];

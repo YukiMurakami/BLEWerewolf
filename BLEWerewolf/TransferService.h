@@ -68,7 +68,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  ------------個人宛に通知------------ok
 「ペリフェラルにメッセージを送信する」（タイムアウト or ペリフェラルから受信通知を受け取るまで一定間隔で送信）
 「1:NNNNNN:T..T:C..C,P..P:message」C..Cは送り元 P..Pは送り先ペリフェラル
-・ゲーム部屋に参加要求「participateRequest:NNNNNN/A..A/S...S」NNNNNNは６桁のゲームID、A..Aは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名
+・ゲーム部屋に参加要求「participateRequest:NNNNNN/A..A/S...S/P..P/F」NNNNNNは６桁のゲームID、A..Aは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
 ・ルール確認（ゲーム開始了承）を通知「settingCheck:A..A」
 ・役職確認完了通知「roleCheck:A..A」
 ・役職アクションを実行「action:1/0/3」1は役職ID、0は実行者、3は対象者
@@ -76,6 +76,10 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・夜時間終了を通知「nightFinish:A..A」
 ・投票結果確認通知「checkVoting:A..A」
 ・犠牲者確認通知「checkVictim:A..A」
+ 
+ ==サブサーバ==
+・サブサーバ担当の参加者追加をサーバに通知「memberAddSubServer:NNNNNN/C..C/S..S/P..P」(P.Pはサブサーバ、C.C,S.Sはサブサーバのメンバ)
+・サブサーバ担当のセントラル全員にプレイヤー情報を送信完了したことをペリフェラル（サーバ）に通知「memberCheckSubServer:NNNNNN/C..C/P..P」
  
 
  

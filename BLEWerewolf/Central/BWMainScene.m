@@ -10,6 +10,7 @@
 #import "BWUtility.h"
 #import "BWWaitConnectionScene.h"
 #import "BWGorgeousTableView.h"
+#import "BWGameSettingScene.h"
 
 
 @implementation BWMainScene {
@@ -26,11 +27,6 @@
     
     [self initBackground];
     
-    centralManager = [BWCentralManager sharedInstance];
-    centralManager.delegate = self;
-    
-    gameIdArray = [NSMutableArray array];
-    
     return self;
 }
 
@@ -43,7 +39,9 @@
     CGFloat margin = self.size.width*0.1;
 
     
-    SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width - margin*2, (self.size.width-margin*2)/4) title:@"ゲーム部屋一覧"];
+    NSString *title = @"サーバ一覧";
+    if([BWUtility isSubPeripheral]) title = @"メインサーバ一覧";
+    SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width - margin*2, (self.size.width-margin*2)/4) title:title];
     titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - margin);
     [backgroundNode addChild:titleNode];
     
@@ -58,6 +56,10 @@
 }
 
 -(void)didMoveToView:(SKView *)view {
+    [BWCentralManager resetSharedInstance];
+    centralManager = [BWCentralManager sharedInstance];
+    centralManager.delegate = self;
+    gameIdArray = [NSMutableArray array];
     
     [self.view addSubview:table];
     [table.tableView reloadData];
@@ -95,7 +97,10 @@
     
     [BWUtility setPeripheralIdentificationId:peripheralIdentificationId];
     
-    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
+    //・ゲーム部屋に参加要求「participateRequest:NNNNNN/A..A/S...S/P..P/F」NNNNNNは６桁のゲームID、A..Aは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
+    NSString *subServerFlag = @"0";
+    if([BWUtility isSubPeripheral]) subServerFlag = @"1";
+    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId,subServerFlag];
     [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
     
     //純粋なセントラルならば画面遷移
@@ -133,6 +138,16 @@
     }
     
     //サブサーバはperipheral画面に遷移する
+    //participateAllow:A..A
+    if([[BWUtility getCommand:message] isEqualToString:@"participateAllow"] && [BWUtility isSubPeripheral]) {
+        NSString *identificationString = [BWUtility getCommandContents:message][0];
+       
+        if([identificationString isEqualToString:[BWUtility getIdentificationString]]) {
+            BWGameSettingScene *scene = [[BWGameSettingScene alloc]initWithSizeAndGameid:self.size :[[centralManager getGameId]integerValue]];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
+        }
+    }
     
 }
 

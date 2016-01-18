@@ -40,7 +40,7 @@
 - (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait;
 - (void)sendNormalMessageEveryClient:(NSString*)message infoDic:(NSMutableDictionary*)infoDic interval:(double)intervalTime timeOut:(double)timeOut;
 - (NSInteger)sendNeedSynchronizeMessage:(NSMutableArray*)messageAndIdentificationId;
-
+- (void)stopAd;
 
 // ------------------------------
 // CBPeripheralManagerDelegate

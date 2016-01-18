@@ -88,6 +88,7 @@ typedef NS_ENUM(NSInteger,ServerMode) {
 + (ServerMode)getServerMode ;
 + (BOOL)isPeripheral;
 + (BOOL)isCentral;
++ (BOOL)isSubPeripheral;
 
 + (void)setPeripheralIdentificationId:(NSString*)identificationId;
 + (NSString*)getPeripheralIdentificationId;

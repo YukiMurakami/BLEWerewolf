@@ -114,7 +114,7 @@ static BWCentralManager *sharedInstance = nil;
         if([gameIdString isEqualToString:@""]) exit(0);
         NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,[BWUtility getIdentificationString],[BWUtility getPeripheralIdentificationId],senderNode.message];
         NSString *command = [BWUtility getCommand:senderNode.message];
-        //participateRequest:NNNNNN/A..A/S...S
+        //・ゲーム部屋に参加要求「participateRequest:NNNNNN/A..A/S...S/P..P/F」NNNNNNは６桁のゲームID、A..Aは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
         if([command isEqualToString:@"participateRequest"]) {
             [self sendMessageFromClientWithResponse:sendMessage];
         } else {
