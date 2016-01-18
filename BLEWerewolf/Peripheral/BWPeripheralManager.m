@@ -512,6 +512,11 @@ static BWPeripheralManager *sharedInstance = nil;
             NSString *centralId = array[3];
             NSString *peripheralId = array[4];
             
+            if([gotGameId isEqualToString:gameIdString] && [BWUtility isSubPeripheral] && [peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]] && [BWUtility isStartGameFlag]) {
+                //サブサーバはペリフェラルへ中継する
+                [_delegate didReceivePeripheralReceiveMessage:message];
+            }
+            
             if(![peripheralId isEqualToString:[BWUtility getIdentificationString]] || ![[BWUtility getCentralIdentifications] containsObject:centralId]) {
                 return;//ペリフェラル対象が自分以外、あるいはセントラルが対象外の場合は無視
             }
@@ -540,10 +545,12 @@ static BWPeripheralManager *sharedInstance = nil;
             NSString *peripheralId = array[4];
             
             NSString *command = array[5];
-            
+            /*
             if(![peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
                 return;//ペリフェラル対象が自分以外は無視
             }
+             */
+            
             if(![[BWUtility getCentralIdentifications] containsObject:identificationId] && ![command isEqualToString:@"participateRequest"]) {
                 return;//セントラルが対象外の場合は無視 ただし初回の参加申請だけは通す
             }
@@ -570,6 +577,11 @@ static BWPeripheralManager *sharedInstance = nil;
                 
                 //受信完了通知を返す
                 [self sendReceivedMessage:gotSignalId identificationId:identificationId];
+            }
+            
+            if([[BWUtility getCentralIdentifications] containsObject:identificationId] && [gameIdString isEqualToString:gotGameId] && [BWUtility isStartGameFlag]) {
+                //サブサーバはさらにセントラルに中継する
+                [_delegate didReceivePeripheralReceiveMessage:message];
             }
         }
     }

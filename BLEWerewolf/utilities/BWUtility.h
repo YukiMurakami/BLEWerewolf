@@ -90,6 +90,9 @@ typedef NS_ENUM(NSInteger,ServerMode) {
 + (BOOL)isCentral;
 + (BOOL)isSubPeripheral;
 
++ (void)setStartGameFlag:(BOOL)flag;
++ (BOOL)isStartGameFlag;
+
 + (void)setPeripheralIdentificationId:(NSString*)identificationId;
 + (NSString*)getPeripheralIdentificationId;
 + (void)setCentralIdentifications:(NSMutableArray*)ids;

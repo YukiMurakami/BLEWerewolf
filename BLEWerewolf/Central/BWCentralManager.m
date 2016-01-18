@@ -428,6 +428,7 @@ static BWCentralManager *sharedInstance = nil;
         }
         if(kind == SignalKindReceived) {
             //peripheral「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId C..Cは受け取った識別ID)
+            //セントラルからさっき送ったメッセージの受信通知をペリフェラルから受けとる
             NSString *gotGameId = [receivedString componentsSeparatedByString:@":"][1];
             NSInteger gotSignalId = [[receivedString componentsSeparatedByString:@":"][2]integerValue];
             NSString *identificationId = [receivedString componentsSeparatedByString:@":"][3];
@@ -440,15 +441,23 @@ static BWCentralManager *sharedInstance = nil;
                 BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
                 [viewController addRecieveMessage:receivedString];
             }
+            
+            if([gotGameId isEqualToString:gameIdString] && [BWUtility isSubPeripheral] && [peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]] && [[BWUtility getCentralIdentifications] containsObject:identificationId] && [BWUtility isStartGameFlag]) {
+                //サブサーバはセントラルへ中継する
+                [_delegate didReceivedCentralReceiveMessage:receivedString];
+            }
         }
         if(kind == SignalKindNormal) {
         //「1:NNNNNN:T..T:A..A:B..B:message」の形式で送信する（NNNNNNはゲームID,T..TはシグナルID,A..Aは送り先ID,B..Bは送り元）
             NSArray *array = [receivedString componentsSeparatedByString:@":"];
             
             NSString *peripheralId = array[4];
+            /*
             if(!([peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]])) {
                 return;//関係ないペリフェラルの信号は受信しない
             }
+             */
+             
             
             NSString *gotGameId = array[1];
             NSInteger gotSignalId = [array[2]integerValue];
@@ -476,6 +485,11 @@ static BWCentralManager *sharedInstance = nil;
                 
                 //受信完了通知を返す
                 [self sendReceivedMessage:gotSignalId];
+            }
+            
+            if([[BWUtility getCentralIdentifications] containsObject:identificationId] && [gameIdString isEqualToString:gotGameId] && [BWUtility isStartGameFlag]) {
+                //サブサーバはさらにペリフェラルに中継する
+                [_delegate didReceivedCentralReceiveMessage:receivedString];
             }
         }
         

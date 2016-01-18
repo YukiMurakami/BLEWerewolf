@@ -56,6 +56,12 @@
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
     }
+    if([BWUtility isSubPeripheral]) {
+        peripheralManager = [BWPeripheralManager sharedInstance];
+        peripheralManager.delegate = self;
+        centralManager = [BWCentralManager sharedInstance];
+        centralManager.delegate = self;
+    }
     
     [self initBackground];
 }
@@ -270,6 +276,7 @@
 
 -(void)didReceivedMessage:(NSString *)message {
     //central
+    
     //firstNight:
     if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {
         BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
@@ -281,6 +288,7 @@
 
 -(void)didReceiveMessage:(NSString *)message {
     //peripheral
+    
     //roleCheck:A..A
     if([[BWUtility getCommand:message] isEqualToString:@"roleCheck"]) {
         NSString *identificationId = [BWUtility getCommandContents:message][0];
@@ -348,6 +356,52 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
     return 30;
+}
+
+#pragma mark - subServerDelegate
+-(void)didReceivePeripheralReceiveMessage:(NSString *)receiveMessage {
+    //セントラル→ペリフェラルの中継
+    //「2:NNNNNN:T..T:C..C:P..P」
+    //「1:NNNNNN:T..T:C..C:P..P:message」
+    NSArray *array = [receiveMessage componentsSeparatedByString:@":"];
+    NSInteger signalId = [array[2]integerValue];
+    if([array[0] isEqualToString:@"1"]) {
+        NSString *message = @"";
+        for(NSInteger i=5;i<array.count;i++) {
+            if(i == 5) {
+                message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+            } else {
+                message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+            }
+        }
+        [centralManager sendNormalMessage:message interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
+    if([array[0] isEqualToString:@"2"]) {
+        [centralManager sendReceivedMessage:signalId];
+    }
+}
+-(void)didReceivedCentralReceiveMessage:(NSString *)receiveMessage {
+    //ペリフェラル→セントラルの中継
+    //「1:NNNNNN:T..T:C..C:P..P:message」
+    //「2:NNNNNN:T..T:C..C:P..P」
+    NSArray *array = [receiveMessage componentsSeparatedByString:@":"];
+    NSInteger signalId = [array[2]integerValue];
+    NSString *peripheralId = array[4];
+    NSString *centralId = array[3];
+    if([array[0] isEqualToString:@"1"]) {
+        NSString *message = @"";
+        for(NSInteger i=5;i<array.count;i++) {
+            if(i == 5) {
+                message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+            } else {
+                message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+            }
+        }
+        [peripheralManager sendNormalMessage:message toIdentificationId:centralId interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
+    if([array[0] isEqualToString:@"2"]) {
+        [peripheralManager sendReceivedMessage:signalId identificationId:centralId];
+    }
 }
 
 @end

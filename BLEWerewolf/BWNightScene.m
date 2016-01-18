@@ -173,6 +173,12 @@ const NSInteger minuteSeconds = 20;
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
     }
+    if([BWUtility isSubPeripheral]) {
+        peripheralManager = [BWPeripheralManager sharedInstance];
+        peripheralManager.delegate = self;
+        centralManager = [BWCentralManager sharedInstance];
+        centralManager.delegate = self;
+    }
     
     day = 1;
     excutionerId = -1;
@@ -963,6 +969,7 @@ const NSInteger minuteSeconds = 20;
 
 -(void)didReceivedMessage:(NSString *)message {//ペリフェラル->セントラル受信処理
     //central
+    
     //ペリフェラルから受け取ったメッセージから、自分と同じグループチャットがあったら反映
     //ただし自分自信はすでに反映されているのでむし
     
@@ -1059,6 +1066,7 @@ const NSInteger minuteSeconds = 20;
 
 -(void)didReceiveMessage:(NSString *)message {//セントラル->ペリフェラル受信処理
     //peripheral
+    
     //セントラルから受け取ったメッセージを送るべき相手に送信
     //その後自分と同じグループと同じグループチャットがあったら反映（ただし自分はむし）
     
@@ -1323,6 +1331,52 @@ const NSInteger minuteSeconds = 20;
         return 100.0;
     }
     return 30;
+}
+
+#pragma mark - subServerDelegate
+-(void)didReceivePeripheralReceiveMessage:(NSString *)receiveMessage {
+    //セントラル→ペリフェラルの中継
+    //「2:NNNNNN:T..T:C..C:P..P」
+    //「1:NNNNNN:T..T:C..C:P..P:message」
+    NSArray *array = [receiveMessage componentsSeparatedByString:@":"];
+    NSInteger signalId = [array[2]integerValue];
+    if([array[0] isEqualToString:@"1"]) {
+        NSString *message = @"";
+        for(NSInteger i=5;i<array.count;i++) {
+            if(i == 5) {
+                message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+            } else {
+                message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+            }
+        }
+        [centralManager sendNormalMessage:message interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
+    if([array[0] isEqualToString:@"2"]) {
+        [centralManager sendReceivedMessage:signalId];
+    }
+}
+-(void)didReceivedCentralReceiveMessage:(NSString *)receiveMessage {
+    //ペリフェラル→セントラルの中継
+    //「1:NNNNNN:T..T:C..C:P..P:message」
+    //「2:NNNNNN:T..T:C..C:P..P」
+    NSArray *array = [receiveMessage componentsSeparatedByString:@":"];
+    NSInteger signalId = [array[2]integerValue];
+    NSString *peripheralId = array[4];
+    NSString *centralId = array[3];
+    if([array[0] isEqualToString:@"1"]) {
+        NSString *message = @"";
+        for(NSInteger i=5;i<array.count;i++) {
+            if(i == 5) {
+                message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+            } else {
+                message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+            }
+        }
+        [peripheralManager sendNormalMessage:message toIdentificationId:centralId interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
+    if([array[0] isEqualToString:@"2"]) {
+        [peripheralManager sendReceivedMessage:signalId identificationId:centralId];
+    }
 }
 
 @end

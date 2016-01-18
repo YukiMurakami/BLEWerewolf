@@ -690,6 +690,15 @@
     [ud setObject:@{} forKey:@"centralIdentificationIds"];
 }
 
++ (void)setStartGameFlag:(BOOL)flag {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:@(flag) forKey:@"startGameFlag"];
+}
++ (BOOL)isStartGameFlag {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    return [[ud objectForKey:@"startGameFlag"]boolValue];
+}
+
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command {
     if(command == nil) return @"-1";

@@ -13,7 +13,7 @@
 #import "BWSettingScene.h"
 #import "BWWaitConnectionScene.h"
 
-const NSInteger connectLimit = 4;
+const NSInteger connectLimit = 15;
 
 typedef NS_ENUM(NSInteger,UserType) {
     UserTypeServerMember,
@@ -371,7 +371,7 @@ typedef NS_ENUM(NSInteger,UserType) {
     }
     
     BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
-    [scene sendPlayerInfo:registeredPlayersArray];
+    [scene sendPlayerInfo:registeredAllPlayersArray];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
     [self.view presentScene:scene transition:transition];
 }

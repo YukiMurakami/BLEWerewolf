@@ -16,12 +16,15 @@
     NSMutableArray *checkList;
     
     BWGorgeousTableView *table;
+    
 }
 
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
     
     isCheck = NO;
+    
+    
     
     [self initBackground];
     
@@ -41,11 +44,21 @@
         
         peripheralManager = [BWPeripheralManager sharedInstance];
         peripheralManager.delegate = self;
+        
     
     } else {
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;
     }
+    
+    if([BWUtility isSubPeripheral]) {
+        peripheralManager = [BWPeripheralManager sharedInstance];
+        peripheralManager.delegate = self;
+        centralManager = [BWCentralManager sharedInstance];
+        centralManager.delegate = self;
+    }
+    
+    [BWUtility setStartGameFlag:YES];
 }
 
 -(void)initBackground {
@@ -206,6 +219,8 @@
 
 -(void)didReceivedMessage:(NSString *)message {
     //central
+    
+    
     //gamestart:0,0/1,0/.../8,1
     //セントラル側では役職IDを格納しておく（配役とルールとプレイヤーはすでに取得済み）
     if([[BWUtility getCommand:message] isEqualToString:@"gamestart"]) {
@@ -225,6 +240,8 @@
 
 -(void)didReceiveMessage:(NSString *)message {
     //peripheral
+   
+    
     //settingCheck:A..A
     if([[BWUtility getCommand:message] isEqualToString:@"settingCheck"]) {
         NSString *identificationId = [BWUtility getCommandContents:message][0];
@@ -294,6 +311,52 @@
         [infoDic[@"players"][i] setObject:shaffleRoleArray[i] forKey:@"roleId"];
         [infoDic[@"players"][i] setObject:@YES forKey:@"isLive"];
         [infoDic[@"players"][i] setObject:@(i) forKey:@"playerId"];
+    }
+}
+
+#pragma mark - subServerDelegate
+-(void)didReceivePeripheralReceiveMessage:(NSString *)receiveMessage {
+    //セントラル→ペリフェラルの中継
+    //「2:NNNNNN:T..T:C..C:P..P」
+    //「1:NNNNNN:T..T:C..C:P..P:message」
+    NSArray *array = [receiveMessage componentsSeparatedByString:@":"];
+    NSInteger signalId = [array[2]integerValue];
+    if([array[0] isEqualToString:@"1"]) {
+        NSString *message = @"";
+        for(NSInteger i=5;i<array.count;i++) {
+            if(i == 5) {
+                message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+            } else {
+                message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+            }
+        }
+        [centralManager sendNormalMessage:message interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
+    if([array[0] isEqualToString:@"2"]) {
+        [centralManager sendReceivedMessage:signalId];
+    }
+}
+-(void)didReceivedCentralReceiveMessage:(NSString *)receiveMessage {
+    //ペリフェラル→セントラルの中継
+    //「1:NNNNNN:T..T:C..C:P..P:message」
+    //「2:NNNNNN:T..T:C..C:P..P」
+    NSArray *array = [receiveMessage componentsSeparatedByString:@":"];
+    NSInteger signalId = [array[2]integerValue];
+    NSString *peripheralId = array[4];
+    NSString *centralId = array[3];
+    if([array[0] isEqualToString:@"1"]) {
+        NSString *message = @"";
+        for(NSInteger i=5;i<array.count;i++) {
+            if(i == 5) {
+                message = [NSString stringWithFormat:@"%@%@",message,array[i]];
+            } else {
+                message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
+            }
+        }
+        [peripheralManager sendNormalMessage:message toIdentificationId:centralId interval:5.0 timeOut:20.0 firstWait:0.0];
+    }
+    if([array[0] isEqualToString:@"2"]) {
+        [peripheralManager sendReceivedMessage:signalId identificationId:centralId];
     }
 }
 

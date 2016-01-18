@@ -21,6 +21,7 @@
     
     //サブサーバ用
     NSInteger memberAllCheckId;
+    
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -133,7 +134,12 @@
         
         if([BWUtility isSubPeripheral]) {
             [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:20.0];
+        } else {
+            //ここは純粋なセントラルのみが実行される
+            [BWUtility setPeripheralIdentificationId:infoDic[@"players"][0][@"identificationId"]];
         }
+        
+        
         
         BWRuleCheckScene *scene = [BWRuleCheckScene sceneWithSize:self.size];
         [scene setCentralOrPeripheral:NO :infoDic];
@@ -148,6 +154,7 @@
         NSInteger playerId = [contents[0]integerValue];
         NSString *nameString = contents[2];
         NSString *identificationid = contents[1];
+        
         
         if(!playerInfos) {
             playerInfos = [NSMutableArray array];

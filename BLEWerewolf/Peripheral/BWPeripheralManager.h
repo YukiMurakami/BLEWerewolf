@@ -12,6 +12,7 @@
 
 @protocol BWPeripheralManagerDelegate
 -(void)didReceiveMessage:(NSString*)message;
+-(void)didReceivePeripheralReceiveMessage:(NSString*)receiveMessage;
 -(void)gotAllReceiveMessage:(NSInteger)id;
 @end
 
@@ -41,6 +42,8 @@
 - (void)sendNormalMessageEveryClient:(NSString*)message infoDic:(NSMutableDictionary*)infoDic interval:(double)intervalTime timeOut:(double)timeOut;
 - (NSInteger)sendNeedSynchronizeMessage:(NSMutableArray*)messageAndIdentificationId;
 - (void)stopAd;
+
+-(void)sendReceivedMessage:(NSInteger)receivedSignalId identificationId:(NSString*)identificationId;
 
 // ------------------------------
 // CBPeripheralManagerDelegate

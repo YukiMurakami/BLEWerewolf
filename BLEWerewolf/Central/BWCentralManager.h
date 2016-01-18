@@ -12,6 +12,7 @@
 
 @protocol BWCentralManagerDelegate
 - (void)didReceivedMessage:(NSString*)message;
+- (void)didReceivedCentralReceiveMessage:(NSString*)receiveMessage;
 @end
 
 @interface BWCentralManager : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate> {
@@ -32,6 +33,7 @@
 -(void)setGameId :(NSString*)gameIdStr;
 -(NSString*)getGameId;
 -(void)stopScan;
+-(void)sendReceivedMessage:(NSInteger)receivedSignalId ;
 
 // --------------------------------
 // CBCentralManagerDelegate
