@@ -134,9 +134,6 @@
         
         if([BWUtility isSubPeripheral]) {
             [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:20.0];
-        } else {
-            //ここは純粋なセントラルのみが実行される
-            [BWUtility setPeripheralIdentificationId:infoDic[@"players"][0][@"identificationId"]];
         }
         
         
