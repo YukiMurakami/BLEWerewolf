@@ -92,6 +92,8 @@ static BWCentralManager *sharedInstance = nil;
 
 
 - (NSInteger)sendNormalMessage:(NSString*)message interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait {
+    intervalTime = 5.0;
+    timeOut = 100.0;
     NSInteger _signalId = signalId;
     signalId++;
     
@@ -254,7 +256,8 @@ static BWCentralManager *sharedInstance = nil;
     } else {
         NSLog(@"disconnect");
     }
-    [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:TRANSFER_SERVICE_UUID]] options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
+    //[self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:TRANSFER_SERVICE_UUID]] options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
+    self.centralManager = [[CBCentralManager alloc] initWithDelegate:sharedInstance queue:nil];
 }
 
 // Invoked when the central manager fails to create a connection with a peripheral

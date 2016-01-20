@@ -113,6 +113,8 @@ static BWPeripheralManager *sharedInstance = nil;
 }
 
 - (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait {
+    intervalTime = 5.0;
+    timeOut = 100.0;
     NSInteger _signalId = signalId;
     signalId++;
     
@@ -483,6 +485,8 @@ static BWPeripheralManager *sharedInstance = nil;
     NSLog(@"%@", NSStringFromSelector(_cmd));
     NSLog(@"request:%@",requests);
     
+    [self.peripheralManager respondToRequest:[requests objectAtIndex:0] withResult:CBATTErrorSuccess];
+    
     for(CBATTRequest *request in requests) {
         NSString *message = [[NSString alloc]initWithData:request.value encoding:NSUTF8StringEncoding];
         NSLog(@"written data:%@",message);
@@ -544,7 +548,7 @@ static BWPeripheralManager *sharedInstance = nil;
         }
     }
     
-    [self.peripheralManager respondToRequest:[requests objectAtIndex:0] withResult:CBATTErrorSuccess];
+    
 }
 
 
