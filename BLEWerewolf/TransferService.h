@@ -86,6 +86,9 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・投票結果確認通知「checkVoting:A..A」
 ・犠牲者確認通知「checkVictim:A..A」
  
+ ==サブサーバ==
+・サブサーバ担当の参加者追加をサーバに通知「memberAddSubServer:NNNNNN/C..C/S..S/SubP..P」(P.Pはサブサーバ、C.C,S.Sはサブサーバのメンバ)
+ 
  
  --------受信完了通知--------ok
  「タイムアウト時間を過ぎるまで無条件で一定間隔で送信し続ける」

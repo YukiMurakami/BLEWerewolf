@@ -41,6 +41,8 @@
     NSString *filename = @"";
     if(colorId == 0) filename = @"ui_plate.png";
     if(colorId == 1) filename = @"ui_plate_red.png";
+    if(colorId == 2) filename = @"ui_plate_blue.png";
+    if(colorId == 3) filename = @"ui_plate_blue_a.png";
     UIImage *image = [UIImage imageNamed:filename];
     
     UIImage *resizedImage = [image resizableImageWithCapInsets:UIEdgeInsetsMake(15, 15, 15, 15)];
@@ -51,6 +53,8 @@
     NSString *filename_push = @"";
     if(colorId == 0) filename_push = @"ui_platePush.png";
     if(colorId == 1) filename_push = @"ui_plate_red.png";
+    if(colorId == 2) filename_push = @"ui_plate_red.png";
+    if(colorId == 3) filename_push = @"ui_plate_red.png";
     UIImage *image_push = [UIImage imageNamed:filename_push];
     
     UIImage *resizedImage_push = [image_push resizableImageWithCapInsets:UIEdgeInsetsMake(15, 15, 15, 15)];

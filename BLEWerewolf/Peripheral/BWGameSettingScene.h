@@ -8,10 +8,14 @@
 
 #import <SpriteKit/SpriteKit.h>
 #import "BWPeripheralManager.h"
+#import "BWCentralManager.h"
 
 #import "BWGorgeousTableView.h"
 #import "BWButtonNode.h"
 
-@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource, BWPeripheralManagerDelegate,BWButtonNodeDelegate>
+@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource, BWPeripheralManagerDelegate,BWButtonNodeDelegate,BWCentralManagerDelegate>
+
+-(id)initWithSize:(CGSize)size gameId:(NSInteger)_gameId ;
+
 
 @end

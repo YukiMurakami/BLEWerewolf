@@ -10,6 +10,7 @@
 #import "BWUtility.h"
 #import "BWWaitConnectionScene.h"
 #import "BWGorgeousTableView.h"
+#import "BWGameSettingScene.h"
 
 
 @implementation BWMainScene {
@@ -96,12 +97,21 @@
     
     
     //・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
-    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/0",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
-    [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
-    
-    BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
-    SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-    [self.view presentScene:scene transition:transition];
+    if([BWUtility isSubPeripheral]) {
+        NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/1",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
+        [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
+        
+        BWGameSettingScene *scene = [[BWGameSettingScene alloc]initWithSize:self.size gameId:[touchedGameId integerValue]];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
+    } else {
+        NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/0",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
+        [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
+        
+        BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
+    }
 }
 
 #pragma mark - BWCentralManagerDelegate

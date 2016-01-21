@@ -85,7 +85,7 @@
 -(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
     if([name isEqualToString:@"server"]) {
         [BWUtility setSubPeripheralFlag:NO];
-        BWGameSettingScene *scene = [BWGameSettingScene sceneWithSize:self.size];
+        BWGameSettingScene *scene = [[BWGameSettingScene alloc]initWithSize:self.size gameId:[BWUtility getRandInteger:1000000]];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
         return;

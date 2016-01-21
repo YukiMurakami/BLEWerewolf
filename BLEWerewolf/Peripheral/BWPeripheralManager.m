@@ -230,7 +230,7 @@ static BWPeripheralManager *sharedInstance = nil;
     double intervalTime = 5.0;
     
     BWSenderNode *senderNode = [[BWSenderNode alloc]init];
-    senderNode.signalId = -1;
+    senderNode.signalId = [BWUtility getRandInteger:100];
     senderNode.signalKind = SignalKindReceived;
     senderNode.firstSendDate = [NSDate date];
     senderNode.timeOutSeconds = timeOut;

@@ -12,17 +12,25 @@
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
 
-const NSInteger limitNumberParticipate = 5;
+const NSInteger limitNumberParticipate = 3;
+
+typedef NS_ENUM(NSInteger,UserType) {
+    UserTypeServerMember,
+    UserTypeServer,
+    UserTypeSubServer,
+    UserTypeSubServerMember,
+};
 
 @interface BWGameSettingScene () {
     BWPeripheralManager *manager;
+    BWCentralManager *centralManager;
     
     NSInteger gameId;
     
     BWGorgeousTableView *tableView;
-    NSMutableArray *registeredPlayersArray;
-    NSMutableArray *registeredSubServerArray;
-    NSMutableArray *registeredAllPlayersArray;
+    NSMutableArray *registeredPlayersArray;//自分のセントラル参加者
+    NSMutableArray *registeredSubServerArray;//自分のサブサーバ（メインサーバのみ）
+    NSMutableArray *registeredAllPlayersArray;//それ込みでの全ての参加者（メインサーバのみ）
     
     BWButtonNode *bwbuttonNode;
     
@@ -35,10 +43,10 @@ const NSInteger limitNumberParticipate = 5;
 
 @implementation BWGameSettingScene
 
--(id)initWithSize:(CGSize)size {
+-(id)initWithSize:(CGSize)size gameId:(NSInteger)_gameId {
     self = [super initWithSize:size];
     
-    gameId = [BWUtility getRandInteger:1000000];
+    gameId = _gameId;
     
     manager = [BWPeripheralManager sharedInstance];
     
@@ -47,11 +55,24 @@ const NSInteger limitNumberParticipate = 5;
     
     registeredPlayersArray = [NSMutableArray array];
     
+    if(![BWUtility isSubPeripheral]) {
+        registeredSubServerArray = [NSMutableArray array];
+        registeredAllPlayersArray = [NSMutableArray array];
+    } else {
+        centralManager = [BWCentralManager sharedInstance];
+        centralManager.delegate = self;
+    }
+    
     checkList = [NSMutableDictionary dictionary];
     
     //まずは自分を追加
-    NSMutableDictionary *dic = [@{@"identificationId":[BWUtility getIdentificationString],@"name":[BWUtility getUserName]}mutableCopy];
+    UserType type = UserTypeServer;
+    if([BWUtility isSubPeripheral]) type = UserTypeSubServer;
+    NSMutableDictionary *dic = [@{@"identificationId":[BWUtility getIdentificationString],@"name":[BWUtility getUserName],@"type":@(type)}mutableCopy];
     [registeredPlayersArray addObject:dic];
+    if(![BWUtility isSubPeripheral]) {
+        [registeredAllPlayersArray addObject:dic];
+    }
     
     [self initBackground];
     
@@ -62,6 +83,7 @@ const NSInteger limitNumberParticipate = 5;
     
     return self;
 }
+
 
 -(void)initBackground {
     self.backgroundColor = [UIColor blueColor];
@@ -75,18 +97,24 @@ const NSInteger limitNumberParticipate = 5;
     titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - self.size.width*0.1);
     [backgroundNode addChild:titleNode];
     
-    SKSpriteNode *numberNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width*0.3, self.size.width*0.8/5) title:[NSString stringWithFormat:@"%d人",(int)registeredPlayersArray.count]];
+    NSInteger playerNumber = registeredPlayersArray.count;
+    if(![BWUtility isSubPeripheral]) {
+        playerNumber = registeredAllPlayersArray.count;
+    }
+    SKSpriteNode *numberNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width*0.3, self.size.width*0.8/5) title:[NSString stringWithFormat:@"%d人",(int)playerNumber]];
     numberNode.position = CGPointMake(0, titleNode.position.y - titleNode.size.height/2 - numberNode.size.height/2 - self.size.width*0.1/2);
     
     [backgroundNode addChild:numberNode];
     
     CGFloat margin = self.size.height * 0.05;
     
-    bwbuttonNode = [[BWButtonNode alloc]init];
-    [bwbuttonNode makeButtonWithSize:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" title:@"参加締め切り" boldRate:1.0];
-    bwbuttonNode.position = CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2);
-    bwbuttonNode.delegate = self;
-    [backgroundNode addChild:bwbuttonNode];
+    if(![BWUtility isSubPeripheral]) {
+        bwbuttonNode = [[BWButtonNode alloc]init];
+        [bwbuttonNode makeButtonWithSize:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" title:@"参加締め切り" boldRate:1.0];
+        bwbuttonNode.position = CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2);
+        bwbuttonNode.delegate = self;
+        [backgroundNode addChild:bwbuttonNode];
+    }
     
     if(!tableView) {
         tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, titleNode.size.height+numberNode.size.height+margin*2.2, self.size.width-margin*2, self.size.height - (titleNode.size.height+numberNode.size.height+margin*2.2 + margin*2+bwbuttonNode.size.height))];
@@ -112,14 +140,41 @@ const NSInteger limitNumberParticipate = 5;
 #pragma mark - tableViewDelegate
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if(![BWUtility isSubPeripheral]) {
+        return registeredAllPlayersArray.count;
+    }
     return registeredPlayersArray.count;
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if(![BWUtility isSubPeripheral]) {
+        //TODO::メインサーバ用の表示にする
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+        if (!cell) {
+            UserType type = [registeredAllPlayersArray[indexPath.row][@"type"]integerValue];
+            NSInteger colorid = 0;
+            if(type == UserTypeServer) colorid = 1;
+            if(type == UserTypeServerMember) colorid = 0;
+            if(type == UserTypeSubServer) colorid = 2;
+            if(type == UserTypeSubServerMember) colorid = 3;
+            cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:colorid];
+        }
+        
+        NSString *name = registeredAllPlayersArray[indexPath.row][@"name"];
+        
+        cell.textLabel.text = name;
+        if(indexPath.row == 0) cell.textLabel.text = [NSString stringWithFormat:@"%@ (gameId:%06d)",name,(int)gameId];
+        
+        //cell.backgroundView.alpha = 0.4;
+        
+        return cell;
+    }
+    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) {
-        NSInteger colorid = 0;
-        if(indexPath.row == 0) colorid = 1;
+        NSInteger colorid = 2;
+        if(indexPath.row == 0) colorid = 3;
         cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:colorid];
     }
     
@@ -136,10 +191,21 @@ const NSInteger limitNumberParticipate = 5;
 -(void)tableView:(UITableView *)_tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [_tableView deselectRowAtIndexPath:indexPath animated:NO];
     
-    if(indexPath.row != 0) {
-        [registeredPlayersArray removeObjectAtIndex:indexPath.row];
-        [_tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
-        [self initBackground];
+    if(![BWUtility isSubPeripheral]) {
+        //TODO::メインサーバ用の処理を行う
+        UserType type = [registeredAllPlayersArray[indexPath.row][@"type"]integerValue];
+        if(type == UserTypeServerMember) {
+            [registeredPlayersArray removeObject:registeredAllPlayersArray[indexPath.row]];
+            [registeredAllPlayersArray removeObjectAtIndex:indexPath.row];
+            [_tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+            [self initBackground];
+        }
+    } else {
+        if(indexPath.row != 0) {
+            [registeredPlayersArray removeObjectAtIndex:indexPath.row];
+            [_tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+            [self initBackground];
+        }
     }
 }
 
@@ -203,8 +269,23 @@ const NSInteger limitNumberParticipate = 5;
                     //participateAllow:A..A
                     [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",centralId] toIdentificationId:centralId interval:5.0 timeOut:100.0 firstWait:0.0];
                     
-                    NSMutableDictionary *dic = [@{@"identificationId":centralId,@"name":userNameString}mutableCopy];
+                    UserType type = UserTypeServerMember;
+                    if([BWUtility isSubPeripheral]) {
+                        type = UserTypeSubServerMember;
+                    }
+                    if(isSubPeripheral) {
+                        type = UserTypeSubServer;
+                    }
+                    
+                    NSMutableDictionary *dic = [@{@"identificationId":centralId,@"name":userNameString,@"type":@(type)}mutableCopy];
                     [registeredPlayersArray addObject:dic];
+                    if(![BWUtility isSubPeripheral]) {
+                        [registeredAllPlayersArray addObject:dic];
+                        if(isSubPeripheral) {
+                            [registeredSubServerArray addObject:dic];
+                        }
+                    }
+                    
                     //[tableView.tableView reloadData];
                     [tableView.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:registeredPlayersArray.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
                     [self initBackground];
@@ -215,9 +296,54 @@ const NSInteger limitNumberParticipate = 5;
                     }
                     //ここで接続しているセントラルを確定させる
                     [BWUtility setCentralIdentifications:centralIds];
+                    
+                    
+                    //・サブサーバ担当の参加者追加をサーバに通知「memberAddSubServer:NNNNNN/C..C/S..S/SubP..P」(P.Pはサブサーバ、C.C,S.Sはサブサーバのメンバ)
+                    if([BWUtility isSubPeripheral]) {
+                        NSString *mes = [NSString stringWithFormat:@"memberAddSubServer:%@/%@/%@/%@",gameIdString,centralId,userNameString,[BWUtility getIdentificationString]];
+                        [centralManager sendNormalMessage:mes interval:5.0 timeOut:100.0 firstWait:0.0];
+                    }
+                    
                 }
             }
             
+        }
+    }
+    
+    //・サブサーバ担当の参加者追加をサーバに通知「memberAddSubServer:NNNNNN/C..C/S..S/SubP..P」(subP.Pはサブサーバ、C.C,S.Sはサブサーバのメンバ)
+    if(![BWUtility isSubPeripheral]) {
+        if([[BWUtility getCommand:message] isEqualToString:@"memberAddSubServer"]) {
+            NSArray *array = [BWUtility getCommandContents:message];
+            NSString *gameIdString = array[0];
+            NSString *centralId = array[1];
+            NSString *userNameString = array[2];
+            NSString *subPeripheralId = array[3];
+            
+            BOOL isFoundSubPeripheral = NO;
+            for(NSInteger i=0;i<registeredSubServerArray.count;i++) {
+                if([registeredSubServerArray[i][@"identificationId"] isEqualToString:subPeripheralId]) {
+                    isFoundSubPeripheral = YES;
+                    break;
+                }
+            }
+            
+            if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]] && isFoundSubPeripheral) {
+                
+                BOOL isNew = YES;
+                for(NSInteger i=0;i<registeredAllPlayersArray.count;i++) {
+                    if([registeredAllPlayersArray[i][@"identificationId"] isEqualToString:centralId]) {
+                        isNew = NO;
+                        break;
+                    }
+                }
+                if(isNew) {
+                    NSMutableDictionary *dic = [@{@"identificationId":centralId,@"name":userNameString,@"type":@(UserTypeSubServerMember)}mutableCopy];
+                    [registeredAllPlayersArray addObject:dic];
+                    
+                    [tableView.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:registeredAllPlayersArray.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
+                    [self initBackground];
+                }
+            }
         }
     }
     
@@ -258,6 +384,11 @@ const NSInteger limitNumberParticipate = 5;
             }
         }
     }
+}
+
+#pragma mark - BWCentralManagerDelegate
+-(void)didReceivedMessage:(NSString *)message {
+    
 }
 
 @end
