@@ -17,6 +17,8 @@
     NSDate *timeoutDate;
     
     NSInteger timeoutCount;
+    
+    SKLabelNode *countLabel;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -73,6 +75,15 @@
     messageLabel.text = printMessage;
     messageLabel.position = CGPointMake(0, 0);
     [backgroundNode addChild:messageLabel];
+    
+    countLabel = [[SKLabelNode alloc]init];
+    countLabel.fontColor = [UIColor whiteColor];
+    countLabel.fontSize = 30.0;
+    countLabel.text = @"0/0";
+    countLabel.fontName = @"HiraKaku-ProW3";
+    countLabel.position = CGPointMake(0, messageLabel.position.y - countLabel.fontSize*1.2);
+    countLabel.hidden = YES;
+    [backgroundNode addChild:countLabel];
 }
 
 -(void)didReceivedMessage:(NSString *)message {
@@ -129,6 +140,13 @@
         
         playerInfos[playerId][@"identificationId"] = identificationid;
         playerInfos[playerId][@"name"] = nameString;
+        
+        NSInteger receivedCount = 0;
+        for(NSInteger i=0;i<playerInfos.count;i++) {
+            if(![playerInfos[i][@"identificationId"] isEqualToString:@""]) receivedCount++;
+        }
+        countLabel.text = [NSString stringWithFormat:@"%d/%d",receivedCount,playerInfos.count];
+        countLabel.hidden = NO;
         
         BOOL isAllReceived = YES;
         for(NSInteger i=0;i<playerInfos.count;i++) {
