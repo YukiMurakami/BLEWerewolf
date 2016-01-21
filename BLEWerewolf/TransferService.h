@@ -69,6 +69,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 「ペリフェラルにメッセージを送信する」（タイムアウト or ペリフェラルから受信通知を受け取るまで一定間隔で送信）
 「1:NNNNNN:T..T:A..A:message」A..Aは送り元
 ・ゲーム部屋に参加要求「participateRequest:NNNNNN/A..A/S...S」NNNNNNは６桁のゲームID、A..Aは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名
+・ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
 ・ルール確認（ゲーム開始了承）を通知「settingCheck:A..A」
 ・役職確認完了通知「roleCheck:A..A」
 ・役職アクションを実行「action:1/0/3」1は役職ID、0は実行者、3は対象者

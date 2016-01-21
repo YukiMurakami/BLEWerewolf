@@ -9,9 +9,14 @@
 #import "BWWaitConnectionScene.h"
 #import "BWUtility.h"
 #import "BWRuleCheckScene.h"
+#import "BWMainScene.h"
 
 @implementation BWWaitConnectionScene {
     NSMutableArray *playerInfos;
+    
+    NSDate *timeoutDate;
+    
+    NSInteger timeoutCount;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -22,11 +27,37 @@
     
     printMessage = @"接続中、、、";
     
-    
+    timeoutCount = 0;
     
     [self initBackground];
     
     return self;
+}
+
+-(void)didMoveToView:(SKView *)view {
+    timeoutDate = [NSDate dateWithTimeIntervalSinceNow:30.0];
+    
+}
+
+-(void)update:(NSTimeInterval)currentTime {
+    if(![printMessage isEqualToString:@"接続中、、、"]) return;
+    timeoutCount++;
+    if(timeoutCount > 400) {
+        timeoutCount=0;
+        NSLog(@"aaaaaaa");
+        NSDate *now = [NSDate date];
+        NSComparisonResult result = [now compare:timeoutDate];
+        if(result == NSOrderedDescending) {
+            //Timeout
+            
+            //ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"participateCandel:%@/%@",[centralManager getGameId],[BWUtility getIdentificationString]] interval:5.0 timeOut:100.0 firstWait:0.0];
+            
+            BWMainScene *scene = [[BWMainScene alloc]initWithSize:self.size];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.5];
+            [self.view presentScene:scene transition:transition];
+        }
+    }
 }
 
 -(void)initBackground {

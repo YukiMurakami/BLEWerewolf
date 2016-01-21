@@ -12,7 +12,7 @@
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
 
-
+const NSInteger limitNumberParticipate = 3;
 
 @interface BWGameSettingScene () {
     BWPeripheralManager *manager;
@@ -85,7 +85,7 @@
         tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, titleNode.size.height+numberNode.size.height+margin*2.2, self.size.width-margin*2, self.size.height - (titleNode.size.height+numberNode.size.height+margin*2.2 + margin*2+bwbuttonNode.size.height))];
         [tableView setViewDesign:self];
         tableView.tableView.rowHeight = tableView.tableView.frame.size.height/6;
-        tableView.tableView.allowsSelection = NO;
+        //tableView.tableView.allowsSelection = NO;
     }
     
     
@@ -126,8 +126,14 @@
     return cell;
 }
 
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+-(void)tableView:(UITableView *)_tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [_tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    if(indexPath.row != 0) {
+        [registeredPlayersArray removeObjectAtIndex:indexPath.row];
+        [_tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+        [self initBackground];
+    }
 }
 
 
@@ -161,23 +167,45 @@
         NSString *gameIdString = params[0];
         NSString *userNameString = params[2];
         
-        //participateAllow:A..A
-        [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0 firstWait:0.0];
+        if(registeredPlayersArray.count < limitNumberParticipate) {
         
-        if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
-            
-            BOOL isNew = YES;
-            for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
-                if([registeredPlayersArray[i][@"identificationId"] isEqualToString:identificationIdString]) {
-                    isNew = NO;
-                    break;
+            if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
+                
+                BOOL isNew = YES;
+                for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
+                    if([registeredPlayersArray[i][@"identificationId"] isEqualToString:identificationIdString]) {
+                        isNew = NO;
+                        break;
+                    }
+                }
+                if(isNew) {
+                    //participateAllow:A..A
+                    [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0 firstWait:0.0];
+                    
+                    NSMutableDictionary *dic = [@{@"identificationId":identificationIdString,@"name":userNameString}mutableCopy];
+                    [registeredPlayersArray addObject:dic];
+                    //[tableView.tableView reloadData];
+                    [tableView.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:registeredPlayersArray.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
+                    [self initBackground];
                 }
             }
-            if(isNew) {
-                NSMutableDictionary *dic = [@{@"identificationId":identificationIdString,@"name":userNameString}mutableCopy];
-                [registeredPlayersArray addObject:dic];
-                [tableView.tableView reloadData];
-                [self initBackground];
+            
+        }
+    }
+    
+    //ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
+    if([[BWUtility getCommand:message] isEqualToString:@"participateCancel"]) {
+        NSArray *params = [BWUtility getCommandContents:message];
+        NSString *centralId = params[1];
+        NSString *gameIdString = params[0];
+        if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
+            for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
+                if([registeredPlayersArray[i][@"identificationId"] isEqualToString:centralId]) {
+                    [registeredPlayersArray removeObjectAtIndex:i];
+                    [tableView.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:i inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+                    [self initBackground];
+                    break;
+                }
             }
         }
     }
