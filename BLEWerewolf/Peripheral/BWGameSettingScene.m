@@ -21,6 +21,8 @@ const NSInteger limitNumberParticipate = 5;
     
     BWGorgeousTableView *tableView;
     NSMutableArray *registeredPlayersArray;
+    NSMutableArray *registeredSubServerArray;
+    NSMutableArray *registeredAllPlayersArray;
     
     BWButtonNode *bwbuttonNode;
     
@@ -50,7 +52,9 @@ const NSInteger limitNumberParticipate = 5;
     
     [self initBackground];
     
-    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@",(long)gameId,[BWUtility getUserName]];
+    
+    //・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
+    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@/%@",(long)gameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
     sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
     
     return self;
@@ -160,29 +164,31 @@ const NSInteger limitNumberParticipate = 5;
 
 #pragma mark - BWPeripheralManagerDelegate
 -(void)didReceiveMessage:(NSString *)message {
-    //participateRequest:NNNNNN/A..A(32)/S...S
+    //・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
     if([[BWUtility getCommand:message] isEqualToString:@"participateRequest"]) {
         NSArray *params = [BWUtility getCommandContents:message];
-        NSString *identificationIdString = params[1];
+        NSString *centralId = params[1];
         NSString *gameIdString = params[0];
         NSString *userNameString = params[2];
+        NSString *peripheralId = params[3];
+        BOOL isSubPeripheral = [params[4]boolValue];
         
         if(registeredPlayersArray.count < limitNumberParticipate) {
         
-            if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]]) {
+            if([gameIdString isEqualToString:[NSString stringWithFormat:@"%06ld",(long)gameId]] && [peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
                 
                 BOOL isNew = YES;
                 for(NSInteger i=0;i<registeredPlayersArray.count;i++) {
-                    if([registeredPlayersArray[i][@"identificationId"] isEqualToString:identificationIdString]) {
+                    if([registeredPlayersArray[i][@"identificationId"] isEqualToString:centralId]) {
                         isNew = NO;
                         break;
                     }
                 }
                 if(isNew) {
                     //participateAllow:A..A
-                    [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",identificationIdString] toIdentificationId:identificationIdString interval:5.0 timeOut:15.0 firstWait:0.0];
+                    [manager sendNormalMessage:[NSString stringWithFormat:@"participateAllow:%@",centralId] toIdentificationId:centralId interval:5.0 timeOut:100.0 firstWait:0.0];
                     
-                    NSMutableDictionary *dic = [@{@"identificationId":identificationIdString,@"name":userNameString}mutableCopy];
+                    NSMutableDictionary *dic = [@{@"identificationId":centralId,@"name":userNameString}mutableCopy];
                     [registeredPlayersArray addObject:dic];
                     //[tableView.tableView reloadData];
                     [tableView.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:registeredPlayersArray.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];

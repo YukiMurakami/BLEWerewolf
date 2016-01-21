@@ -96,6 +96,8 @@
                 printMessage = @"プレイヤー情報受信中";
                 [self initBackground];
             }
+            
+            
         }
     }
     //setting:/6,3,1,1,1,1/7,3,0,1,1
@@ -157,6 +159,8 @@
         }
         if(isAllReceived) {
             printMessage = @"ルール設定待ち";
+            //・参加者情報受信完了通知「memberCheck:C..C」
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"memberCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:100.0 firstWait:0.0];
             [self initBackground];
         }
     }

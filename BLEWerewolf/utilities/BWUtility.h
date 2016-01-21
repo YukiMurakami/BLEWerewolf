@@ -77,6 +77,8 @@ typedef NS_ENUM(NSInteger,Winner) {
 + (BOOL)wasSetting;
 + (NSString*)getUserName;
 
++ (void)setPeripheralIdentificationId:(NSString*)identificationId;
++ (NSString*)getPeripheralIdentificationId;
 + (void)setSubPeripheralFlag:(BOOL)flag;
 + (BOOL)isSubPeripheral;
 

@@ -630,6 +630,17 @@
     return userData[@"name"];
 }
 
++ (void)setPeripheralIdentificationId:(NSString*)identificationId {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:identificationId forKey:@"peripheralIdentificationId"];
+}
+
++ (NSString*)getPeripheralIdentificationId {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSString *id = [ud objectForKey:@"peripheralIdentificationId"];
+    return id;
+}
+
 + (void)setSubPeripheralFlag:(BOOL)flag {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud setObject:@(flag) forKey:@"isSubPeripheral"];

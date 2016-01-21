@@ -77,7 +77,7 @@
         //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle  reuseIdentifier:@"cell"];
     }
     
-    NSString *name = gameIdArray[indexPath.row];
+    NSString *name = [NSString stringWithFormat:@"%@(%@)",gameIdArray[indexPath.row][@"name"],gameIdArray[indexPath.row][@"gameId"]];
     
     cell.textLabel.text = name;
     
@@ -87,11 +87,16 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
-    NSString *touchedGameId = [gameIdArray[indexPath.row] substringToIndex:6];
+    NSString *touchedGameId = gameIdArray[indexPath.row][@"gameId"];
+    NSString *peripheralIdentificationId = gameIdArray[indexPath.row][@"identificationId"];
     [centralManager setGameId:touchedGameId];
     //ここでgameIdを確定させる
     [centralManager stopScan];
-    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
+    [BWUtility setPeripheralIdentificationId:peripheralIdentificationId];
+    
+    
+    //・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
+    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/0",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
     [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
     
     BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
@@ -102,21 +107,23 @@
 #pragma mark - BWCentralManagerDelegate
 
 -(void)didReceivedMessage:(NSString *)message {
-    //serveId:NNNNNN/S...S
+    //・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
     if([[BWUtility getCommand:message] isEqualToString:@"serveId"]) {
         NSArray *array = [BWUtility getCommandContents:message];
         NSString *gameId = array[0];
-        NSString *hostName = array[1];
+        NSString *peripheralId = array[1];
+        NSString *peripheralName = array[2];
     
         BOOL isNew = YES;
         for(NSInteger i=0;i<gameIdArray.count;i++) {
-            if([[gameIdArray[i] substringToIndex:6] isEqualToString:gameId]) {
+            if([[gameIdArray[i][@"gameId"] substringToIndex:6] isEqualToString:gameId]) {
                 isNew = NO;
                 break;
             }
         }
         if(isNew) {
-            [gameIdArray addObject:[NSString stringWithFormat:@"%@(%@)",gameId,hostName]];
+            NSMutableDictionary *dic = [@{@"gameId":gameId,@"identificationId":peripheralId,@"name":peripheralName}mutableCopy];
+            [gameIdArray addObject:dic];
             [table.tableView reloadData];
         }
     }

@@ -46,7 +46,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ------------全体外部に通知（ゲーム参加登録に使う）----------------------ok
 「基本的に送りっぱなし（停止メソッドを呼ぶまで一定間隔で送信し続ける）」
 「0:message」の形式で送信する
-・ゲーム部屋のID通知「serveId:NNNNNN/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、S...Sはユーザ名
+・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
  
  
 ------------個人宛に通知------------ok
@@ -75,8 +75,9 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  ------------個人宛に通知------------ok
 「ペリフェラルにメッセージを送信する」（タイムアウト or ペリフェラルから受信通知を受け取るまで一定間隔で送信）
 「1:NNNNNN:T..T:A..A:message」A..Aは送り元
-・ゲーム部屋に参加要求「participateRequest:NNNNNN/A..A/S...S」NNNNNNは６桁のゲームID、A..Aは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名
+・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
 ・ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
+・参加者情報受信完了通知「memberCheck:C..C」
 ・ルール確認（ゲーム開始了承）を通知「settingCheck:A..A」
 ・役職確認完了通知「roleCheck:A..A」
 ・役職アクションを実行「action:1/0/3」1は役職ID、0は実行者、3は対象者
