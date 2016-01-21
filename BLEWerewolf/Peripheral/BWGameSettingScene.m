@@ -12,7 +12,7 @@
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
 
-const NSInteger limitNumberParticipate = 3;
+const NSInteger limitNumberParticipate = 5;
 
 @interface BWGameSettingScene () {
     BWPeripheralManager *manager;

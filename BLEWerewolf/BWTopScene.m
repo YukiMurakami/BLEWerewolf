@@ -41,11 +41,12 @@
     
     NSArray *buttons = @[@{@"title":@"サーバ",@"name":@"server"},
                          @{@"title":@"クライアント",@"name":@"client"},
-                         @{@"title":@"ユーザ設定",@"name":@"setting"}];
+                         @{@"title":@"ユーザ設定",@"name":@"setting"},
+                         @{@"title":@"サブサーバ(9人以上)",@"name":@"subserver"}];
     
     CGSize buttonSize = CGSizeMake(self.size.width*0.8,self.size.width*0.8*0.2);
     if([BWUtility wasSetting]) {
-        for(NSInteger i=0;i<3;i++) {
+        for(NSInteger i=0;i<buttons.count;i++) {
             BWButtonNode *buttonNode = [[BWButtonNode alloc]init];
             [buttonNode makeButtonWithSize:buttonSize name:buttons[i][@"name"] title:buttons[i][@"title"] boldRate:1.0];
             buttonNode.position = CGPointMake(0, buttonSize.width*0.3*(1-i));
@@ -83,12 +84,14 @@
 
 -(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
     if([name isEqualToString:@"server"]) {
+        [BWUtility setSubPeripheralFlag:NO];
         BWGameSettingScene *scene = [BWGameSettingScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
         return;
     }
     if([name isEqualToString:@"client"]) {
+        [BWUtility setSubPeripheralFlag:NO];
         BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
@@ -96,6 +99,13 @@
     }
     if([name isEqualToString:@"setting"]) {
         BWUserSettingScene *scene = [BWUserSettingScene sceneWithSize:self.size];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+        [self.view presentScene:scene transition:transition];
+        return;
+    }
+    if([name isEqualToString:@"subserver"]) {
+        [BWUtility setSubPeripheralFlag:YES];
+        BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
         return;

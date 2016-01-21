@@ -630,6 +630,16 @@
     return userData[@"name"];
 }
 
++ (void)setSubPeripheralFlag:(BOOL)flag {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:@(flag) forKey:@"isSubPeripheral"];
+}
+
++ (BOOL)isSubPeripheral {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    return [[ud objectForKey:@"isSubPeripheral"] boolValue];
+}
+
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command {

@@ -80,7 +80,7 @@
     countLabel.fontColor = [UIColor whiteColor];
     countLabel.fontSize = 30.0;
     countLabel.text = @"0/0";
-    countLabel.fontName = @"HiraKaku-ProW3";
+    countLabel.fontName = @"HiraKakuProN-W3";
     countLabel.position = CGPointMake(0, messageLabel.position.y - countLabel.fontSize*1.2);
     countLabel.hidden = YES;
     [backgroundNode addChild:countLabel];
