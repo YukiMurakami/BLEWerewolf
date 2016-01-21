@@ -925,10 +925,11 @@ const NSInteger minuteSeconds = 20;
         //自分自身あて
         [messageViewController receiveMessage:message id:[messageViewController getGmId] infoDic:infoDic];
     } else {
+        //GMメッセージ（peripheral(gm)->central）「chatreceive:G..G/C..C/M..M」G..GはgmId C..Cは送り先central
         NSArray *messages = [self divideMessage:message];
         for(NSInteger i=0;i<messages.count;i++) {
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],identificationId,messages[i]];
-            [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:5.0 timeOut:15.0 firstWait:0.1*i];
+            [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:5.0 timeOut:30.0 firstWait:0.1*i];
         }
     }
 }

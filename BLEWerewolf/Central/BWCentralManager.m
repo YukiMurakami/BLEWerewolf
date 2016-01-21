@@ -479,7 +479,15 @@ static BWCentralManager *sharedInstance = nil;
                 //サブサーバの中継処理
                 if([BWUtility isSubPeripheral] && [BWUtility isSubPeripheralTransfer] && [[BWUtility getCentralIdentifications] containsObject:centralId] && [gameIdString isEqualToString:gotGameId] && [peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]]) {
                     //ペリフェラル→セントラルへの中継処理
+                    
+                    if([receivedSignalIds containsObject:@(gotSignalId)]) {
+                        return;//２重受信を防ぐ
+                    }
+                    [receivedSignalIds addObject:@(gotSignalId)];
+                    
                     [_transferDelegate didReceiveTransferMessageCentral:receivedString];
+                    //受信完了通知を返す
+                    [self sendReceivedMessage:gotSignalId];
                     return;
                 }
             }

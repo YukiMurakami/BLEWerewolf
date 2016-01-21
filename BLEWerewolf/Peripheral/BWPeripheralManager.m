@@ -152,7 +152,7 @@ static BWPeripheralManager *sharedInstance = nil;
         [self updateSendMessage:sendMessage];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
-        [viewController addSendMessage:senderNode.message];
+        [viewController addSendMessage:sendMessage];
         
         NSDate *now = [NSDate date];
         NSDate *finishDate = [senderNode.firstSendDate dateByAddingTimeInterval:senderNode.timeOutSeconds];
@@ -565,6 +565,8 @@ static BWPeripheralManager *sharedInstance = nil;
             if([BWUtility isSubPeripheral] && [BWUtility isSubPeripheralTransfer]) {
                 //セントラル→ペリフェラルへの中継処理
                 [_transferDelegate didReceiveTransferMessagePeripheral:message];
+                //受信完了通知を返す
+                [self sendReceivedMessage:gotSignalId identificationId:centralId];
                 return;
             }
             
