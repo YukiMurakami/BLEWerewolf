@@ -241,9 +241,9 @@ static BWPeripheralManager *sharedInstance = nil;
     
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *send = [SKAction runBlock:^{
-        //「2:NNNNNN:T..T:A..A」
+        //peripheral「2:NNNNNN:T..T:C..C:P..P」
         if([gameIdString isEqualToString:@""]) exit(0);
-        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId,senderNode.toIdentificationId];
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)receivedSignalId,senderNode.toIdentificationId,[BWUtility getIdentificationString]];
         [self updateSendMessage:sendMessage];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
@@ -492,7 +492,7 @@ static BWPeripheralManager *sharedInstance = nil;
         NSLog(@"written data:%@",message);
         
         //TODO::セントラルからの受信を処理
-        //「1:NNNNNN:T..T:A..A:message」T..TはセントラルのシグナルID
+        //「1:NNNNNN:T..T:C..C:P..P:message」T..TはセントラルのシグナルID
         //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
         NSString *contentMessage = @"";
         SignalKind kind = [[BWUtility getCommand:message]integerValue];
@@ -516,16 +516,22 @@ static BWPeripheralManager *sharedInstance = nil;
             }
         }
         if(kind == SignalKindNormal) {
-            //「1:NNNNNN:T..T:A..A:message」
+            //「1:NNNNNN:T..T:C..C:P..P:message」
             NSArray *array = [message componentsSeparatedByString:@":"];
             NSString *gotGameId = array[1];
             NSInteger gotSignalId = [array[2]integerValue];
-            NSString *identificationId = array[3];
+            NSString *centralId = array[3];
+            NSString *peripheralId = array[4];
             
-            if([receivedSignalIds containsObject:[NSString stringWithFormat:@"%@-%d",identificationId,(int)gotSignalId]]) {
+            if(![peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
+                //自分宛てじゃないものは受け取らrない
+                return;
+            }
+            
+            if([receivedSignalIds containsObject:[NSString stringWithFormat:@"%@-%d",centralId,(int)gotSignalId]]) {
                 return;//２重受信を防ぐ
             }
-            [receivedSignalIds addObject:[NSString stringWithFormat:@"%@-%d",identificationId,(int)gotSignalId]];
+            [receivedSignalIds addObject:[NSString stringWithFormat:@"%@-%d",centralId,(int)gotSignalId]];
             
             
             if([gameIdString isEqualToString:gotGameId]) {
@@ -533,8 +539,8 @@ static BWPeripheralManager *sharedInstance = nil;
                 BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
                 [viewController addRecieveMessage:message];
                 //受信
-                for(NSInteger i=4;i<array.count;i++) {
-                    if(i == 4) {
+                for(NSInteger i=5;i<array.count;i++) {
+                    if(i == 5) {
                         contentMessage = [NSString stringWithFormat:@"%@%@",contentMessage,array[i]];
                     } else {
                         contentMessage = [NSString stringWithFormat:@"%@:%@",contentMessage,array[i]];
@@ -543,7 +549,7 @@ static BWPeripheralManager *sharedInstance = nil;
                 [_delegate didReceiveMessage:contentMessage];
                 
                 //受信完了通知を返す
-                [self sendReceivedMessage:gotSignalId identificationId:identificationId];
+                [self sendReceivedMessage:gotSignalId identificationId:centralId];
             }
         }
     }

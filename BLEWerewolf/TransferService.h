@@ -68,13 +68,13 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  
  --------受信完了通知--------ok
  「タイムアウト時間を過ぎるまで無条件で一定間隔で送信し続ける」
-  peripheral「2:NNNNNN:T..T:A..A」(T..Tは受け取ったsignalId A..Aは受け取った識別ID)
+  peripheral「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId A..Aは受け取った識別ID)
 
  
 <Central側only>
  ------------個人宛に通知------------ok
 「ペリフェラルにメッセージを送信する」（タイムアウト or ペリフェラルから受信通知を受け取るまで一定間隔で送信）
-「1:NNNNNN:T..T:A..A:message」A..Aは送り元
+「1:NNNNNN:T..T:C..C:P..P:message」C..Cは送り元
 ・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
 ・ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
 ・参加者情報受信完了通知「memberCheck:C..C」

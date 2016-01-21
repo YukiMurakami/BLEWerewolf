@@ -111,9 +111,9 @@ static BWCentralManager *sharedInstance = nil;
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *firstWaitAction = [SKAction waitForDuration:firstWait];
     SKAction *send = [SKAction runBlock:^{
-        //「1:NNNNNN:T..T:A..A:message」T..Tは自分のsignalID,A..Aは自分のidentificationID
+        //「1:NNNNNN:T..T:C..C:P..P:message」
         if([gameIdString isEqualToString:@""]) exit(0);
-        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,[BWUtility getIdentificationString],senderNode.message];
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,[BWUtility getIdentificationString],[BWUtility getPeripheralIdentificationId],senderNode.message];
         NSString *command = [BWUtility getCommand:senderNode.message];
         //participateRequest:NNNNNN/A..A/S...S
         if([command isEqualToString:@"participateRequest"]) {
