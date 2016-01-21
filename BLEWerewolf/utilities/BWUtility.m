@@ -641,6 +641,23 @@
     return id;
 }
 
++ (void)setCentralIdentifications:(NSMutableArray*)ids {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:[ids copy] forKey:@"centralIdentificationIds"];
+}
+
++ (NSMutableArray*)getCentralIdentifications {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSArray *array = [ud objectForKey:@"centralIdentificationIds"];
+    return [array mutableCopy];
+}
+
++ (void)resetPeripheralAndCentralIds {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:@"" forKey:@"peripheralIdentificationId"];
+    [ud setObject:@{} forKey:@"centralIdentificationIds"];
+}
+
 + (void)setSubPeripheralFlag:(BOOL)flag {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud setObject:@(flag) forKey:@"isSubPeripheral"];

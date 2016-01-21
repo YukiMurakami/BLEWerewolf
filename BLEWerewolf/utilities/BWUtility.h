@@ -79,6 +79,9 @@ typedef NS_ENUM(NSInteger,Winner) {
 
 + (void)setPeripheralIdentificationId:(NSString*)identificationId;
 + (NSString*)getPeripheralIdentificationId;
++ (void)setCentralIdentifications:(NSMutableArray*)ids;
++ (NSMutableArray*)getCentralIdentifications;
++ (void)resetPeripheralAndCentralIds;
 + (void)setSubPeripheralFlag:(BOOL)flag;
 + (BOOL)isSubPeripheral;
 

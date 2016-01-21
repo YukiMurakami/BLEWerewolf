@@ -151,9 +151,14 @@ const NSInteger limitNumberParticipate = 5;
         
         [bwbuttonNode removeFromParent];
         
+        NSMutableArray *centralIds = [NSMutableArray array];
+        
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
             [checkList setObject:@NO forKey:registeredPlayersArray[i][@"identificationId"]];
+            [centralIds addObject:registeredPlayersArray[i][@"identificationId"]];
         }
+        //ここで接続しているセントラルを確定させる
+        [BWUtility setCentralIdentifications:centralIds];
         
         NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
         //member:0/A..A/S..S/12
@@ -203,6 +208,13 @@ const NSInteger limitNumberParticipate = 5;
                     //[tableView.tableView reloadData];
                     [tableView.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:registeredPlayersArray.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
                     [self initBackground];
+                    
+                    NSMutableArray *centralIds = [NSMutableArray array];
+                    for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
+                        [centralIds addObject:registeredPlayersArray[i][@"identificationId"]];
+                    }
+                    //ここで接続しているセントラルを確定させる
+                    [BWUtility setCentralIdentifications:centralIds];
                 }
             }
             

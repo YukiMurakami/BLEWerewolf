@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  
 ------------個人宛に通知------------ok
 「受信完了通知を受け取るまで定期的に送信する（タイムアウト時間を設定し、それを過ぎたら無条件で送信をやめる」
-「1:NNNNNN:T..T:C..C:message」の形式で送信する（NNNNNNはゲームID,T..TはシグナルID,A..Aは送り先ID）
+「1:NNNNNN:T..T:C..C:P..P:message」の形式で送信する（NNNNNNはゲームID,T..TはシグナルID,C..Cは送り先ID）
 ・ゲーム参加了承「participateAllow:」
 ・（同期必須）ゲーム参加者を通知（一度に送れる情報が限られるので一人ずつおくり、確認をとる）「member:0/C..C/S..S/12」 0はプレイヤーID 12は参加人数
 ・ルール設定を通知「setting:/6,3,1,1,1,1/7,3,0,1,1」一つ目は配役、二つ目はルール（昼時間、夜時間、占いモード、連続護衛、役かけ）
@@ -89,6 +89,6 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  
  --------受信完了通知--------ok
  「タイムアウト時間を過ぎるまで無条件で一定間隔で送信し続ける」
- central「2:NNNNNN:T..T:」(T..Tは受け取ったsignalId)
+ central「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId)
  
 */

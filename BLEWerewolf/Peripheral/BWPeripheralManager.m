@@ -133,9 +133,10 @@ static BWPeripheralManager *sharedInstance = nil;
     SKAction *wait = [SKAction waitForDuration:intervalTime];
     SKAction *firstWaitAction = [SKAction waitForDuration:firstWait];
     SKAction *send = [SKAction runBlock:^{
-        //「1:NNNNNN:T..T:A..A:message」
+        //「1:NNNNNN:T..T:A..A:message」old
+        //「1:NNNNNN:T..T:C..C:P..P:message」の形式で送信する（NNNNNNはゲームID,T..TはシグナルID,C..Cは送り先ID）
         if([gameIdString isEqualToString:@""]) exit(0);
-        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,senderNode.toIdentificationId,senderNode.message];
+        NSString *sendMessage = [NSString stringWithFormat:@"%d:%@:%d:%@:%@:%@",(int)senderNode.signalKind,gameIdString,(int)senderNode.signalId,senderNode.toIdentificationId,[BWUtility getIdentificationString], senderNode.message];
         [self updateSendMessage:sendMessage];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *viewController = (BWViewController*)appDelegate.window.rootViewController;
@@ -493,14 +494,20 @@ static BWPeripheralManager *sharedInstance = nil;
         
         //TODO::セントラルからの受信を処理
         //「1:NNNNNN:T..T:C..C:P..P:message」T..TはセントラルのシグナルID
-        //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID
+        //「2:NNNNNN:T..T」T..Tは先ほどペリフェラルが送ったシグナルID old
+        // central「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId)
         NSString *contentMessage = @"";
         SignalKind kind = [[BWUtility getCommand:message]integerValue];
         if(kind == SignalKindReceived) {
-            //「2:NNNNNN:T..T」
-            NSString *gotGameId = [message componentsSeparatedByString:@":"][1];
-            NSInteger gotSignalId = [[message componentsSeparatedByString:@":"][2]integerValue];
-            if([gotGameId isEqualToString:gameIdString]) {
+            //「2:NNNNNN:T..T」old
+            // central「2:NNNNNN:T..T:C..C:P..P」(T..Tは受け取ったsignalId)
+            NSArray *array = [message componentsSeparatedByString:@":"];
+            NSString *gotGameId = array[1];
+            NSInteger gotSignalId = [array[2]integerValue];
+            NSString *centralId = array[3];
+            NSString *peripheralId = array[4];
+            
+            if([gotGameId isEqualToString:gameIdString] && [peripheralId isEqualToString:[BWUtility getIdentificationString]] && [[BWUtility getCentralIdentifications] containsObject:centralId]) {
                 if([receivedReceiveNotifyIds containsObject:@(gotSignalId)]) {
                     return;//２重受信を防ぐ
                 }
@@ -526,6 +533,13 @@ static BWPeripheralManager *sharedInstance = nil;
             if(![peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
                 //自分宛てじゃないものは受け取らrない
                 return;
+            }
+            if(![[BWUtility getCentralIdentifications] containsObject:centralId]) {
+                //対象じゃないセントラル以外のものは受け取らrない
+                //ただし最初の参加申請だけは通す
+                if(![array[5] isEqualToString:@"participateRequest"]) {
+                    return;
+                }
             }
             
             if([receivedSignalIds containsObject:[NSString stringWithFormat:@"%@-%d",centralId,(int)gotSignalId]]) {

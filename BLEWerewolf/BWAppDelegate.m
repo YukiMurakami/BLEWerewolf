@@ -23,6 +23,7 @@
     
     //初回起動時に固有識別文字列を生成しておく
     [BWUtility getIdentificationString];
+    [BWUtility resetPeripheralAndCentralIds];
     
     return YES;
 }
