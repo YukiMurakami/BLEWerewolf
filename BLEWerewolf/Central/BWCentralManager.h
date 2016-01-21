@@ -14,11 +14,17 @@
 - (void)didReceivedMessage:(NSString*)message;
 @end
 
+@protocol BWCentralTransferDelegate
+-(void)didReceiveTransferMessageCentral:(NSString*)message;
+@end
+
 @interface BWCentralManager : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate> {
     id<BWCentralManagerDelegate> _delegate;
+    id<BWCentralTransferDelegate> _transferDelegate;
 }
 
 @property (nonatomic) id<BWCentralManagerDelegate> delegate;
+@property (nonatomic) id<BWCentralTransferDelegate> transferDelegate;
 
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) CBCharacteristic *interestingCharacteristic;

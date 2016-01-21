@@ -12,6 +12,7 @@
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
 #import "BWWaitConnectionScene.h"
+#import "BWTransferManager.h"
 
 const NSInteger limitNumberParticipate = 3;
 
@@ -233,8 +234,10 @@ typedef NS_ENUM(NSInteger,UserType) {
         
         NSMutableArray *centralIds = [NSMutableArray array];
         
+        for(NSInteger i=1;i<registeredAllPlayersArray.count;i++) {
+            [checkList setObject:@NO forKey:registeredAllPlayersArray[i][@"identificationId"]];
+        }
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
-            [checkList setObject:@NO forKey:registeredPlayersArray[i][@"identificationId"]];
             [centralIds addObject:registeredPlayersArray[i][@"identificationId"]];
         }
         //ここで接続しているセントラルを確定させる
@@ -396,7 +399,7 @@ typedef NS_ENUM(NSInteger,UserType) {
         }
         if(isAllOK) {
             BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
-            [scene sendPlayerInfo:registeredPlayersArray];
+            [scene sendPlayerInfo:registeredAllPlayersArray];
             SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
             [self.view presentScene:scene transition:transition];
         }
@@ -427,8 +430,8 @@ typedef NS_ENUM(NSInteger,UserType) {
             checkFinishList[subPeripheralId] = @YES;
             
             BOOL isAllOK = YES;
-            for(id value in [checkFinishList objectEnumerator]) {
-                if(![checkFinishList[value]boolValue]) {
+            for(NSString *key in checkFinishList) {
+                if(![checkFinishList[key]boolValue]) {
                     isAllOK = NO;
                     break;
                 }
@@ -450,8 +453,11 @@ typedef NS_ENUM(NSInteger,UserType) {
             [BWUtility setSubPeripheralTranferFlag:YES];
             
             //・締め切り終了確認を通知する「checkParticipateFinish:C..C」（C..CはサブサーバのセントラルID)
-            NSString *sendMessage = [NSString stringWithFormat:@"checkParticipateFinish:%@/",[BWUtility getIdentificationString]];
+            NSString *sendMessage = [NSString stringWithFormat:@"checkParticipateFinish:%@",[BWUtility getIdentificationString]];
             [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:100.0 firstWait:0.0];
+            
+            //中継用のシングルトンを生成
+            [BWTransferManager sharedInstance];
             
             BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
             [scene setPrintMessage:@"プレイヤー情報受信中"];

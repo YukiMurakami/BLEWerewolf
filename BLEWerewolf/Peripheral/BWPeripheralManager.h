@@ -15,13 +15,19 @@
 -(void)gotAllReceiveMessage:(NSInteger)id;
 @end
 
+@protocol BWPeripheralTransferDelegate
+-(void)didReceiveTransferMessagePeripheral:(NSString*)message;
+@end
+
 @interface BWPeripheralManager : NSObject <CBPeripheralManagerDelegate> {
     id<BWPeripheralManagerDelegate> _delegate;
+    id<BWPeripheralTransferDelegate> _transferDelegate;
     
     NSMutableArray *sendingMessageQueue;
 }
 
 @property (nonatomic) id<BWPeripheralManagerDelegate> delegate;
+@property (nonatomic) id<BWPeripheralTransferDelegate> transferDelegate;
 
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;

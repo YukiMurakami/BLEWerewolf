@@ -86,6 +86,8 @@ typedef NS_ENUM(NSInteger,Winner) {
 + (BOOL)isSubPeripheral;
 + (void)setSubPeripheralTranferFlag:(BOOL)flag;
 + (BOOL)isSubPeripheralTransfer;
++ (void)setSignalId:(NSInteger)signalId;
++ (NSInteger)getSignalId;
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command;

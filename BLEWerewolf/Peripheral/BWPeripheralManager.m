@@ -15,7 +15,7 @@
 #import "BWViewController.h"
 #import "BWSenderNode.h"
 
-
+#import "BWCentralManager.h"
 
 
 
@@ -42,6 +42,7 @@
 
 @implementation BWPeripheralManager
 @synthesize delegate = _delegate;
+@synthesize transferDelegate = _transferDelegate;
 
 static BWPeripheralManager *sharedInstance = nil;
 
@@ -68,6 +69,7 @@ static BWPeripheralManager *sharedInstance = nil;
 - (NSInteger)sendGlobalSignalMessage:(NSString*)message interval:(double)intervalTime {
     NSInteger _signalId = signalId;
     signalId++;
+    
     
     if([[BWUtility getCommand:message] isEqualToString:@"serveId"]) {
         gameIdString = [BWUtility getCommandContents:message][0];
@@ -540,6 +542,7 @@ static BWPeripheralManager *sharedInstance = nil;
             NSString *centralId = array[3];
             NSString *peripheralId = array[4];
             
+            
             if(![peripheralId isEqualToString:[BWUtility getIdentificationString]]) {
                 //自分宛てじゃないものは受け取らrない
                 return;
@@ -556,6 +559,14 @@ static BWPeripheralManager *sharedInstance = nil;
                 return;//２重受信を防ぐ
             }
             [receivedSignalIds addObject:[NSString stringWithFormat:@"%@-%d",centralId,(int)gotSignalId]];
+            
+            
+            //サブサーバの中継処理
+            if([BWUtility isSubPeripheral] && [BWUtility isSubPeripheralTransfer]) {
+                //セントラル→ペリフェラルへの中継処理
+                [_transferDelegate didReceiveTransferMessagePeripheral:message];
+                return;
+            }
             
             
             if([gameIdString isEqualToString:gotGameId]) {

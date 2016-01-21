@@ -88,6 +88,7 @@
 
 -(void)setPrintMessage:(NSString*)mes {
     printMessage = mes;
+    [self initBackground];
 }
 
 -(void)didReceivedMessage:(NSString *)message {

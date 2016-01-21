@@ -678,6 +678,16 @@
     return [[ud objectForKey:@"subPeripheralTransferFlag"] boolValue];
 }
 
++ (void)setSignalId:(NSInteger)signalId {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:@(signalId) forKey:@"signalId"];
+}
+
++ (NSInteger)getSignalId {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    return [[ud objectForKey:@"signalId"]integerValue];
+}
+
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command {

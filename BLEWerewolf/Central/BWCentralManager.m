@@ -36,6 +36,7 @@
 
 @implementation BWCentralManager
 @synthesize delegate = _delegate;
+@synthesize transferDelegate = _transferDelegate;
 
 static BWCentralManager *sharedInstance = nil;
 
@@ -62,7 +63,7 @@ static BWCentralManager *sharedInstance = nil;
     if (self) {
         // 初期化処理
         
-        signalId = 0;
+        signalId = [BWUtility getSignalId];
         signals = [NSMutableArray array];
         receivedSignalIds = [NSMutableArray array];
     }
@@ -96,6 +97,8 @@ static BWCentralManager *sharedInstance = nil;
     timeOut = 100.0;
     NSInteger _signalId = signalId;
     signalId++;
+    
+    [BWUtility setSignalId:signalId+3];
     
     BWSenderNode *senderNode = [[BWSenderNode alloc]init];
     senderNode.signalId = _signalId;
@@ -448,6 +451,7 @@ static BWCentralManager *sharedInstance = nil;
             NSString *centralId = array[3];
             NSString *peripheralId = array[4];
             
+            //セントラルIDが自分自身ならそのまま受信
             if([centralId isEqualToString:[BWUtility getIdentificationString]] && [gameIdString isEqualToString:gotGameId] && [peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]]) {
             
                 if([receivedSignalIds containsObject:@(gotSignalId)]) {
@@ -470,6 +474,14 @@ static BWCentralManager *sharedInstance = nil;
                 
                 //受信完了通知を返す
                 [self sendReceivedMessage:gotSignalId];
+            } else {
+                
+                //サブサーバの中継処理
+                if([BWUtility isSubPeripheral] && [BWUtility isSubPeripheralTransfer] && [[BWUtility getCentralIdentifications] containsObject:centralId] && [gameIdString isEqualToString:gotGameId] && [peripheralId isEqualToString:[BWUtility getPeripheralIdentificationId]]) {
+                    //ペリフェラル→セントラルへの中継処理
+                    [_transferDelegate didReceiveTransferMessageCentral:receivedString];
+                    return;
+                }
             }
         }
         

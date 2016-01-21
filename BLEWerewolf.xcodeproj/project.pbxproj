@@ -16,6 +16,7 @@
 		B60A67A91C3A502800FFD0E5 /* time_frame.png in Resources */ = {isa = PBXBuildFile; fileRef = B60A67A81C3A502800FFD0E5 /* time_frame.png */; };
 		B611032D1C509BF7009C82A3 /* ui_plate_blue_a.png in Resources */ = {isa = PBXBuildFile; fileRef = B611032B1C509BF7009C82A3 /* ui_plate_blue_a.png */; };
 		B611032E1C509BF7009C82A3 /* ui_plate_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = B611032C1C509BF7009C82A3 /* ui_plate_blue.png */; };
+		B61103311C50DCBC009C82A3 /* BWTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B61103301C50DCBC009C82A3 /* BWTransferManager.m */; };
 		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
 		B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */; };
 		B614DD941C381C28006BB3C8 /* card6.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD921C381C28006BB3C8 /* card6.png */; };
@@ -107,6 +108,8 @@
 		B60A67A81C3A502800FFD0E5 /* time_frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = time_frame.png; sourceTree = "<group>"; };
 		B611032B1C509BF7009C82A3 /* ui_plate_blue_a.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate_blue_a.png; sourceTree = "<group>"; };
 		B611032C1C509BF7009C82A3 /* ui_plate_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate_blue.png; sourceTree = "<group>"; };
+		B611032F1C50DCBC009C82A3 /* BWTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWTransferManager.h; sourceTree = "<group>"; };
+		B61103301C50DCBC009C82A3 /* BWTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWTransferManager.m; sourceTree = "<group>"; };
 		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
 		B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRoleRotateScene.h; sourceTree = "<group>"; };
 		B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRoleRotateScene.m; sourceTree = "<group>"; };
@@ -363,6 +366,8 @@
 			children = (
 				B69ED5B11B6B48CF00A9C355 /* BWPeripheralManager.h */,
 				B69ED5B21B6B48CF00A9C355 /* BWPeripheralManager.m */,
+				B611032F1C50DCBC009C82A3 /* BWTransferManager.h */,
+				B61103301C50DCBC009C82A3 /* BWTransferManager.m */,
 				B67CC3981C37715D00546FC0 /* BWSettingScene.h */,
 				B67CC3991C37715D00546FC0 /* BWSettingScene.m */,
 				B67CC39B1C3789C700546FC0 /* LWRuleSettingScene.h */,
@@ -625,6 +630,7 @@
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
 				B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */,
 				B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */,
+				B61103311C50DCBC009C82A3 /* BWTransferManager.m in Sources */,
 				B69ED5B31B6B48CF00A9C355 /* BWPeripheralManager.m in Sources */,
 				B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */,
 				B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */,
