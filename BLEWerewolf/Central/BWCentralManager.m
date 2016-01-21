@@ -411,7 +411,7 @@ static BWCentralManager *sharedInstance = nil;
         
         NSLog(@"[data] %@",receivedString);
         
-        
+        if(!receivedString) return;
         
         //TODO::受信振り分け、受信完了通知が必要な場合は返す
         SignalKind kind = [[BWUtility getCommand:receivedString]integerValue];
