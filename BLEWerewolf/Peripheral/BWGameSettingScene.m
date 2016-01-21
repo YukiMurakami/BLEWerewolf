@@ -27,7 +27,8 @@ const NSInteger limitNumberParticipate = 5;
     BWButtonNode *bwbuttonNode;
     
     NSInteger sendGlobalId;
-    NSInteger memberAllCheckId;
+
+    NSMutableDictionary *checkList;
 }
 
 @end
@@ -45,6 +46,8 @@ const NSInteger limitNumberParticipate = 5;
     
     
     registeredPlayersArray = [NSMutableArray array];
+    
+    checkList = [NSMutableDictionary dictionary];
     
     //まずは自分を追加
     NSMutableDictionary *dic = [@{@"identificationId":[BWUtility getIdentificationString],@"name":[BWUtility getUserName]}mutableCopy];
@@ -148,6 +151,10 @@ const NSInteger limitNumberParticipate = 5;
         
         [bwbuttonNode removeFromParent];
         
+        for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
+            [checkList setObject:@NO forKey:registeredPlayersArray[i][@"identificationId"]];
+        }
+        
         NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
         //member:0/A..A/S..S/12
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
@@ -158,7 +165,10 @@ const NSInteger limitNumberParticipate = 5;
                 [messagesAndIdentificationIds addObject:@{@"message":message,@"identificationId":toIdentificationId}];
             }
         }
-        memberAllCheckId = [manager sendNeedSynchronizeMessage:messagesAndIdentificationIds];
+        
+        for(NSInteger i=0;i<messagesAndIdentificationIds.count;i++) {
+            [manager sendNormalMessage:messagesAndIdentificationIds[i][@"message"] toIdentificationId:messagesAndIdentificationIds[i][@"identificationId"] interval:5.0 timeOut:100.0 firstWait:i*0.02];
+        }
     }
 }
 
@@ -199,6 +209,27 @@ const NSInteger limitNumberParticipate = 5;
         }
     }
     
+    //・参加者情報受信完了通知「memberCheck:C..C」
+    if([[BWUtility getCommand:message] isEqualToString:@"memberCheck"]) {
+        NSString *centralId = [BWUtility getCommandContents:message][0];
+        checkList[centralId] = @YES;
+        
+        BOOL isAllOK = YES;
+        for(id isOK in [checkList objectEnumerator]) {
+            if(![isOK boolValue]) {
+                isAllOK = NO;
+                break;
+            }
+        }
+        if(isAllOK) {
+            BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
+            [scene sendPlayerInfo:registeredPlayersArray];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
+        }
+    }
+    
+    
     //ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
     if([[BWUtility getCommand:message] isEqualToString:@"participateCancel"]) {
         NSArray *params = [BWUtility getCommandContents:message];
@@ -214,15 +245,6 @@ const NSInteger limitNumberParticipate = 5;
                 }
             }
         }
-    }
-}
-
--(void)gotAllReceiveMessage:(NSInteger)id {
-    if(id == memberAllCheckId) {
-        BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
-        [scene sendPlayerInfo:registeredPlayersArray];
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-        [self.view presentScene:scene transition:transition];
     }
 }
 
