@@ -86,6 +86,10 @@
     [backgroundNode addChild:countLabel];
 }
 
+-(void)setPrintMessage:(NSString*)mes {
+    printMessage = mes;
+}
+
 -(void)didReceivedMessage:(NSString *)message {
     //participateAllow:A..A
     if([printMessage isEqualToString:@"接続中、、、"] && [[BWUtility getCommand:message] isEqualToString:@"participateAllow"]) {

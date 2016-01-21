@@ -11,6 +11,7 @@
 #import "BWUtility.h"
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
+#import "BWWaitConnectionScene.h"
 
 const NSInteger limitNumberParticipate = 3;
 
@@ -37,6 +38,8 @@ typedef NS_ENUM(NSInteger,UserType) {
     NSInteger sendGlobalId;
 
     NSMutableDictionary *checkList;
+    
+    NSMutableDictionary *checkFinishList;
 }
 
 @end
@@ -76,14 +79,20 @@ typedef NS_ENUM(NSInteger,UserType) {
     
     [self initBackground];
     
-    
-    //・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
-    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@/%@",(long)gameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
-    sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
+    [self startAdvertisingGameRoom];
     
     return self;
 }
 
+-(void)startAdvertisingGameRoom {
+    //・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
+    NSString *message = [NSString stringWithFormat:@"serveId:%06ld/%@/%@",(long)gameId,[BWUtility getIdentificationString],[BWUtility getUserName]];
+    sendGlobalId = [manager sendGlobalSignalMessage:message interval:3.0];
+}
+
+-(void)stopAdvertisingGameRoom {
+    [manager stopGlobalSignal:sendGlobalId];
+}
 
 -(void)initBackground {
     self.backgroundColor = [UIColor blueColor];
@@ -207,12 +216,17 @@ typedef NS_ENUM(NSInteger,UserType) {
             [self initBackground];
         }
     }
+    
+    if(![manager isSendingSignal]) {
+        //ルーム信号発信が止まってたら再開
+        [self startAdvertisingGameRoom];
+    }
 }
 
 
 
 -(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
-    if([name isEqualToString:@"next"]) {
+    if([name isEqualToString:@"next"]) {//nextボタンが押せるのはメインサーバのみ
         [manager stopGlobalSignal:sendGlobalId];
         
         [bwbuttonNode removeFromParent];
@@ -226,20 +240,38 @@ typedef NS_ENUM(NSInteger,UserType) {
         //ここで接続しているセントラルを確定させる
         [BWUtility setCentralIdentifications:centralIds];
         
-        NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
-        //member:0/A..A/S..S/12
-        for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
-            NSString *toIdentificationId = registeredPlayersArray[i][@"identificationId"];
-            for(NSInteger j=0;j<registeredPlayersArray.count;j++) {
-                NSString *identificationId = registeredPlayersArray[j][@"identificationId"];
-                NSString *message = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)j,identificationId,registeredPlayersArray[j][@"name"],(int)registeredPlayersArray.count];
-                [messagesAndIdentificationIds addObject:@{@"message":message,@"identificationId":toIdentificationId}];
+        //セントラルに締め切りを通知する
+        if(registeredSubServerArray.count <= 0) {
+            [self sendPlayerInfos];
+        } else {
+            checkFinishList = [NSMutableDictionary dictionary];
+            for(NSInteger i=0;i<registeredSubServerArray.count;i++) {
+                [checkFinishList setObject:@NO forKey:registeredSubServerArray[i][@"identificationId"]];
+            }
+            for(NSInteger i=0;i<registeredSubServerArray.count;i++) {
+                NSString *toIdentificationId = registeredSubServerArray[i][@"identificationId"];
+                //・サブサーバが接続されてる場合は、接続締め切り信号を送る「participateFinish:」
+                [manager sendNormalMessage:@"participateFinish:" toIdentificationId:toIdentificationId interval:5.0 timeOut:100.0 firstWait:0.02*i];
             }
         }
-        
-        for(NSInteger i=0;i<messagesAndIdentificationIds.count;i++) {
-            [manager sendNormalMessage:messagesAndIdentificationIds[i][@"message"] toIdentificationId:messagesAndIdentificationIds[i][@"identificationId"] interval:5.0 timeOut:100.0 firstWait:i*0.02];
+    }
+}
+
+-(void)sendPlayerInfos {
+    NSMutableArray *messagesAndIdentificationIds = [NSMutableArray array];
+    //これ以降は全ての端末が仮想的にメインサーバと接続されているかのように通信する。
+    //member:0/A..A/S..S/12
+    for(NSInteger i=1;i<registeredAllPlayersArray.count;i++) {
+        NSString *toIdentificationId = registeredAllPlayersArray[i][@"identificationId"];
+        for(NSInteger j=0;j<registeredAllPlayersArray.count;j++) {
+            NSString *identificationId = registeredAllPlayersArray[j][@"identificationId"];
+            NSString *message = [NSString stringWithFormat:@"member:%d/%@/%@/%d",(int)j,identificationId,registeredAllPlayersArray[j][@"name"],(int)registeredAllPlayersArray.count];
+            [messagesAndIdentificationIds addObject:@{@"message":message,@"identificationId":toIdentificationId}];
         }
+    }
+    
+    for(NSInteger i=0;i<messagesAndIdentificationIds.count;i++) {
+        [manager sendNormalMessage:messagesAndIdentificationIds[i][@"message"] toIdentificationId:messagesAndIdentificationIds[i][@"identificationId"] interval:5.0 timeOut:100.0 firstWait:i*0.02];
     }
 }
 
@@ -279,6 +311,9 @@ typedef NS_ENUM(NSInteger,UserType) {
                     
                     NSMutableDictionary *dic = [@{@"identificationId":centralId,@"name":userNameString,@"type":@(type)}mutableCopy];
                     [registeredPlayersArray addObject:dic];
+                    if(registeredPlayersArray.count >= limitNumberParticipate) {
+                        [self stopAdvertisingGameRoom];
+                    }
                     if(![BWUtility isSubPeripheral]) {
                         [registeredAllPlayersArray addObject:dic];
                         if(isSubPeripheral) {
@@ -384,11 +419,46 @@ typedef NS_ENUM(NSInteger,UserType) {
             }
         }
     }
+    
+    //・締め切り終了確認を通知する「checkParticipateFinish:C..C」（C..CはサブサーバのセントラルID) (サブサーバから送られてくる）
+    if(![BWUtility isSubPeripheral]) {
+        if([[BWUtility getCommand:message] isEqualToString:@"checkParticipateFinish"]) {
+            NSString *subPeripheralId = [BWUtility getCommandContents:message][0];
+            checkFinishList[subPeripheralId] = @YES;
+            
+            BOOL isAllOK = YES;
+            for(id value in [checkFinishList objectEnumerator]) {
+                if(![checkFinishList[value]boolValue]) {
+                    isAllOK = NO;
+                    break;
+                }
+            }
+            if(isAllOK) {
+                [self sendPlayerInfos];
+            }
+        }
+    }
 }
 
 #pragma mark - BWCentralManagerDelegate
 -(void)didReceivedMessage:(NSString *)message {
-    
+    if([BWUtility isSubPeripheral]) {
+        //・サブサーバが接続されてる場合は、接続締め切り信号を送る「participateFinish:」（メインサーバから送られてくる）
+        if([[BWUtility getCommand:message] isEqualToString:@"participateFinish"]) {
+            //ここで接続終了
+            //サブサーバはメインサーバに通知を送り、あとは基本的にセントラルと同じ動きをし、信号の中継のみを行う。
+            [BWUtility setSubPeripheralTranferFlag:YES];
+            
+            //・締め切り終了確認を通知する「checkParticipateFinish:C..C」（C..CはサブサーバのセントラルID)
+            NSString *sendMessage = [NSString stringWithFormat:@"checkParticipateFinish:%@/",[BWUtility getIdentificationString]];
+            [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:100.0 firstWait:0.0];
+            
+            BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
+            [scene setPrintMessage:@"プレイヤー情報受信中"];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
+        }
+    }
 }
 
 @end

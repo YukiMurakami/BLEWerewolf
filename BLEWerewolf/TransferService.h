@@ -65,6 +65,8 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・夜開始を通知「nightStart:」
 ・ゲーム終了を通知「gameEnd:W」Wは処理者チームID (utilityを参照）
  
+・サブサーバが接続されてる場合は、接続締め切り信号を送る「participateFinish:」
+ 
  
  --------受信完了通知--------ok
  「タイムアウト時間を過ぎるまで無条件で一定間隔で送信し続ける」
@@ -88,6 +90,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  
  ==サブサーバ==
 ・サブサーバ担当の参加者追加をサーバに通知「memberAddSubServer:NNNNNN/C..C/S..S/SubP..P」(P.Pはサブサーバ、C.C,S.Sはサブサーバのメンバ)
+・締め切り終了確認を通知する「checkParticipateFinish:C..C」（C..CはサブサーバのセントラルID)
  
  
  --------受信完了通知--------ok

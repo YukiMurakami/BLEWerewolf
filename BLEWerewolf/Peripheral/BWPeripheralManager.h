@@ -41,6 +41,7 @@
 - (void)sendNormalMessageEveryClient:(NSString*)message infoDic:(NSMutableDictionary*)infoDic interval:(double)intervalTime timeOut:(double)timeOut;
 - (NSInteger)sendNeedSynchronizeMessage:(NSMutableArray*)messageAndIdentificationId;
 
+- (BOOL)isSendingSignal;
 
 // ------------------------------
 // CBPeripheralManagerDelegate

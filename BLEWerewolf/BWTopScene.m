@@ -105,6 +105,7 @@
     }
     if([name isEqualToString:@"subserver"]) {
         [BWUtility setSubPeripheralFlag:YES];
+        [BWUtility setSubPeripheralTranferFlag:NO];
         BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];

@@ -34,6 +34,8 @@
     
     NSInteger synchronizeSignalId;//すべてのメッセージの受信チェックが必要な信号セットのID
     NSMutableArray *synchronizeSignalArray;//信号セットの情報を保存する配列
+    
+    BOOL isSendingSignal;
 }
 
 @end
@@ -100,7 +102,13 @@ static BWPeripheralManager *sharedInstance = nil;
     senderNode.runningAction = repeat;
     [senderNode runAction:repeat];
     
+    isSendingSignal = YES;
+    
     return _signalId;
+}
+
+- (BOOL)isSendingSignal {
+    return isSendingSignal;
 }
 
 - (void)stopGlobalSignal:(NSInteger)_signalId {
@@ -110,6 +118,8 @@ static BWPeripheralManager *sharedInstance = nil;
         [senderNode removeFromParent];
         //[signals removeObject:senderNode];
     }
+    
+    isSendingSignal = NO;
 }
 
 - (NSInteger)sendNormalMessage:(NSString*)message toIdentificationId:(NSString*)toIdentificationId interval:(double)intervalTime timeOut:(double)timeOut firstWait:(double)firstWait {

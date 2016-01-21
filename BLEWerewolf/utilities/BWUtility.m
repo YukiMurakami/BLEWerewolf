@@ -668,6 +668,16 @@
     return [[ud objectForKey:@"isSubPeripheral"] boolValue];
 }
 
++ (void)setSubPeripheralTranferFlag:(BOOL)flag {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:@(flag) forKey:@"subPeripheralTransferFlag"];
+}
+
++ (BOOL)isSubPeripheralTransfer {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    return [[ud objectForKey:@"subPeripheralTransferFlag"] boolValue];
+}
+
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command {

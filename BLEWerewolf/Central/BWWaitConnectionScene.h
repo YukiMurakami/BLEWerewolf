@@ -16,4 +16,6 @@
     NSString *printMessage;
 }
 
+-(void)setPrintMessage:(NSString*)mes;
+
 @end
