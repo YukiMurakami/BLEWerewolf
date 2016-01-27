@@ -17,6 +17,8 @@
 		B611032D1C509BF7009C82A3 /* ui_plate_blue_a.png in Resources */ = {isa = PBXBuildFile; fileRef = B611032B1C509BF7009C82A3 /* ui_plate_blue_a.png */; };
 		B611032E1C509BF7009C82A3 /* ui_plate_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = B611032C1C509BF7009C82A3 /* ui_plate_blue.png */; };
 		B61103311C50DCBC009C82A3 /* BWTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B61103301C50DCBC009C82A3 /* BWTransferManager.m */; };
+		B61103331C512FD3009C82A3 /* card8.png in Resources */ = {isa = PBXBuildFile; fileRef = B61103321C512FD3009C82A3 /* card8.png */; };
+		B61103381C5609F3009C82A3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61103371C5609F3009C82A3 /* AVFoundation.framework */; };
 		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
 		B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */; };
 		B614DD941C381C28006BB3C8 /* card6.png in Resources */ = {isa = PBXBuildFile; fileRef = B614DD921C381C28006BB3C8 /* card6.png */; };
@@ -110,6 +112,8 @@
 		B611032C1C509BF7009C82A3 /* ui_plate_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate_blue.png; sourceTree = "<group>"; };
 		B611032F1C50DCBC009C82A3 /* BWTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWTransferManager.h; sourceTree = "<group>"; };
 		B61103301C50DCBC009C82A3 /* BWTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWTransferManager.m; sourceTree = "<group>"; };
+		B61103321C512FD3009C82A3 /* card8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card8.png; sourceTree = "<group>"; };
+		B61103371C5609F3009C82A3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
 		B614DD8F1C380D34006BB3C8 /* BWRoleRotateScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWRoleRotateScene.h; sourceTree = "<group>"; };
 		B614DD901C380D34006BB3C8 /* BWRoleRotateScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWRoleRotateScene.m; sourceTree = "<group>"; };
@@ -206,6 +210,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B61103381C5609F3009C82A3 /* AVFoundation.framework in Frameworks */,
 				B6D1037C1C404DD30007D6AB /* SpriteKit.framework in Frameworks */,
 				D623000A1957FB6E4986B0E6 /* libPods.a in Frameworks */,
 			);
@@ -418,6 +423,7 @@
 				B69ED5A51B6B2C2E00A9C355 /* card5.png */,
 				B614DD921C381C28006BB3C8 /* card6.png */,
 				B614DD931C381C28006BB3C8 /* card7.png */,
+				B61103321C512FD3009C82A3 /* card8.png */,
 				B614DD8D1C37F953006BB3C8 /* back_card.jpg */,
 			);
 			path = roleCard;
@@ -435,6 +441,7 @@
 		F1AC64495DB1349C506EDAE7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B61103371C5609F3009C82A3 /* AVFoundation.framework */,
 				B6D1037B1C404DD30007D6AB /* SpriteKit.framework */,
 				2B305F111B76436C68C48C08 /* libPods.a */,
 			);
@@ -539,6 +546,7 @@
 				B6D1039C1C421A420007D6AB /* ui_frameQuestion.png in Resources */,
 				B69ED5A91B6B2C2E00A9C355 /* card1.png in Resources */,
 				B6D1038E1C4187E70007D6AB /* bg_dead.png in Resources */,
+				B61103331C512FD3009C82A3 /* card8.png in Resources */,
 				B611032E1C509BF7009C82A3 /* ui_plate_blue.png in Resources */,
 				B63D90471B60DD35000E366B /* Main.storyboard in Resources */,
 				B69ED5AA1B6B2C2E00A9C355 /* card2.png in Resources */,

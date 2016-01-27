@@ -63,6 +63,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・全員の犠牲者受信完了を通知「victimCheckFinish:」
 ・投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
 ・夜開始を通知「nightStart:」
+・夜時間開始前に道連れを通知「afternoonVictim:1,8/2,?」プレイヤーID,死因となる役職IDのセットを死亡者分
 ・ゲーム終了を通知「gameEnd:W」Wは処理者チームID (utilityを参照）
  
 ・サブサーバが接続されてる場合は、接続締め切り信号を送る「participateFinish:」
@@ -86,6 +87,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 ・チャット（central->peripheral)「chatsend:A..A/M...M」M...Mは内容
 ・夜時間終了を通知「nightFinish:A..A」
 ・投票結果確認通知「checkVoting:A..A」
+・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
 ・犠牲者確認通知「checkVictim:A..A」
  
  ==サブサーバ==

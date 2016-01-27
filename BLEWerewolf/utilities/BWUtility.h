@@ -26,6 +26,7 @@ typedef NS_ENUM(NSUInteger, Role) {
     RoleBodyguard,
     RoleJointOwner,
     RoleFox,
+    RoleCat,
     //TODO::役職追加時変更点
 };
 

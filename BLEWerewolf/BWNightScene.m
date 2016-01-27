@@ -46,6 +46,7 @@ const NSInteger minuteSeconds = 20;
     //この辺のゲーム進行用変数は基本的にペリフェラルのみ
     NSInteger targetIndex;
     NSInteger wolfTargetIndex;
+    NSInteger wolfDidActionindex;
     NSInteger voteCount;
     NSMutableArray *victimArray;//これは情報をセントラルでも共有する
     NSMutableArray *bodyguardArray;
@@ -54,10 +55,12 @@ const NSInteger minuteSeconds = 20;
     
     SKSpriteNode *checkButton;//投票確認用ぼたんなど
     SKLabelNode *waitLabelNode;//かくにん待ち表示用
+    SKSpriteNode *messageFrameNode;
     SKSpriteNode *voteCheckNode;
     SKSpriteNode *victimCheckNode;
     
     NSInteger excutionerId;
+    NSMutableArray *afternoonVictimArray;//猫又とか
     
     BWGorgeousTableView *table;
     NSMutableArray *tableArray;
@@ -318,6 +321,17 @@ const NSInteger minuteSeconds = 20;
                 }
             }
         }
+        //道連れ
+        for(NSInteger i=0;i<afternoonVictimArray.count;i++) {
+            NSInteger index = [afternoonVictimArray[i][@"index"]integerValue];
+            infoDic[@"players"][index][@"isLive"] = @NO;
+            if([BWUtility getMyPlayerId:infoDic] == index) {
+                [self dead:YES];
+                if(!isPeripheral) {
+                    return;
+                }
+            }
+        }
     }
     
     //GMメッセージを時間差で送信する
@@ -411,6 +425,7 @@ const NSInteger minuteSeconds = 20;
     [waitLabelNode removeFromParent];
     //リフレッシュ操作を行う
     excutionerId = -1;
+    afternoonVictimArray = [NSMutableArray array];
     
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
@@ -505,6 +520,10 @@ const NSInteger minuteSeconds = 20;
         if(wolfTargetIndex != -1 && ![bodyguardArray containsObject:@(wolfTargetIndex)]) {
             //護衛失敗の場合は死亡
             [victimArray addObject:@(wolfTargetIndex)];
+            //猫又の場合は噛んだ人も道づれ
+            if([infoDic[@"players"][wolfTargetIndex][@"roleId"]integerValue] == RoleCat) {
+                [victimArray addObject:@(wolfDidActionindex)];
+            }
         }
     }
     
@@ -521,7 +540,8 @@ const NSInteger minuteSeconds = 20;
     
     if(isPeripheral) {
         //ペリフェラルはセントラルに朝開始と犠牲者を通知
-        
+        //犠牲者をシャッフルする
+        victimArray = [BWUtility getRandomArray:victimArray];
         
         //朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
         NSString *mes = [NSString stringWithFormat:@"afternoonStart:%@",[victimArray componentsJoinedByString:@","]];
@@ -568,7 +588,7 @@ const NSInteger minuteSeconds = 20;
     if(isPeripheral) {
         [self resetDidActionPeripheralArray];
         [self resetCheckList];
-        //TODO::処刑による犠牲者処理
+        
         
         //ペリフェラルはセントラルに処刑者と投票結果を通知
         //投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
@@ -609,6 +629,17 @@ const NSInteger minuteSeconds = 20;
         } else {
             excutionerId = [maxIndices[0]integerValue];
         }
+        
+        //TODO::処刑による犠牲者処理
+        if(excutionerId != -1) {
+            //猫又チェック
+            if([infoDic[@"players"][excutionerId][@"roleId"]integerValue] == RoleCat) {
+                NSMutableArray *liver = [self getLivePlayerIds];
+                [liver removeObject:@(excutionerId)];
+                NSInteger catDeathIndex = [liver[[BWUtility getRandInteger:liver.count]]integerValue];
+                [afternoonVictimArray addObject:@{@"index":@(catDeathIndex),@"reasonRoleId":@(RoleCat)}];
+            }
+        }
       
         NSString *message = [NSString stringWithFormat:@"voteResult:%d/%d",(int)voteCount,(int)excutionerId];
         for(NSInteger i=0;i<votingArray.count;i++) {
@@ -623,6 +654,7 @@ const NSInteger minuteSeconds = 20;
     
     
     //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
+    //TODO::投票結果の保存
     tableMode = TableModeVoteResult;
     table.tableView.rowHeight = table.frame.size.width/1446*244;
     table.tableView.allowsSelection = NO;
@@ -637,6 +669,51 @@ const NSInteger minuteSeconds = 20;
     CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
     checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"check" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
+}
+
+-(void)beforeNight {
+    //道連れ報告など、夜に入る直前の処理
+    if(isPeripheral) {
+        //ペリフェラルは全員に道連れを通知 (nightstartの代わりに)
+        //・夜時間開始前に道連れを通知「afternoonVictim:1,8/2,?」プレイヤーID,死因となる役職IDのセットを死亡者分
+        NSString *mes = @"afternoonVictim:";
+        for(NSInteger i=0;i<afternoonVictimArray.count;i++) {
+            mes = [NSString stringWithFormat:@"%@%@,%@",mes,afternoonVictimArray[i][@"index"],afternoonVictimArray[i][@"reasonRoleId"]];
+            if(i != afternoonVictimArray.count-1) {
+                mes = [NSString stringWithFormat:@"%@/",mes];
+            }
+        }
+        [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:30.0];
+        [self resetCheckList];
+    }
+    
+    //道連れを表示 + 確認ボタン表示
+    CGSize size = CGSizeMake(self.size.width*0.7, self.size.width*0.7*0.5);
+    NSString *mes = @"";
+    for(NSInteger i=0;i<afternoonVictimArray.count;i++) {
+        NSString *name = infoDic[@"players"][[afternoonVictimArray[i][@"index"]integerValue]][@"name"];
+        NSString *reasonString = @"";
+        NSInteger reasonRoleId = [afternoonVictimArray[i][@"reasonRoleId"]integerValue];
+        if(reasonRoleId == RoleCat) {
+            reasonString = @"猫又の呪いで死亡しました。";
+        }
+        
+        mes = [NSString stringWithFormat:@"%@「%@」さんは%@",mes,name,reasonString];
+    }
+    messageFrameNode = [BWUtility makeMessageNodeWithBoldrate:1.0 size:size text:[NSString stringWithFormat:@"%@",mes] fontSize:size.height*0.09];
+    messageFrameNode.position = CGPointMake(0, messageFrameNode.size.height*0.8);
+    if(!messageFrameNode.parent) {
+        [backgroundNode addChild:messageFrameNode];
+        messageFrameNode.hidden = NO;
+    }
+    
+    CGFloat margin = self.size.height*0.05;
+    CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
+    checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"afternoonVictimCheck" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
+    if(!checkButton.parent) {
+        [backgroundNode addChild:checkButton];
+        checkButton.hidden = NO;
+    }
 }
 
 -(void)gameEnd {
@@ -785,13 +862,41 @@ const NSInteger minuteSeconds = 20;
                     [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
                     [self finishAfternoon];
                 } else {
-                    [self nightStart];
+                    if(afternoonVictimArray.count <= 0) {
+                        [self nightStart];
+                    } else {
+                        //道連れが発生していたら表示する
+                        [self beforeNight];
+                    }
                 }
             }
         } else {
             //セントラルはかくにん通知を送る
             //投票結果確認通知「checkVoting:A..A」
             [centralManager sendNormalMessage:[NSString stringWithFormat:@"checkVoting:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+        }
+    }
+    
+    //afternoonVictimCheck
+    if([node.name isEqualToString:@"afternoonVictimCheck"]) {
+        [checkButton removeFromParent];
+        waitLabelNode = [[SKLabelNode alloc]init];
+        waitLabelNode.text = @"全員の確認待ち";
+        waitLabelNode.fontColor = [UIColor blackColor];
+        waitLabelNode.fontSize = checkButton.size.height*0.9;
+        waitLabelNode.position = checkButton.position;
+        [backgroundNode addChild:waitLabelNode];
+        
+        if(isPeripheral) {
+            //ペリフェラルは直接処理
+            checkList[[BWUtility getMyPlayerId:infoDic]] = @YES;
+            if([self isAllOkCheckList]) {
+                [self nightStart];
+            }
+        } else {
+            //セントラルはかくにん通知を送る
+            //・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
+            [centralManager sendNormalMessage:[NSString stringWithFormat:@"afternoonVictimCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
         }
     }
     
@@ -889,6 +994,7 @@ const NSInteger minuteSeconds = 20;
     }
     if(roleId == RoleWerewolf) {
         wolfTargetIndex = targetPlayerId;//噛み先を保存
+        wolfDidActionindex = actionPlayerId;//噛んだ人も保存（猫又とか）
         //人狼にメッセージを送信
         NSMutableArray *playerArray = infoDic[@"players"];
         NSString *message = [NSString stringWithFormat:@"「%@」さんが「%@」さんを噛みます。",playerArray[actionPlayerId][@"name"],playerArray[targetPlayerId][@"name"]];
@@ -959,6 +1065,18 @@ const NSInteger minuteSeconds = 20;
     return [shouldSenderId copy];
 }
 
+
+-(NSMutableArray*)getLivePlayerIds {
+    NSMutableArray *players = infoDic[@"players"];
+    NSMutableArray *result = [NSMutableArray array];
+    for(NSInteger i=0;i<players.count;i++) {
+        if([players[i][@"isLive"]boolValue]) {
+            [result addObject:@(i)];
+        }
+    }
+    return result;
+}
+
 #pragma mark - messageDelegate
 
 -(void)didReceivedMessage:(NSString *)message {//ペリフェラル->セントラル受信処理
@@ -1011,7 +1129,7 @@ const NSInteger minuteSeconds = 20;
         //ペリフェラルからの投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
         if([[BWUtility getCommand:message] isEqualToString:@"voteResult"]) {
             if(phase == PhaseAfternoonFinish) {
-                //ここで投票履歴を取得
+                //TODO::ここで投票履歴を取得
                 votingArray = [NSMutableArray array];
                 NSArray *components = [BWUtility getCommandContents:message];
                 excutionerId = [components[1]integerValue];
@@ -1039,6 +1157,20 @@ const NSInteger minuteSeconds = 20;
                 } else {
                     [self nightStart];
                 }
+            }
+        }
+        
+        //・夜時間開始前に道連れを通知「afternoonVictim:1,8/2,?」プレイヤーID,死因となる役職IDのセットを死亡者分
+        if([[BWUtility getCommand:message] isEqualToString:@"afternoonVictim"]) {
+            if(phase == PhaseVotingFinish) {
+                //TODO::セントラルはここで道連れを保存
+                NSArray *components = [BWUtility getCommandContents:message];
+                for(NSInteger i=0;i<components.count;i++) {
+                    NSArray *values = [components[i] componentsSeparatedByString:@","];
+                    [afternoonVictimArray addObject:@{@"index":@([values[0]integerValue]),@"reasonRoleId":@([values[1]integerValue])}];
+                }
+                
+                [self beforeNight];
             }
         }
         
@@ -1116,6 +1248,16 @@ const NSInteger minuteSeconds = 20;
         checkList[playerId] = @YES;
         if([self isAllOkCheckList]) {
             [self afternoonStart];
+        }
+    }
+    
+    //セントラルによる・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
+    if([[BWUtility getCommand:message] isEqualToString:@"afternoonVictimCheck"]) {
+        NSString *identificationId = [BWUtility getCommandContents:message][0];
+        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+        checkList[playerId] = @YES;
+        if([self isAllOkCheckList]) {
+            [self nightStart];
         }
     }
     

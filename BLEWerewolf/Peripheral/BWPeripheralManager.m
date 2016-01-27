@@ -70,6 +70,9 @@ static BWPeripheralManager *sharedInstance = nil;
     NSInteger _signalId = signalId;
     signalId++;
     
+    if(!isSendingSignal) {
+        [self startAdvertising];
+    }
     
     if([[BWUtility getCommand:message] isEqualToString:@"serveId"]) {
         gameIdString = [BWUtility getCommandContents:message][0];
@@ -120,6 +123,8 @@ static BWPeripheralManager *sharedInstance = nil;
         [senderNode removeFromParent];
         //[signals removeObject:senderNode];
     }
+    
+    [self.peripheralManager stopAdvertising];
     
     isSendingSignal = NO;
 }
@@ -429,10 +434,14 @@ static BWPeripheralManager *sharedInstance = nil;
         NSLog(@"[error] %@", [error localizedDescription]);
     }else{
         // Starts advertising the service
-        [self.peripheralManager startAdvertising:@{CBAdvertisementDataLocalNameKey : @"mokyu", CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:TRANSFER_SERVICE_UUID]] }];
-        NSLog(@"start advertising");
-        
+        isSendingSignal = YES;
+        [self startAdvertising];
     }
+}
+
+-(void)startAdvertising {
+    [self.peripheralManager startAdvertising:@{CBAdvertisementDataLocalNameKey : @"mokyu", CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:TRANSFER_SERVICE_UUID]] }];
+    NSLog(@"start advertising");
 }
 
 // Advertising Peripheral Data

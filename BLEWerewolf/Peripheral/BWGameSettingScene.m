@@ -14,7 +14,7 @@
 #import "BWWaitConnectionScene.h"
 #import "BWTransferManager.h"
 
-const NSInteger limitNumberParticipate = 3;
+const NSInteger limitNumberParticipate = 10;
 
 typedef NS_ENUM(NSInteger,UserType) {
     UserTypeServerMember,
