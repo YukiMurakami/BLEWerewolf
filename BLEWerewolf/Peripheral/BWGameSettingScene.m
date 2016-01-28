@@ -14,6 +14,8 @@
 #import "BWWaitConnectionScene.h"
 #import "BWTransferManager.h"
 
+#import "LWBonjourManager.h"
+
 const NSInteger limitNumberParticipate = 10;
 
 typedef NS_ENUM(NSInteger,UserType) {
@@ -60,8 +62,17 @@ typedef NS_ENUM(NSInteger,UserType) {
     registeredPlayersArray = [NSMutableArray array];
     
     if(![BWUtility isSubPeripheral]) {
+        //メインサーバ
         registeredSubServerArray = [NSMutableArray array];
         registeredAllPlayersArray = [NSMutableArray array];
+        
+        [[LWBonjourManager sharedManager] searchNetService];
+        
+        [NSObject performBlock:^{
+            [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/通信テストOK"]];
+        } afterDelay:3.0];
+        
+        
     } else {
         centralManager = [BWCentralManager sharedInstance];
         centralManager.delegate = self;

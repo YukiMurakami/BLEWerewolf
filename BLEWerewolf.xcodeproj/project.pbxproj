@@ -33,6 +33,7 @@
 		B63D90491B60DD35000E366B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B63D90481B60DD35000E366B /* Images.xcassets */; };
 		B63D90581B60DD35000E366B /* BLEWerewolfTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90571B60DD35000E366B /* BLEWerewolfTests.m */; };
 		B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B63D90621B60DDCA000E366B /* BWTopScene.m */; };
+		B662D25B1C5A2690006E4456 /* LWBonjourManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B662D25A1C5A2690006E4456 /* LWBonjourManager.m */; };
 		B67CC3911C36D3D300546FC0 /* BWWaitConnectionScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3901C36D3D300546FC0 /* BWWaitConnectionScene.m */; };
 		B67CC3941C37650700546FC0 /* night.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B67CC3931C37650700546FC0 /* night.jpg */; };
 		B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3961C37657400546FC0 /* BWRuleCheckScene.m */; };
@@ -137,6 +138,8 @@
 		B63D90571B60DD35000E366B /* BLEWerewolfTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEWerewolfTests.m; sourceTree = "<group>"; };
 		B63D90611B60DDCA000E366B /* BWTopScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWTopScene.h; sourceTree = "<group>"; };
 		B63D90621B60DDCA000E366B /* BWTopScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWTopScene.m; sourceTree = "<group>"; };
+		B662D2591C5A2690006E4456 /* LWBonjourManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LWBonjourManager.h; sourceTree = "<group>"; };
+		B662D25A1C5A2690006E4456 /* LWBonjourManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LWBonjourManager.m; sourceTree = "<group>"; };
 		B67CC38F1C36D3D300546FC0 /* BWWaitConnectionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWWaitConnectionScene.h; sourceTree = "<group>"; };
 		B67CC3901C36D3D300546FC0 /* BWWaitConnectionScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWWaitConnectionScene.m; sourceTree = "<group>"; };
 		B67CC3931C37650700546FC0 /* night.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = night.jpg; sourceTree = "<group>"; };
@@ -340,6 +343,8 @@
 				B60A679C1C38B0FC00FFD0E5 /* BWTimer.m */,
 				B60A679E1C38B87900FFD0E5 /* BWMessageViewController.h */,
 				B60A679F1C38B87900FFD0E5 /* BWMessageViewController.m */,
+				B662D2591C5A2690006E4456 /* LWBonjourManager.h */,
+				B662D25A1C5A2690006E4456 /* LWBonjourManager.m */,
 			);
 			name = utilities;
 			path = BLEWerewolf/utilities;
@@ -635,6 +640,7 @@
 				B6D103A21C4233CD0007D6AB /* BWGorgeousTableView.m in Sources */,
 				B631DCEC1C43917A00BC9D04 /* BWVoteCell.m in Sources */,
 				B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */,
+				B662D25B1C5A2690006E4456 /* LWBonjourManager.m in Sources */,
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
 				B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */,
 				B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */,

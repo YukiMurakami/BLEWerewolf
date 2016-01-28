@@ -17,6 +17,8 @@
 #import "BWGorgeousTableView.h"
 #import "BWVoteCell.h"
 
+#import "LWBonjourManager.h"
+
 typedef NS_ENUM(NSInteger,Phase) {
     PhaseNight,
     PhaseNightFinish,
@@ -563,6 +565,11 @@ const NSInteger minuteSeconds = 20;
     CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
     checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"victimCheck" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
+    
+    
+    if(![BWUtility isSubPeripheral]) {
+        [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",[NSString stringWithFormat:@"%d日目の朝になりました。昨晩の犠牲者は%@でした。",(int)day,victimString]]];
+    }
 }
 
 -(void)finishAfternoon {
@@ -669,6 +676,21 @@ const NSInteger minuteSeconds = 20;
     CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
     checkButton = [BWUtility makeButton:@"確認" size:buttonSize name:@"check" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
+    
+    
+    if(![BWUtility isSubPeripheral]) {
+        NSString *message = @"";
+        for(NSInteger i=0;i<votingArray.count;i++) {
+            message = [NSString stringWithFormat:@"%@\r\n%@",message,[BWUtility getVoteResultFormatString:votingArray[i] infoDic:infoDic]];
+        }
+        
+        if(excutionerId == -1) {
+            message = [NSString stringWithFormat:@"%@\r\n%d日目%d回目投票結果 同票のため再投票します。（あと%d回)",message,(int)day,(int)voteCount,(int)voteMaxCount-(int)voteCount];
+        } else {
+            message = [NSString stringWithFormat:@"%@\r\n%d日目%d回目投票結果「%@」さんが追放されました。",message,(int)day,(int)voteCount,infoDic[@"players"][excutionerId][@"name"]];
+        }
+        [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",message]];
+    }
 }
 
 -(void)beforeNight {
@@ -714,6 +736,10 @@ const NSInteger minuteSeconds = 20;
         [backgroundNode addChild:checkButton];
         checkButton.hidden = NO;
     }
+    
+    if(![BWUtility isSubPeripheral]) {
+        [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",mes]];
+    }
 }
 
 -(void)gameEnd {
@@ -747,6 +773,10 @@ const NSInteger minuteSeconds = 20;
     CGSize buttonSize = CGSizeMake(self.size.width*0.8, self.size.width*0.8/5);
     checkButton = [BWUtility makeButton:@"終了する" size:buttonSize name:@"end" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
+    
+    if(![BWUtility isSubPeripheral]) {
+        [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",mes]];
+    }
 }
 
 -(void)dead:(BOOL)isExcute {
@@ -951,6 +981,8 @@ const NSInteger minuteSeconds = 20;
     tableMode = TableModeNormal;
     
     [table.tableView reloadData];
+    
+    
 }
 
 -(void)doRoleAction {
@@ -1037,6 +1069,13 @@ const NSInteger minuteSeconds = 20;
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],identificationId,messages[i]];
             [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:5.0 timeOut:30.0 firstWait:0.1*i];
         }
+    }
+    
+    //ログを送信
+    if(![BWUtility isSubPeripheral]) {
+        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+        NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
+        [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/GM/-/%@",(int)roleId,message]];
     }
 }
 
@@ -1206,6 +1245,14 @@ const NSInteger minuteSeconds = 20;
             text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
         }
         
+        //ログを送信
+        if(![BWUtility isSubPeripheral]) {
+            NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+            NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
+            NSString *name = infoDic[@"players"][playerId][@"name"];
+            [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/%@/-/%@",(int)roleId,name,text]];
+        }
+        
         NSArray *shouldSendIds = [self getSameChatroomMemberId:identificationId];
         for(NSInteger i=0;i<shouldSendIds.count;i++) {
             [peripheralManager sendNormalMessage:[NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text] toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0 firstWait:0.05*i];
@@ -1308,6 +1355,15 @@ const NSInteger minuteSeconds = 20;
             for(NSInteger i=0;i<shouldSendIds.count;i++) {
                 [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0 firstWait:i*0.07+j*0.1];
             }
+            
+            //ログを送信
+            if(![BWUtility isSubPeripheral]) {
+                NSInteger playerId = [BWUtility getMyPlayerId:infoDic];
+                NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
+                NSString *name = infoDic[@"players"][playerId][@"name"];
+                [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/%@/-/%@",(int)roleId,name,array[j]]];
+            }
+            
         } else {
             //まずはペリフェラルに知らせる
             NSString *mes = [NSString stringWithFormat:@"chatsend:%@/%@",[BWUtility getIdentificationString],array[j]];

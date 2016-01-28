@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger,Winner) {
 +(SKSpriteNode*)makeTitleNodeWithBoldrate:(CGFloat)boldRate size:(CGSize)size title:(NSString*)title;
 +(SKSpriteNode*)makeMessageNodeWithBoldrate:(CGFloat)boldRate size:(CGSize)size text:(NSString*)text fontSize:(CGFloat)fontSize;
 
-
++(NSString*)getVoteResultFormatString:(NSMutableDictionary*)voteDic infoDic:(NSMutableDictionary*)infoDic ;
 +(SKSpriteNode*)makeVoteResultNode:(CGSize)size position:(CGPoint)position texture:(SKTexture*)texture day:(NSInteger)day voteCount:(NSInteger)voteCount excutionerId:(NSInteger)excutionerId voteArray:(NSMutableArray*)voteArray infoDic:(NSMutableDictionary*)infoDic;
 +(SKSpriteNode *) makeFrameNode :(CGSize)size position:(CGPoint)position color:(UIColor*)color texture:(SKTexture *)texture;
 +(SKSpriteNode *) makeMessageNode :(CGSize)frameSize position:(CGPoint)position backColor:(UIColor*)color string:(NSString*)string fontSize:(CGFloat)fontSize fontColor:(UIColor*)fontColor;

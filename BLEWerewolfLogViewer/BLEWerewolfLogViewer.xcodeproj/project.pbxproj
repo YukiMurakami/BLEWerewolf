@@ -1,0 +1,506 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B662D22E1C5A0913006E4456 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B662D22D1C5A0913006E4456 /* AppDelegate.m */; };
+		B662D2311C5A0913006E4456 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B662D2301C5A0913006E4456 /* main.m */; };
+		B662D2331C5A0913006E4456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B662D2321C5A0913006E4456 /* Assets.xcassets */; };
+		B662D2361C5A0913006E4456 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B662D2341C5A0913006E4456 /* MainMenu.xib */; };
+		B662D2411C5A0913006E4456 /* BLEWerewolfLogViewerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B662D2401C5A0913006E4456 /* BLEWerewolfLogViewerTests.m */; };
+		B662D24C1C5A0914006E4456 /* BLEWerewolfLogViewerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = B662D24B1C5A0914006E4456 /* BLEWerewolfLogViewerUITests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B662D23D1C5A0913006E4456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B662D2211C5A0913006E4456 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B662D2281C5A0913006E4456;
+			remoteInfo = BLEWerewolfLogViewer;
+		};
+		B662D2481C5A0914006E4456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B662D2211C5A0913006E4456 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B662D2281C5A0913006E4456;
+			remoteInfo = BLEWerewolfLogViewer;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		B662D2291C5A0913006E4456 /* BLEWerewolfLogViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLEWerewolfLogViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B662D22C1C5A0913006E4456 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		B662D22D1C5A0913006E4456 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B662D2301C5A0913006E4456 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B662D2321C5A0913006E4456 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B662D2351C5A0913006E4456 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		B662D2371C5A0913006E4456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B662D23C1C5A0913006E4456 /* BLEWerewolfLogViewerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLEWerewolfLogViewerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B662D2401C5A0913006E4456 /* BLEWerewolfLogViewerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEWerewolfLogViewerTests.m; sourceTree = "<group>"; };
+		B662D2421C5A0913006E4456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B662D2471C5A0914006E4456 /* BLEWerewolfLogViewerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLEWerewolfLogViewerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B662D24B1C5A0914006E4456 /* BLEWerewolfLogViewerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLEWerewolfLogViewerUITests.m; sourceTree = "<group>"; };
+		B662D24D1C5A0914006E4456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B662D2261C5A0913006E4456 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B662D2391C5A0913006E4456 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B662D2441C5A0913006E4456 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B662D2201C5A0913006E4456 = {
+			isa = PBXGroup;
+			children = (
+				B662D22B1C5A0913006E4456 /* BLEWerewolfLogViewer */,
+				B662D23F1C5A0913006E4456 /* BLEWerewolfLogViewerTests */,
+				B662D24A1C5A0914006E4456 /* BLEWerewolfLogViewerUITests */,
+				B662D22A1C5A0913006E4456 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B662D22A1C5A0913006E4456 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B662D2291C5A0913006E4456 /* BLEWerewolfLogViewer.app */,
+				B662D23C1C5A0913006E4456 /* BLEWerewolfLogViewerTests.xctest */,
+				B662D2471C5A0914006E4456 /* BLEWerewolfLogViewerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B662D22B1C5A0913006E4456 /* BLEWerewolfLogViewer */ = {
+			isa = PBXGroup;
+			children = (
+				B662D22C1C5A0913006E4456 /* AppDelegate.h */,
+				B662D22D1C5A0913006E4456 /* AppDelegate.m */,
+				B662D2321C5A0913006E4456 /* Assets.xcassets */,
+				B662D2341C5A0913006E4456 /* MainMenu.xib */,
+				B662D2371C5A0913006E4456 /* Info.plist */,
+				B662D22F1C5A0913006E4456 /* Supporting Files */,
+			);
+			path = BLEWerewolfLogViewer;
+			sourceTree = "<group>";
+		};
+		B662D22F1C5A0913006E4456 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				B662D2301C5A0913006E4456 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B662D23F1C5A0913006E4456 /* BLEWerewolfLogViewerTests */ = {
+			isa = PBXGroup;
+			children = (
+				B662D2401C5A0913006E4456 /* BLEWerewolfLogViewerTests.m */,
+				B662D2421C5A0913006E4456 /* Info.plist */,
+			);
+			path = BLEWerewolfLogViewerTests;
+			sourceTree = "<group>";
+		};
+		B662D24A1C5A0914006E4456 /* BLEWerewolfLogViewerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				B662D24B1C5A0914006E4456 /* BLEWerewolfLogViewerUITests.m */,
+				B662D24D1C5A0914006E4456 /* Info.plist */,
+			);
+			path = BLEWerewolfLogViewerUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B662D2281C5A0913006E4456 /* BLEWerewolfLogViewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B662D2501C5A0914006E4456 /* Build configuration list for PBXNativeTarget "BLEWerewolfLogViewer" */;
+			buildPhases = (
+				B662D2251C5A0913006E4456 /* Sources */,
+				B662D2261C5A0913006E4456 /* Frameworks */,
+				B662D2271C5A0913006E4456 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BLEWerewolfLogViewer;
+			productName = BLEWerewolfLogViewer;
+			productReference = B662D2291C5A0913006E4456 /* BLEWerewolfLogViewer.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B662D23B1C5A0913006E4456 /* BLEWerewolfLogViewerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B662D2531C5A0914006E4456 /* Build configuration list for PBXNativeTarget "BLEWerewolfLogViewerTests" */;
+			buildPhases = (
+				B662D2381C5A0913006E4456 /* Sources */,
+				B662D2391C5A0913006E4456 /* Frameworks */,
+				B662D23A1C5A0913006E4456 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B662D23E1C5A0913006E4456 /* PBXTargetDependency */,
+			);
+			name = BLEWerewolfLogViewerTests;
+			productName = BLEWerewolfLogViewerTests;
+			productReference = B662D23C1C5A0913006E4456 /* BLEWerewolfLogViewerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		B662D2461C5A0913006E4456 /* BLEWerewolfLogViewerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B662D2561C5A0914006E4456 /* Build configuration list for PBXNativeTarget "BLEWerewolfLogViewerUITests" */;
+			buildPhases = (
+				B662D2431C5A0913006E4456 /* Sources */,
+				B662D2441C5A0913006E4456 /* Frameworks */,
+				B662D2451C5A0913006E4456 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B662D2491C5A0914006E4456 /* PBXTargetDependency */,
+			);
+			name = BLEWerewolfLogViewerUITests;
+			productName = BLEWerewolfLogViewerUITests;
+			productReference = B662D2471C5A0914006E4456 /* BLEWerewolfLogViewerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B662D2211C5A0913006E4456 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = yuki;
+				TargetAttributes = {
+					B662D2281C5A0913006E4456 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					B662D23B1C5A0913006E4456 = {
+						CreatedOnToolsVersion = 7.2;
+						TestTargetID = B662D2281C5A0913006E4456;
+					};
+					B662D2461C5A0913006E4456 = {
+						CreatedOnToolsVersion = 7.2;
+						TestTargetID = B662D2281C5A0913006E4456;
+					};
+				};
+			};
+			buildConfigurationList = B662D2241C5A0913006E4456 /* Build configuration list for PBXProject "BLEWerewolfLogViewer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B662D2201C5A0913006E4456;
+			productRefGroup = B662D22A1C5A0913006E4456 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B662D2281C5A0913006E4456 /* BLEWerewolfLogViewer */,
+				B662D23B1C5A0913006E4456 /* BLEWerewolfLogViewerTests */,
+				B662D2461C5A0913006E4456 /* BLEWerewolfLogViewerUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B662D2271C5A0913006E4456 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B662D2331C5A0913006E4456 /* Assets.xcassets in Resources */,
+				B662D2361C5A0913006E4456 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B662D23A1C5A0913006E4456 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B662D2451C5A0913006E4456 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B662D2251C5A0913006E4456 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B662D2311C5A0913006E4456 /* main.m in Sources */,
+				B662D22E1C5A0913006E4456 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B662D2381C5A0913006E4456 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B662D2411C5A0913006E4456 /* BLEWerewolfLogViewerTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B662D2431C5A0913006E4456 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B662D24C1C5A0914006E4456 /* BLEWerewolfLogViewerUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B662D23E1C5A0913006E4456 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B662D2281C5A0913006E4456 /* BLEWerewolfLogViewer */;
+			targetProxy = B662D23D1C5A0913006E4456 /* PBXContainerItemProxy */;
+		};
+		B662D2491C5A0914006E4456 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B662D2281C5A0913006E4456 /* BLEWerewolfLogViewer */;
+			targetProxy = B662D2481C5A0914006E4456 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		B662D2341C5A0913006E4456 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B662D2351C5A0913006E4456 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		B662D24E1C5A0914006E4456 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B662D24F1C5A0914006E4456 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B662D2511C5A0914006E4456 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BLEWerewolfLogViewer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = jp.co.BLEWerewolfLogViewer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B662D2521C5A0914006E4456 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BLEWerewolfLogViewer/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = jp.co.BLEWerewolfLogViewer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		B662D2541C5A0914006E4456 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BLEWerewolfLogViewerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = jp.co.BLEWerewolfLogViewerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BLEWerewolfLogViewer.app/Contents/MacOS/BLEWerewolfLogViewer";
+			};
+			name = Debug;
+		};
+		B662D2551C5A0914006E4456 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BLEWerewolfLogViewerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = jp.co.BLEWerewolfLogViewerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BLEWerewolfLogViewer.app/Contents/MacOS/BLEWerewolfLogViewer";
+			};
+			name = Release;
+		};
+		B662D2571C5A0914006E4456 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BLEWerewolfLogViewerUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = jp.co.BLEWerewolfLogViewerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = BLEWerewolfLogViewer;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		B662D2581C5A0914006E4456 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = BLEWerewolfLogViewerUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = jp.co.BLEWerewolfLogViewerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = BLEWerewolfLogViewer;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B662D2241C5A0913006E4456 /* Build configuration list for PBXProject "BLEWerewolfLogViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B662D24E1C5A0914006E4456 /* Debug */,
+				B662D24F1C5A0914006E4456 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B662D2501C5A0914006E4456 /* Build configuration list for PBXNativeTarget "BLEWerewolfLogViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B662D2511C5A0914006E4456 /* Debug */,
+				B662D2521C5A0914006E4456 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		B662D2531C5A0914006E4456 /* Build configuration list for PBXNativeTarget "BLEWerewolfLogViewerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B662D2541C5A0914006E4456 /* Debug */,
+				B662D2551C5A0914006E4456 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		B662D2561C5A0914006E4456 /* Build configuration list for PBXNativeTarget "BLEWerewolfLogViewerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B662D2571C5A0914006E4456 /* Debug */,
+				B662D2581C5A0914006E4456 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B662D2211C5A0913006E4456 /* Project object */;
+}
