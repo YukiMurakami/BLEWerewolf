@@ -26,7 +26,10 @@
 
 #import "BWSendMessageManager.h"
 #import "BWUtility.h"
+#import "NSObject+BlocksWait.h"
 #import <GNSMessages.h>
+
+const NSInteger saveNumberPublications = 30;
 
 static NSString * const APIKey = @"AIzaSyDWFBySXYZ_jYsfO67lvzVTmC4LAaCb8JU";
 
@@ -40,7 +43,7 @@ static NSString * const APIKey = @"AIzaSyDWFBySXYZ_jYsfO67lvzVTmC4LAaCb8JU";
 @property (nonatomic) NSInteger signalId;
 @property (nonatomic) NSMutableArray *receivedSignalIds;
 
-@property (nonatomic) BOOL isPeripheral;
+
 @property (nonatomic) NSMutableArray *centralIds;
 @property (nonatomic) NSString *peripheralId;
 
@@ -113,16 +116,12 @@ static BWSendMessageManager *sharedInstance = nil;
     return self;
 }
 
-- (void)setIsPeripheral:(BOOL)isPeripheral {
+- (void)setIsPeripheralParams:(BOOL)isPeripheral {
     self.isPeripheral = isPeripheral;
     
     if(self.isPeripheral) {
         self.centralIds = [NSMutableArray array];
     }
-}
-
-- (BOOL)isPeripheral {
-    return self.isPeripheral;
 }
 
 - (id)init {
@@ -180,10 +179,6 @@ static BWSendMessageManager *sharedInstance = nil;
 
 #pragma mark - public methods
 
-- (void)setPeripheralId:(NSString *)peripheralId {
-    self.peripheralId = peripheralId;
-}
-
 - (BOOL)addCentralIdsObject:(NSString*)centralId {
     if(![self.centralIds containsObject:centralId]) {
         [self.centralIds addObject:centralId];
@@ -202,7 +197,7 @@ static BWSendMessageManager *sharedInstance = nil;
     GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding]];
     [self.publications addObject: [self.messageManager publicationWithMessage:pubMessage]];
     
-    if(self.publications.count > 50) {
+    if(self.publications.count > saveNumberPublications) {
         [self.publications removeObjectAtIndex:0];
     }
 }
@@ -213,7 +208,9 @@ static BWSendMessageManager *sharedInstance = nil;
 
 - (void)sendMessageForAllCentrals:(NSString*)message {
     for(NSInteger i=0;i<self.centralIds.count;i++) {
-        [self sendMessageWithAddressId:message toId:self.centralIds[i]];
+        [NSObject performBlock:^{
+            [self sendMessageWithAddressId:message toId:self.centralIds[i]];
+        } afterDelay:0.05*i];
     }
 }
 
@@ -223,7 +220,7 @@ static BWSendMessageManager *sharedInstance = nil;
     GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding]];
     [self.publications addObject: [self.messageManager publicationWithMessage:pubMessage]];
     
-    if(self.publications.count > 50) {
+    if(self.publications.count > saveNumberPublications) {
         [self.publications removeObjectAtIndex:0];
     }
 }

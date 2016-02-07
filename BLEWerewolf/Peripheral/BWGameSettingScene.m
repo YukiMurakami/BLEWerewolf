@@ -50,7 +50,7 @@ typedef NS_ENUM(NSInteger,UserType) {
     
     sendManager = [BWSendMessageManager sharedInstance];
     sendManager.delegate = self;
-    [sendManager setIsPeripheral:YES];
+    [sendManager setIsPeripheralParams:YES];
     
     
     registeredPlayersArray = [NSMutableArray array];

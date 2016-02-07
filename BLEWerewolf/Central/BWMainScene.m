@@ -28,7 +28,7 @@
     [self initBackground];
     
     sendManager = [BWSendMessageManager sharedInstance];
-    [sendManager setIsPeripheral:NO];
+    [sendManager setIsPeripheralParams:NO];
     sendManager.delegate = self;
     
     gameIdArray = [NSMutableArray array];

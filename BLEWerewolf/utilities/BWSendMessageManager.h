@@ -16,10 +16,11 @@
 @interface BWSendMessageManager : NSObject
 
 @property (nonatomic) id<BWSendMessageManagerDelegate> delegate;
+@property (nonatomic) BOOL isPeripheral;
 
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;
-- (void)setIsPeripheral:(BOOL)isPeripheral;
+- (void)setIsPeripheralParams:(BOOL)isPeripheral;
 - (BOOL)isPeripheral;
 
 - (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString;//ゲームIDの送信用 ペリフェラル→セントラル
