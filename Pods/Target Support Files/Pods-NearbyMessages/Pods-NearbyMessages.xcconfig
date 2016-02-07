@@ -1,0 +1,2 @@
+PODS_NEARBYMESSAGES_LIBRARY_SEARCH_PATHS = "$(PODS_ROOT)/NearbyMessages/Libraries"
+PODS_NEARBYMESSAGES_OTHER_LDFLAGS = -l"GNSMessages" -l"c++" -framework "AVFoundation" -framework "Accelerate" -framework "AudioToolbox" -framework "CoreBluetooth" -framework "CoreGraphics" -framework "CoreLocation" -framework "CoreMedia" -framework "CoreText" -framework "MediaPlayer"
