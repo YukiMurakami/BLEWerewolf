@@ -24,9 +24,9 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 
 /*
 通信用プロトコル 2種類
-(A) "advertiseMyDevice:<myId>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
+(A) "advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
  ・セントラルはこの信号を受信し、自分のperipheralIDとして保持
- ・ペリフェラルを保持したら自分のIDを送信する（ペリフェラルはこのメッセージのみは無条件で受信し、セントラルIDとして保持しておく。今後は自分の担当セントラルのメッセージしか受信しない）
+ ・セントラルはペリフェラルを保持したら自分のIDを送信する（ペリフェラルはこのメッセージのみは無条件で受信し、セントラルIDとして保持しておく。今後は自分の担当セントラルのメッセージしか受信しない）
  
 (B) "mes:<signalId>:<yourId>:<myId>:<message>" yourIDに対してメッセージを送信する
  ・送られるメッセージはすべて個別idを付与して送る（2重受信の防止)
@@ -42,8 +42,6 @@ typedef NS_ENUM(NSInteger,SignalKind) {
  
 
 <Peripheral側only>
-・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
- セントラル追加後に、自動的に送信する
 ・ゲーム参加了承「participateAllow:」
 ・（同期必須）ゲーム参加者を通知（一度に送れる情報が限られるので一人ずつおくり、確認をとる）「member:0/C..C/S..S/12」 0はプレイヤーID 12は参加人数
 ・ルール設定を通知「setting:/6,3,1,1,1,1/7,3,0,1,1」一つ目は配役、二つ目はルール（昼時間、夜時間、占いモード、連続護衛、役かけ）

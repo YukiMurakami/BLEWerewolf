@@ -11,7 +11,7 @@
  NearbyMessageAPIでは、すべての近接する端末同士で相互通信が張られ、メッセージがブロードキャスト的な送信になってしまう。
  そこで相手との通信確立用の専用メッセージを設定し、それによって送信相手を取得し、その相手のIDと自分のIDをメッセージにのせて送受信することにする。
  
- "advertiseMyDevice:<myId>" 自分のIDを全員に知らせる (ペリフェラルのみ)
+ "advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
  （セントラルは個別に自分のIDを送る)
  "mes:<signalId>:<yourId>:<myId>:<message>" yourIDに対してメッセージを送信する
  送られるメッセージはすべて個別idを付与して送る（2重受信の防止)
@@ -121,18 +121,28 @@ static BWSendMessageManager *sharedInstance = nil;
     }
 }
 
+- (BOOL)isPeripheral {
+    return self.isPeripheral;
+}
+
 - (id)init {
     [self doesNotRecognizeSelector:_cmd];
     return nil;
 }
 
 - (void)receiveMessage:(NSString*)mes {
-    //デバイスのアドバータイズなら受け取る
-    //"advertiseMyDevice:<myId>"
-    if([[BWUtility getCommand:mes] isEqualToString:@"advertiseMyDevice"]) {
-        NSArray *array = [mes componentsSeparatedByString:@":"];
-        NSString *identificationId = array[1];
-        [self.delegate didReceiveAdvertiseDevice:identificationId];
+    
+    if(!self.isPeripheral) {
+        //デバイスのアドバータイズなら受け取る
+        //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>"
+        if([[BWUtility getCommand:mes] isEqualToString:@"advertiseMyDevice"]) {
+            NSArray *array = [mes componentsSeparatedByString:@":"];
+            NSString *gameId = array[1];
+            NSString *peripheralId = array[2];
+            NSString *peripheralName = array[3];
+            
+            [self.delegate didReceiveAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId,@"peripheralName":peripheralName}];
+        }
     }
     
     //通常メッセージは自分あてなら受け取る
@@ -146,9 +156,24 @@ static BWSendMessageManager *sharedInstance = nil;
         for(NSInteger i=5;i<array.count;i++) {
             message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
         }
-        if([receiverId isEqualToString:self.identificationId] && ![self.receivedSignalIds containsObject:@(signalId)]) {
-            [self.delegate didReceiveMessage:message senderId:senderId];
-            [self.receivedSignalIds addObject:@(signalId)];
+        if([receiverId isEqualToString:self.identificationId]) {//自分あてかどうか確認
+            BOOL canReceive = NO;
+            if(self.isPeripheral) {
+                //ペリフェラルは担当セントラルからのメッセージのみ受信
+                //ただしparticipateRequestだけは無条件で受信
+                if([self.centralIds containsObject:senderId] || [array[4] isEqualToString:@"participateRequest"]) {
+                    canReceive = YES;
+                }
+            } else {
+                //セントラルは自分のペリフェラルからのメッセージのみ受信
+                if([senderId isEqualToString:self.peripheralId]) {
+                    canReceive = YES;
+                }
+            }
+            if(![self.receivedSignalIds containsObject:@(signalId)] && canReceive) {
+                [self.delegate didReceiveMessage:message senderId:senderId];
+                [self.receivedSignalIds addObject:@(signalId)];
+            }
         }
     }
 }
@@ -167,9 +192,13 @@ static BWSendMessageManager *sharedInstance = nil;
     return NO;
 }
 
-- (void)sendMyIdentificationId {
-    //"advertiseMyDevice:<myId>"
-    NSString *mes = [NSString stringWithFormat:@"advertiseMyDevice:%@",self.identificationId];
+- (void)resetCentralIds {
+    [self.centralIds removeAllObjects];
+}
+
+- (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString {
+    //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
+    NSString *mes = [NSString stringWithFormat:@"advertiseMyDevice:%@:%@:%@",gameIdString,self.identificationId,[BWUtility getUserName]];
     GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding]];
     [self.publications addObject: [self.messageManager publicationWithMessage:pubMessage]];
     

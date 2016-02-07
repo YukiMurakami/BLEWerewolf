@@ -7,13 +7,11 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-#import "BWCentralManager.h"
-#import "BWPeripheralManager.h"
+#import "BWSendMessageManager.h"
 
-@interface BWRoleRotateScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface BWRoleRotateScene : SKScene <BWSendMessageManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
     SKSpriteNode *backgroundNode;
-    BWCentralManager *centralManager;
-    BWPeripheralManager *peripheralManager;
+    BWSendMessageManager *sendManager;
     
     NSMutableDictionary *infoDic;
     

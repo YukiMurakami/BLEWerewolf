@@ -10,7 +10,7 @@
 
 @protocol BWSendMessageManagerDelegate
 -(void)didReceiveMessage:(NSString*)message senderId:(NSString*)senderId;
--(void)didReceiveAdvertiseDevice:(NSString*)deviceId;
+-(void)didReceiveAdvertiseGameroomInfo:(NSDictionary*)gameroomInfo;
 @end
 
 @interface BWSendMessageManager : NSObject
@@ -20,7 +20,9 @@
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;
 - (void)setIsPeripheral:(BOOL)isPeripheral;
-- (void)sendMyIdentificationId;
+- (BOOL)isPeripheral;
+
+- (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString;//ゲームIDの送信用 ペリフェラル→セントラル
 
 - (void)sendMessageForPeripheral:(NSString*)message;//セントラル→ペリフェラル
 - (void)sendMessageForAllCentrals:(NSString*)message;//ペリフェラル→全セントラル
@@ -29,6 +31,7 @@
 
 - (void)setPeripheralId:(NSString *)peripheralId;
 - (BOOL)addCentralIdsObject:(NSString*)centralId;
+- (void)resetCentralIds;
 
 
 @end

@@ -24,8 +24,8 @@
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
     
-    centralManager = [BWCentralManager sharedInstance];
-    centralManager.delegate = self;
+    sendManager = [BWSendMessageManager sharedInstance];
+    sendManager.delegate = self;
     
     printMessage = @"接続中、、、";
     
@@ -53,7 +53,8 @@
             //Timeout
             
             //ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"participateCandel:%@/%@",[centralManager getGameId],[BWUtility getIdentificationString]] interval:5.0 timeOut:100.0 firstWait:0.0];
+            NSString *message = [NSString stringWithFormat:@"participateCandel:%@/%@",[BWUtility getNowGameIdString],[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:message];
             
             BWMainScene *scene = [[BWMainScene alloc]initWithSize:self.size];
             SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.5];
@@ -91,7 +92,12 @@
     [self initBackground];
 }
 
--(void)didReceivedMessage:(NSString *)message {
+#pragma mark - messageDelegate
+- (void)didReceiveAdvertiseGameroomInfo:(NSDictionary *)gameroomInfo {
+    
+}
+
+- (void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
     //participateAllow:A..A
     if([printMessage isEqualToString:@"接続中、、、"] && [[BWUtility getCommand:message] isEqualToString:@"participateAllow"]) {
         NSString *identificationString = [BWUtility getCommandContents:message][0];
@@ -152,7 +158,7 @@
         for(NSInteger i=0;i<playerInfos.count;i++) {
             if(![playerInfos[i][@"identificationId"] isEqualToString:@""]) receivedCount++;
         }
-        countLabel.text = [NSString stringWithFormat:@"%d/%d",receivedCount,playerInfos.count];
+        countLabel.text = [NSString stringWithFormat:@"%d/%d",(int)receivedCount,(int)playerInfos.count];
         countLabel.hidden = NO;
         
         BOOL isAllReceived = YES;
@@ -165,12 +171,11 @@
         if(isAllReceived) {
             printMessage = @"ルール設定待ち";
             //・参加者情報受信完了通知「memberCheck:C..C」
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"memberCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:100.0 firstWait:0.0];
+            NSString *mes = [NSString stringWithFormat:@"memberCheck:%@",[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:mes];
             [self initBackground];
         }
     }
-    
-    
 }
 
 @end

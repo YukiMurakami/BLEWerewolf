@@ -168,14 +168,12 @@ const NSInteger minuteSeconds = 20;
     
     winner = WinnerNone;
     
+    sendManager = [BWSendMessageManager sharedInstance];
+    sendManager.delegate = self;
+    
     if(isPeripheral) {
-        peripheralManager = [BWPeripheralManager sharedInstance];
-        peripheralManager.delegate = self;
         [self resetCheckList];
         voteCount = 1;
-    } else {
-        centralManager = [BWCentralManager sharedInstance];
-        centralManager.delegate = self;
     }
     
     day = 1;
@@ -409,13 +407,13 @@ const NSInteger minuteSeconds = 20;
                 //ゲーム終了を通知「gameEnd:W」
                 winner = [self checkWinner];
                 NSString *mes = [NSString stringWithFormat:@"gameEnd:%d",(int)winner];
-                [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:60.0];
+                [sendManager sendMessageForAllCentrals:mes];
                 [self gameEnd];
                 return;
             }
             
             //２日目以降は夜開始を通知「nightStart:」
-            [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
+            [sendManager sendMessageForAllCentrals:@"nightStart:"];
             [self resetCheckList];
         }
     }
@@ -444,13 +442,14 @@ const NSInteger minuteSeconds = 20;
             //ゲーム終了を通知「gameEnd:W」
             winner = [self checkWinner];
             NSString *mes = [NSString stringWithFormat:@"gameEnd:%d",(int)winner];
-            [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:60.0];
+            [sendManager sendMessageForAllCentrals:mes];
             [self gameEnd];
             return;
         }
         
         //全員の犠牲者受信完了を通知「victimCheckFinish:」
-        [peripheralManager sendNormalMessageEveryClient:@"victimCheckFinish:" infoDic:infoDic interval:3.0 timeOut:30.0];
+        [sendManager sendMessageForAllCentrals:@"victimCheckFinish:"];
+        
     }
 }
 
@@ -490,7 +489,9 @@ const NSInteger minuteSeconds = 20;
         }
     } else {
         //セントラルは夜時間終了を通知「nightFinish:A..A」
-        [centralManager sendNormalMessage:[NSString stringWithFormat:@"nightFinish:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+        NSString *mes = [NSString stringWithFormat:@"nightFinish:%@",[BWUtility getIdentificationString]];
+       
+        [sendManager sendMessageForPeripheral:mes];
         //ペリフェラルからの朝通知を待つ
     }
 }
@@ -547,7 +548,7 @@ const NSInteger minuteSeconds = 20;
         
         //朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
         NSString *mes = [NSString stringWithFormat:@"afternoonStart:%@",[victimArray componentsJoinedByString:@","]];
-        [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:30.0];
+        [sendManager sendMessageForAllCentrals:mes];
     }
     
     //犠牲者を表示　＋　確認ボタン これを全員が押したら昼に移動
@@ -567,7 +568,7 @@ const NSInteger minuteSeconds = 20;
     [backgroundNode addChild:checkButton];
     
     
-    if(![BWUtility isSubPeripheral]) {
+    if([sendManager isPeripheral]) {
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",[NSString stringWithFormat:@"%d日目の朝になりました。昨晩の犠牲者は%@でした。",(int)day,victimString]]];
     }
 }
@@ -655,7 +656,7 @@ const NSInteger minuteSeconds = 20;
             NSInteger count = [counter[voterId]integerValue];
             message = [NSString stringWithFormat:@"%@/%d,%d,%d",message,(int)voterId,(int)votederId,(int)count];
         }
-        [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:30.0];
+        [sendManager sendMessageForAllCentrals:message];
     }
     
     
@@ -678,7 +679,7 @@ const NSInteger minuteSeconds = 20;
     [backgroundNode addChild:checkButton];
     
     
-    if(![BWUtility isSubPeripheral]) {
+    if([sendManager isPeripheral]) {
         NSString *message = @"";
         for(NSInteger i=0;i<votingArray.count;i++) {
             message = [NSString stringWithFormat:@"%@\r\n%@",message,[BWUtility getVoteResultFormatString:votingArray[i] infoDic:infoDic]];
@@ -705,7 +706,8 @@ const NSInteger minuteSeconds = 20;
                 mes = [NSString stringWithFormat:@"%@/",mes];
             }
         }
-        [peripheralManager sendNormalMessageEveryClient:mes infoDic:infoDic interval:3.0 timeOut:30.0];
+        [sendManager sendMessageForAllCentrals:mes];
+        
         [self resetCheckList];
     }
     
@@ -737,7 +739,7 @@ const NSInteger minuteSeconds = 20;
         checkButton.hidden = NO;
     }
     
-    if(![BWUtility isSubPeripheral]) {
+    if([sendManager isPeripheral]) {
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",mes]];
     }
 }
@@ -774,7 +776,7 @@ const NSInteger minuteSeconds = 20;
     checkButton = [BWUtility makeButton:@"終了する" size:buttonSize name:@"end" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
     
-    if(![BWUtility isSubPeripheral]) {
+    if([sendManager isPeripheral]) {
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",mes]];
     }
 }
@@ -868,7 +870,9 @@ const NSInteger minuteSeconds = 20;
         } else {
             //セントラルはかくにん通知を送る
             //犠牲者確認通知「checkVictim:A..A」
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"checkVictim:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+            NSString *mes = [NSString stringWithFormat:@"checkVictim:%@",[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:mes];
+            
         }
     }
     
@@ -889,7 +893,7 @@ const NSInteger minuteSeconds = 20;
                     //再投票
                     voteCount++;
                     votingArray = [NSMutableArray array];
-                    [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
+                    [sendManager sendMessageForAllCentrals:@"nightStart:"];
                     [self finishAfternoon];
                 } else {
                     if(afternoonVictimArray.count <= 0) {
@@ -903,7 +907,9 @@ const NSInteger minuteSeconds = 20;
         } else {
             //セントラルはかくにん通知を送る
             //投票結果確認通知「checkVoting:A..A」
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"checkVoting:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+            NSString *mes = [NSString stringWithFormat:@"checkVoting:%@",[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:mes];
+    
         }
     }
     
@@ -926,18 +932,15 @@ const NSInteger minuteSeconds = 20;
         } else {
             //セントラルはかくにん通知を送る
             //・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"afternoonVictimCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+            NSString *mes = [NSString stringWithFormat:@"afternoonVictimCheck:%@",[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:mes];
         }
     }
     
     if([node.name isEqualToString:@"end"]) {
-        if(isPeripheral) {
-            [peripheralManager stopAllSignals];
-            [BWPeripheralManager resetSharedInstance];
-        } else {
-            [centralManager stopAllSignals];
-            [BWCentralManager resetSharedInstance];
-        }
+     
+        [BWSendMessageManager resetSharedInstance];
+        
         [timer stopTimer];
         timer.delegate = nil;
         [timer removeAllActions];
@@ -997,7 +1000,7 @@ const NSInteger minuteSeconds = 20;
     if(!isPeripheral) {
         //セントラルは命令をペリフェラルに送信
         NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)tableRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
-        [centralManager sendNormalMessage:message interval:5.0 timeOut:15.0 firstWait:0.0];
+        [sendManager sendMessageForPeripheral:message];
     } else {
         //ペリフェラルは即実行
         [self processRoleAction:tableRoleId actionPlayerId:[BWUtility getMyPlayerId:infoDic] targetPlayerId:targetIndex];
@@ -1067,12 +1070,13 @@ const NSInteger minuteSeconds = 20;
         NSArray *messages = [self divideMessage:message];
         for(NSInteger i=0;i<messages.count;i++) {
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],identificationId,messages[i]];
-            [peripheralManager sendNormalMessage:mes toIdentificationId:identificationId interval:5.0 timeOut:30.0 firstWait:0.1*i];
+            [sendManager sendMessageWithAddressId:mes toId:identificationId];
+            
         }
     }
     
     //ログを送信
-    if(![BWUtility isSubPeripheral]) {
+    if([sendManager isPeripheral]) {
         NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
         NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/GM/-/%@",(int)roleId,message]];
@@ -1116,219 +1120,223 @@ const NSInteger minuteSeconds = 20;
     return result;
 }
 
-#pragma mark - messageDelegate
+#pragma mark - messageManagerDelegate
 
--(void)didReceivedMessage:(NSString *)message {//ペリフェラル->セントラル受信処理
-    //central
-    //ペリフェラルから受け取ったメッセージから、自分と同じグループチャットがあったら反映
-    //ただし自分自信はすでに反映されているのでむし
-    
-    if(winner != WinnerNone) return;//ゲーム終了後は無視
-    
-    //chatreceive:A..A/T...T
-    //chatreceive:G..G/A..A/T..T
-    //セントラルは自分が死んだら、ゲーム終了後まで信号を受信しない
-    if([infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
-        if([[BWUtility getCommand:message] isEqualToString:@"chatreceive"]) {
-            NSArray *contents = [BWUtility getCommandContents:message];
-            if([messageViewController isMember:contents[0]] && ![contents[0] isEqualToString:[BWUtility getIdentificationString]]) {
-                //メッセージを反映
-                //ただしGMメッセージの場合は振り分ける
-                if([[messageViewController getGmId] isEqualToString:contents[0]]) {
-                    if([[BWUtility getIdentificationString] isEqualToString:contents[1]]) {
+- (void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
+    if(![sendManager isPeripheral]) {
+        //central
+        //ペリフェラルから受け取ったメッセージから、自分と同じグループチャットがあったら反映
+        //ただし自分自信はすでに反映されているのでむし
+        
+        if(winner != WinnerNone) return;//ゲーム終了後は無視
+        
+        //chatreceive:A..A/T...T
+        //chatreceive:G..G/A..A/T..T
+        //セントラルは自分が死んだら、ゲーム終了後まで信号を受信しない
+        if([infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
+            if([[BWUtility getCommand:message] isEqualToString:@"chatreceive"]) {
+                NSArray *contents = [BWUtility getCommandContents:message];
+                if([messageViewController isMember:contents[0]] && ![contents[0] isEqualToString:[BWUtility getIdentificationString]]) {
+                    //メッセージを反映
+                    //ただしGMメッセージの場合は振り分ける
+                    if([[messageViewController getGmId] isEqualToString:contents[0]]) {
+                        if([[BWUtility getIdentificationString] isEqualToString:contents[1]]) {
+                            NSString *text = @"";
+                            for(NSInteger i=2;i<contents.count;i++) {
+                                text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
+                            }
+                            [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
+                        }
+                    } else {
                         NSString *text = @"";
-                        for(NSInteger i=2;i<contents.count;i++) {
+                        for(NSInteger i=1;i<contents.count;i++) {
                             text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
                         }
                         [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
                     }
-                } else {
-                    NSString *text = @"";
-                    for(NSInteger i=1;i<contents.count;i++) {
-                        text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
+                }
+            }
+            
+            //ペリフェラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
+            if([[BWUtility getCommand:message] isEqualToString:@"afternoonStart"]) {
+                if(phase == PhaseNightFinish) {
+                    //TODO::ここでセントラル側のvictimArrayを更新
+                    NSArray *victimString = [[BWUtility getCommandContents:message][0] componentsSeparatedByString:@","];
+                    for(NSInteger i=0;i<victimString.count;i++) {
+                        if([victimString[i] isEqualToString:@""]) continue;
+                        [victimArray addObject:@([victimString[i]integerValue])];
                     }
-                    [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
+                    [self morning];
+                }
+            }
+            
+            //ペリフェラルからの投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
+            if([[BWUtility getCommand:message] isEqualToString:@"voteResult"]) {
+                if(phase == PhaseAfternoonFinish) {
+                    //TODO::ここで投票履歴を取得
+                    votingArray = [NSMutableArray array];
+                    NSArray *components = [BWUtility getCommandContents:message];
+                    excutionerId = [components[1]integerValue];
+                    voteCount = [components[0]integerValue];
+                    for(NSInteger i=2;i<[components count];i++) {
+                        NSArray *idStrings = [components[i] componentsSeparatedByString:@","];
+                        NSInteger voterId = [idStrings[0]integerValue];
+                        NSInteger votederId = [idStrings[1]integerValue];
+                        NSInteger count = [idStrings[2]integerValue];
+                        [votingArray addObject:[@{@"voter":@(voterId),@"voteder":@(votederId),@"count":@(count)}mutableCopy]];
+                    }
+                    
+                    [self finishVoting];
+                }
+            }
+            
+            //ペリフェラルからの夜開始通知「nightStart:」
+            if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
+                if(phase == PhaseVotingFinish) {
+                    if(excutionerId == -1) {
+                        //再投票
+                        votingArray = [NSMutableArray array];
+                        voteCount++;
+                        [self finishAfternoon];
+                    } else {
+                        [self nightStart];
+                    }
+                }
+            }
+            
+            //・夜時間開始前に道連れを通知「afternoonVictim:1,8/2,?」プレイヤーID,死因となる役職IDのセットを死亡者分
+            if([[BWUtility getCommand:message] isEqualToString:@"afternoonVictim"]) {
+                if(phase == PhaseVotingFinish) {
+                    //TODO::セントラルはここで道連れを保存
+                    NSArray *components = [BWUtility getCommandContents:message];
+                    for(NSInteger i=0;i<components.count;i++) {
+                        NSArray *values = [components[i] componentsSeparatedByString:@","];
+                        [afternoonVictimArray addObject:@{@"index":@([values[0]integerValue]),@"reasonRoleId":@([values[1]integerValue])}];
+                    }
+                    
+                    [self beforeNight];
+                }
+            }
+            
+            //ペリフェラルからの犠牲者受信完了を通知「victimCheckFinish:」
+            if([[BWUtility getCommand:message] isEqualToString:@"victimCheckFinish"]) {
+                if(phase == PhaseMorning) {
+                    [self afternoonStart];
                 }
             }
         }
         
-        //ペリフェラルからの朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
-        if([[BWUtility getCommand:message] isEqualToString:@"afternoonStart"]) {
-            if(phase == PhaseNightFinish) {
-                //TODO::ここでセントラル側のvictimArrayを更新
-                NSArray *victimString = [[BWUtility getCommandContents:message][0] componentsSeparatedByString:@","];
-                for(NSInteger i=0;i<victimString.count;i++) {
-                    if([victimString[i] isEqualToString:@""]) continue;
-                    [victimArray addObject:@([victimString[i]integerValue])];
+        //ペリフェラルからのゲーム終了通知「gameEnd:W」Wは処理者チームID (utilityを参照）
+        if([[BWUtility getCommand:message] isEqualToString:@"gameEnd"]) {
+            winner = [[BWUtility getCommandContents:message][0]integerValue];
+            [self gameEnd];
+        }
+    } else {
+        //peripheral
+        //セントラルから受け取ったメッセージを送るべき相手に送信
+        //その後自分と同じグループと同じグループチャットがあったら反映（ただし自分はむし）
+        
+        if(winner != WinnerNone) return;//ゲーム終了後は無視
+        
+        //chatsend:A..A/T...T
+        if([[BWUtility getCommand:message] isEqualToString:@"chatsend"]) {
+            NSArray *contents = [BWUtility getCommandContents:message];
+            NSString *identificationId = contents[0];
+            
+            NSString *text = @"";
+            for(NSInteger i=1;i<contents.count;i++) {
+                text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
+            }
+            
+            //ログを送信
+            if([sendManager isPeripheral]) {
+                NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+                NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
+                NSString *name = infoDic[@"players"][playerId][@"name"];
+                [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/%@/-/%@",(int)roleId,name,text]];
+            }
+            
+            NSArray *shouldSendIds = [self getSameChatroomMemberId:identificationId];
+            for(NSInteger i=0;i<shouldSendIds.count;i++) {
+                NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text];
+                [sendManager sendMessageWithAddressId:mes toId:shouldSendIds[i]];
+            }
+            
+            if([messageViewController isMember:identificationId] && ![identificationId isEqualToString:[BWUtility getIdentificationString]]) {
+                //メッセージを反映
+                NSString *text = @"";
+                for(NSInteger i=1;i<contents.count;i++) {
+                    text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
                 }
+                [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
+            }
+        }
+        
+        //action:1/0/3
+        if([[BWUtility getCommand:message] isEqualToString:@"action"]) {
+            NSArray *contents = [BWUtility getCommandContents:message];
+            NSInteger actionRoleId = [contents[0]integerValue];
+            NSInteger actionPlayerId = [contents[1]integerValue];
+            NSInteger actionTargetId = [contents[2]integerValue];
+            
+            [self processRoleAction:actionRoleId actionPlayerId:actionPlayerId targetPlayerId:actionTargetId];
+        }
+        
+        //セントラルによる夜時間終了通知「nightFinish:A..A」
+        if([[BWUtility getCommand:message] isEqualToString:@"nightFinish"]) {
+            NSString *identificationId = [BWUtility getCommandContents:message][0];
+            NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+            checkList[playerId] = @YES;
+            if([self isAllOkCheckList]) {
                 [self morning];
             }
         }
         
-        //ペリフェラルからの投票結果通知「voteResult:1/-1/0,0,1/1,5,2/2,8,0/.../8,1,1」何回目の投票か、最多得票者、投票内訳(投票者、投票先、投票者に何票はいったか)の順番（最多得票者が-1の場合は決戦orランダム、生存者分のみ)
-        if([[BWUtility getCommand:message] isEqualToString:@"voteResult"]) {
-            if(phase == PhaseAfternoonFinish) {
-                //TODO::ここで投票履歴を取得
-                votingArray = [NSMutableArray array];
-                NSArray *components = [BWUtility getCommandContents:message];
-                excutionerId = [components[1]integerValue];
-                voteCount = [components[0]integerValue];
-                for(NSInteger i=2;i<[components count];i++) {
-                    NSArray *idStrings = [components[i] componentsSeparatedByString:@","];
-                    NSInteger voterId = [idStrings[0]integerValue];
-                    NSInteger votederId = [idStrings[1]integerValue];
-                    NSInteger count = [idStrings[2]integerValue];
-                    [votingArray addObject:[@{@"voter":@(voterId),@"voteder":@(votederId),@"count":@(count)}mutableCopy]];
-                }
-                
-                [self finishVoting];
+        //セントラルによる犠牲者確認通知「checkVictim:A..A」
+        if([[BWUtility getCommand:message] isEqualToString:@"checkVictim"]) {
+            NSString *identificationId = [BWUtility getCommandContents:message][0];
+            NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+            checkList[playerId] = @YES;
+            if([self isAllOkCheckList]) {
+                [self afternoonStart];
             }
         }
         
-        //ペリフェラルからの夜開始通知「nightStart:」
-        if([[BWUtility getCommand:message] isEqualToString:@"nightStart"]) {
-            if(phase == PhaseVotingFinish) {
+        //セントラルによる・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
+        if([[BWUtility getCommand:message] isEqualToString:@"afternoonVictimCheck"]) {
+            NSString *identificationId = [BWUtility getCommandContents:message][0];
+            NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+            checkList[playerId] = @YES;
+            if([self isAllOkCheckList]) {
+                [self nightStart];
+            }
+        }
+        
+        //セントラルによる投票結果確認通知「checkVoting:A..A」
+        if([[BWUtility getCommand:message] isEqualToString:@"checkVoting"]) {
+            NSString *identificationId = [BWUtility getCommandContents:message][0];
+            NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
+            checkList[playerId] = @YES;
+            if([self isAllOkCheckList]) {
                 if(excutionerId == -1) {
                     //再投票
                     votingArray = [NSMutableArray array];
                     voteCount++;
+                    [sendManager sendMessageForAllCentrals:@"nightStart:"];
+                  
                     [self finishAfternoon];
                 } else {
                     [self nightStart];
                 }
             }
         }
-        
-        //・夜時間開始前に道連れを通知「afternoonVictim:1,8/2,?」プレイヤーID,死因となる役職IDのセットを死亡者分
-        if([[BWUtility getCommand:message] isEqualToString:@"afternoonVictim"]) {
-            if(phase == PhaseVotingFinish) {
-                //TODO::セントラルはここで道連れを保存
-                NSArray *components = [BWUtility getCommandContents:message];
-                for(NSInteger i=0;i<components.count;i++) {
-                    NSArray *values = [components[i] componentsSeparatedByString:@","];
-                    [afternoonVictimArray addObject:@{@"index":@([values[0]integerValue]),@"reasonRoleId":@([values[1]integerValue])}];
-                }
-                
-                [self beforeNight];
-            }
-        }
-        
-        //ペリフェラルからの犠牲者受信完了を通知「victimCheckFinish:」
-        if([[BWUtility getCommand:message] isEqualToString:@"victimCheckFinish"]) {
-            if(phase == PhaseMorning) {
-                [self afternoonStart];
-            }
-        }
-    }
-    
-    //ペリフェラルからのゲーム終了通知「gameEnd:W」Wは処理者チームID (utilityを参照）
-    if([[BWUtility getCommand:message] isEqualToString:@"gameEnd"]) {
-        winner = [[BWUtility getCommandContents:message][0]integerValue];
-        [self gameEnd];
     }
 }
 
--(void)didReceiveMessage:(NSString *)message {//セントラル->ペリフェラル受信処理
-    //peripheral
-    //セントラルから受け取ったメッセージを送るべき相手に送信
-    //その後自分と同じグループと同じグループチャットがあったら反映（ただし自分はむし）
-    
-    if(winner != WinnerNone) return;//ゲーム終了後は無視
-    
-    //chatsend:A..A/T...T
-    if([[BWUtility getCommand:message] isEqualToString:@"chatsend"]) {
-        NSArray *contents = [BWUtility getCommandContents:message];
-        NSString *identificationId = contents[0];
-        
-        NSString *text = @"";
-        for(NSInteger i=1;i<contents.count;i++) {
-            text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
-        }
-        
-        //ログを送信
-        if(![BWUtility isSubPeripheral]) {
-            NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
-            NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
-            NSString *name = infoDic[@"players"][playerId][@"name"];
-            [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/%@/-/%@",(int)roleId,name,text]];
-        }
-        
-        NSArray *shouldSendIds = [self getSameChatroomMemberId:identificationId];
-        for(NSInteger i=0;i<shouldSendIds.count;i++) {
-            [peripheralManager sendNormalMessage:[NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text] toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0 firstWait:0.05*i];
-        }
-        
-        if([messageViewController isMember:identificationId] && ![identificationId isEqualToString:[BWUtility getIdentificationString]]) {
-            //メッセージを反映
-            NSString *text = @"";
-            for(NSInteger i=1;i<contents.count;i++) {
-                text = [NSString stringWithFormat:@"%@%@",text,contents[i]];
-            }
-            [messageViewController receiveMessage:text id:contents[0] infoDic:infoDic];
-        }
-    }
-    
-    //action:1/0/3
-    if([[BWUtility getCommand:message] isEqualToString:@"action"]) {
-        NSArray *contents = [BWUtility getCommandContents:message];
-        NSInteger actionRoleId = [contents[0]integerValue];
-        NSInteger actionPlayerId = [contents[1]integerValue];
-        NSInteger actionTargetId = [contents[2]integerValue];
-        
-        [self processRoleAction:actionRoleId actionPlayerId:actionPlayerId targetPlayerId:actionTargetId];
-    }
-    
-    //セントラルによる夜時間終了通知「nightFinish:A..A」
-    if([[BWUtility getCommand:message] isEqualToString:@"nightFinish"]) {
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
-        checkList[playerId] = @YES;
-        if([self isAllOkCheckList]) {
-            [self morning];
-        }
-    }
-    
-    //セントラルによる犠牲者確認通知「checkVictim:A..A」
-    if([[BWUtility getCommand:message] isEqualToString:@"checkVictim"]) {
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
-        checkList[playerId] = @YES;
-        if([self isAllOkCheckList]) {
-            [self afternoonStart];
-        }
-    }
-    
-    //セントラルによる・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
-    if([[BWUtility getCommand:message] isEqualToString:@"afternoonVictimCheck"]) {
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
-        checkList[playerId] = @YES;
-        if([self isAllOkCheckList]) {
-            [self nightStart];
-        }
-    }
-    
-    //セントラルによる投票結果確認通知「checkVoting:A..A」
-    if([[BWUtility getCommand:message] isEqualToString:@"checkVoting"]) {
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
-        checkList[playerId] = @YES;
-        if([self isAllOkCheckList]) {
-            if(excutionerId == -1) {
-                //再投票
-                votingArray = [NSMutableArray array];
-                voteCount++;
-                [peripheralManager sendNormalMessageEveryClient:@"nightStart:" infoDic:infoDic interval:3.0 timeOut:30.0];
-                [self finishAfternoon];
-            } else {
-                [self nightStart];
-            }
-        }
-    }
-}
+
 
 -(NSArray*)divideMessage :(NSString*)message {
-    NSInteger limit = 32;
+    NSInteger limit = 80;
     NSMutableArray *array = [NSMutableArray array];
    
     while([message length] > limit) {
@@ -1353,11 +1361,12 @@ const NSInteger minuteSeconds = 20;
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",[BWUtility getIdentificationString],array[j]];
             NSArray *shouldSendIds = [self getSameChatroomMemberId:[BWUtility getIdentificationString]];
             for(NSInteger i=0;i<shouldSendIds.count;i++) {
-                [peripheralManager sendNormalMessage:mes toIdentificationId:shouldSendIds[i] interval:5.0 timeOut:15.0 firstWait:i*0.07+j*0.1];
+                [sendManager sendMessageWithAddressId:mes toId:shouldSendIds[i]];
+               
             }
             
             //ログを送信
-            if(![BWUtility isSubPeripheral]) {
+            if([sendManager isPeripheral]) {
                 NSInteger playerId = [BWUtility getMyPlayerId:infoDic];
                 NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
                 NSString *name = infoDic[@"players"][playerId][@"name"];
@@ -1367,7 +1376,8 @@ const NSInteger minuteSeconds = 20;
         } else {
             //まずはペリフェラルに知らせる
             NSString *mes = [NSString stringWithFormat:@"chatsend:%@/%@",[BWUtility getIdentificationString],array[j]];
-            [centralManager sendNormalMessage:mes interval:5.0 timeOut:15.0 firstWait:j*0.1];
+            [sendManager sendMessageForPeripheral:mes];
+
         }
     }
 }

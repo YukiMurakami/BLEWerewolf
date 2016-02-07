@@ -77,18 +77,9 @@ typedef NS_ENUM(NSInteger,Winner) {
 //ユーザデータを設定していたかどうか
 + (BOOL)wasSetting;
 + (NSString*)getUserName;
++ (void)saveNowGameIdString:(NSString*)gameIdString;
++ (NSString*)getNowGameIdString;
 
-+ (void)setPeripheralIdentificationId:(NSString*)identificationId;
-+ (NSString*)getPeripheralIdentificationId;
-+ (void)setCentralIdentifications:(NSMutableArray*)ids;
-+ (NSMutableArray*)getCentralIdentifications;
-+ (void)resetPeripheralAndCentralIds;
-+ (void)setSubPeripheralFlag:(BOOL)flag;
-+ (BOOL)isSubPeripheral;
-+ (void)setSubPeripheralTranferFlag:(BOOL)flag;
-+ (BOOL)isSubPeripheralTransfer;
-+ (void)setSignalId:(NSInteger)signalId;
-+ (NSInteger)getSignalId;
 
 #pragma mark - string
 +(NSString*)getCommand :(NSString*)command;

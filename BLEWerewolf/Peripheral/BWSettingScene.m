@@ -22,9 +22,6 @@
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
     
-    manager = [BWPeripheralManager sharedInstance];
-    
-    manager.delegate = self;
     
     return self;
 }

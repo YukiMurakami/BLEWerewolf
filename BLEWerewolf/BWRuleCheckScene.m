@@ -38,14 +38,10 @@
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
             [checkList addObject:@NO];
         }
-        
-        peripheralManager = [BWPeripheralManager sharedInstance];
-        peripheralManager.delegate = self;
-    
-    } else {
-        centralManager = [BWCentralManager sharedInstance];
-        centralManager.delegate = self;
     }
+    
+    sendManager = [BWSendMessageManager sharedInstance];
+    sendManager.delegate = self;
 }
 
 -(void)initBackground {
@@ -113,7 +109,7 @@
         ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"canContinuousGuard"]];
         ruleString = [NSString stringWithFormat:@"%@%@",ruleString,ruleDic[@"isLacking"]];
         
-        [peripheralManager sendNormalMessageEveryClient:ruleString infoDic:infoDic interval:5.0 timeOut:30.0];
+        [sendManager sendMessageForAllCentrals:ruleString];
     }
 }
 
@@ -121,7 +117,8 @@
     if([name isEqualToString:@"next"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //settingCheck:A..A
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+            NSString *mes = [NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:mes];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -204,50 +201,54 @@
     return cell;
 }
 
--(void)didReceivedMessage:(NSString *)message {
-    //central
-    //gamestart:0,0/1,0/.../8,1
-    //セントラル側では役職IDを格納しておく（配役とルールとプレイヤーはすでに取得済み）
-    if([[BWUtility getCommand:message] isEqualToString:@"gamestart"]) {
-        NSArray *components = [BWUtility getCommandContents:message];
-        for(NSInteger i=0;i<components.count;i++) {
-            NSArray *strings = [components[i] componentsSeparatedByString:@","];
-            [infoDic[@"players"][[strings[0]integerValue]] setObject:@([strings[1]integerValue]) forKey:@"roleId"];
-            [infoDic[@"players"][[strings[0]integerValue]] setObject:@YES forKey:@"isLive"];
+
+#pragma  mark - MessageManagerDelegate
+
+-(void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
+    if(![sendManager isPeripheral]) {
+        //central
+        //gamestart:0,0/1,0/.../8,1
+        //セントラル側では役職IDを格納しておく（配役とルールとプレイヤーはすでに取得済み）
+        if([[BWUtility getCommand:message] isEqualToString:@"gamestart"]) {
+            NSArray *components = [BWUtility getCommandContents:message];
+            for(NSInteger i=0;i<components.count;i++) {
+                NSArray *strings = [components[i] componentsSeparatedByString:@","];
+                [infoDic[@"players"][[strings[0]integerValue]] setObject:@([strings[1]integerValue]) forKey:@"roleId"];
+                [infoDic[@"players"][[strings[0]integerValue]] setObject:@YES forKey:@"isLive"];
+            }
+            
+            BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
+            [scene setCentralOrPeripheral:NO :infoDic];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
         }
-        
-        BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
-        [scene setCentralOrPeripheral:NO :infoDic];
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-        [self.view presentScene:scene transition:transition];
+    } else {
+        //peripheral
+        //settingCheck:A..A
+        if([[BWUtility getCommand:message] isEqualToString:@"settingCheck"]) {
+            NSString *identificationId = [BWUtility getCommandContents:message][0];
+            BOOL isAllOK = YES;
+            for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+                if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
+                    checkList[i] = @YES;
+                }
+                if(![checkList[i]boolValue]) {
+                    isAllOK = NO;
+                }
+            }
+            if(isAllOK) {
+                //全員確認済み ゲームスタート
+                [self gameStart];
+            }
+        }
     }
 }
 
--(void)didReceiveMessage:(NSString *)message {
-    //peripheral
-    //settingCheck:A..A
-    if([[BWUtility getCommand:message] isEqualToString:@"settingCheck"]) {
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        BOOL isAllOK = YES;
-        for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
-            if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
-                checkList[i] = @YES;
-            }
-            if(![checkList[i]boolValue]) {
-                isAllOK = NO;
-            }
-        }
-        if(isAllOK) {
-            //全員確認済み ゲームスタート
-            [self gameStart];
-        }
-    }
-}
 
 -(void)gameStart {
     [self setRole];
     
-    //先に画面遷移してから通知を送る（こっち側では一回だけ送っとく）
+    //先に画面遷移してから通知を送る
     
     BWRoleRotateScene *scene = [BWRoleRotateScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:YES :infoDic];

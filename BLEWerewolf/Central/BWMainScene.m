@@ -16,7 +16,7 @@
 @implementation BWMainScene {
     SKSpriteNode *backgroundNode;
 
-    BWCentralManager *centralManager;
+    BWSendMessageManager *sendManager;
     
     BWGorgeousTableView *table;
     NSMutableArray *gameIdArray;
@@ -27,8 +27,9 @@
     
     [self initBackground];
     
-    centralManager = [BWCentralManager sharedInstance];
-    centralManager.delegate = self;
+    sendManager = [BWSendMessageManager sharedInstance];
+    [sendManager setIsPeripheral:NO];
+    sendManager.delegate = self;
     
     gameIdArray = [NSMutableArray array];
     
@@ -90,54 +91,42 @@
     
     NSString *touchedGameId = gameIdArray[indexPath.row][@"gameId"];
     NSString *peripheralIdentificationId = gameIdArray[indexPath.row][@"identificationId"];
-    [centralManager setGameId:touchedGameId];
-    //ここでgameIdを確定させる
-    [centralManager stopScan];
-    [BWUtility setPeripheralIdentificationId:peripheralIdentificationId];
     
+    [BWUtility saveNowGameIdString:touchedGameId];
+    //ここでgameId,peripheralIdを確定させる
+    [sendManager setPeripheralId:peripheralIdentificationId];
     
     //・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
-    if([BWUtility isSubPeripheral]) {
-        NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/1",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
-        [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
+    //今はサブサーバはなし
+    NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/0",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
+    [sendManager sendMessageForPeripheral:sendMessage];
         
-        BWGameSettingScene *scene = [[BWGameSettingScene alloc]initWithSize:self.size gameId:[touchedGameId integerValue]];
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-        [self.view presentScene:scene transition:transition];
-    } else {
-        NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/0",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
-        [centralManager sendNormalMessage:sendMessage interval:5.0 timeOut:15.0 firstWait:0.0];
-        
-        BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-        [self.view presentScene:scene transition:transition];
-    }
-}
-
-#pragma mark - BWCentralManagerDelegate
-
--(void)didReceivedMessage:(NSString *)message {
-    //・ゲーム部屋のID通知「serveId:NNNNNN/P..P/S...S」 NNNNNNは６桁のゲームID（部屋生成時に自動的に生成）、P..P、S...SはペリフェラルのID,ユーザ名
-    if([[BWUtility getCommand:message] isEqualToString:@"serveId"]) {
-        NSArray *array = [BWUtility getCommandContents:message];
-        NSString *gameId = array[0];
-        NSString *peripheralId = array[1];
-        NSString *peripheralName = array[2];
+    BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
+    SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+    [self.view presentScene:scene transition:transition];
     
-        BOOL isNew = YES;
-        for(NSInteger i=0;i<gameIdArray.count;i++) {
-            if([[gameIdArray[i][@"gameId"] substringToIndex:6] isEqualToString:gameId]) {
-                isNew = NO;
-                break;
-            }
-        }
-        if(isNew) {
-            NSMutableDictionary *dic = [@{@"gameId":gameId,@"identificationId":peripheralId,@"name":peripheralName}mutableCopy];
-            [gameIdArray addObject:dic];
-            [table.tableView reloadData];
-        }
-    }
 }
 
+#pragma mark - MessageManager
+
+- (void)didReceiveAdvertiseGameroomInfo:(NSDictionary *)gameroomInfo {
+    //ペリフェラルのアドバタイズを受信
+    NSString *gameId = gameroomInfo[@"gameId"];
+    NSString *peripheralId = gameroomInfo[@"peripheralId"];
+    NSString *peripheralName = gameroomInfo[@"peripheralName"];
+    
+    BOOL isNew = YES;
+    for(NSInteger i=0;i<gameIdArray.count;i++) {
+        if([[gameIdArray[i][@"gameId"] substringToIndex:6] isEqualToString:gameId]) {
+            isNew = NO;
+            break;
+        }
+    }
+    if(isNew) {
+        NSMutableDictionary *dic = [@{@"gameId":gameId,@"identificationId":peripheralId,@"name":peripheralName}mutableCopy];
+        [gameIdArray addObject:dic];
+        [table.tableView reloadData];
+    }
+}
 
 @end

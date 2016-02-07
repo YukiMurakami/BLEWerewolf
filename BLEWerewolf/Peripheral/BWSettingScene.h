@@ -7,7 +7,7 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-#import "BWPeripheralManager.h"
+
 #import "LWRoleSettingScene.h"
 #import "LWRuleSettingScene.h"
 
@@ -17,7 +17,7 @@
 //#import "LWGameScene.h"
 //#import "LWRoleTableScene.h"
 
-@interface BWSettingScene : SKScene <BWPeripheralManagerDelegate,BWButtonNodeDelegate> {
+@interface BWSettingScene : SKScene <BWButtonNodeDelegate> {
     NSInteger player;
     
     SKScene *rollSettingScene;
@@ -25,12 +25,12 @@
     
     NSMutableDictionary *informations;
     
-    BWPeripheralManager *manager;
+
 }
 
 -(void)sendPlayerInfo:(NSMutableArray*)playerArray;
 -(void)setRollInfo :(NSMutableArray *)rollInfo ;
 -(void)setRuleInfo :(NSMutableDictionary *)ruleInfo ;
 
--(void)stopMessage ;
+
 @end

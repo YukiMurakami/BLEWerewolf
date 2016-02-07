@@ -7,11 +7,11 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-#import "BWCentralManager.h"
+#import "BWSendMessageManager.h"
 
-@interface BWWaitConnectionScene : SKScene <BWCentralManagerDelegate>{
+@interface BWWaitConnectionScene : SKScene <BWSendMessageManagerDelegate>{
     SKSpriteNode *backgroundNode;
-    BWCentralManager *centralManager;
+    BWSendMessageManager *sendManager;
     
     NSString *printMessage;
 }

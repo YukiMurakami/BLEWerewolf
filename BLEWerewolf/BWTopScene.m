@@ -41,8 +41,8 @@
     
     NSArray *buttons = @[@{@"title":@"サーバ",@"name":@"server"},
                          @{@"title":@"クライアント",@"name":@"client"},
-                         @{@"title":@"ユーザ設定",@"name":@"setting"},
-                         @{@"title":@"サブサーバ(9人以上)",@"name":@"subserver"}];
+                         @{@"title":@"ユーザ設定",@"name":@"setting"},];
+                         //@{@"title":@"サブサーバ(9人以上)",@"name":@"subserver"}];
     
     CGSize buttonSize = CGSizeMake(self.size.width*0.8,self.size.width*0.8*0.2);
     if([BWUtility wasSetting]) {
@@ -84,14 +84,12 @@
 
 -(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
     if([name isEqualToString:@"server"]) {
-        [BWUtility setSubPeripheralFlag:NO];
         BWGameSettingScene *scene = [[BWGameSettingScene alloc]initWithSize:self.size gameId:[BWUtility getRandInteger:1000000]];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
         return;
     }
     if([name isEqualToString:@"client"]) {
-        [BWUtility setSubPeripheralFlag:NO];
         BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];
@@ -104,8 +102,6 @@
         return;
     }
     if([name isEqualToString:@"subserver"]) {
-        [BWUtility setSubPeripheralFlag:YES];
-        [BWUtility setSubPeripheralTranferFlag:NO];
         BWMainScene *scene = [BWMainScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
         [self.view presentScene:scene transition:transition];

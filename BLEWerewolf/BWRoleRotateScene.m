@@ -30,14 +30,14 @@
     
     tablePlayerArray = [NSMutableArray array];
     
+    sendManager = [BWSendMessageManager sharedInstance];
+    sendManager.delegate = self;
+    
     if(isPeripheral) {
         checkList = [NSMutableArray array];
         for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
             [checkList addObject:@NO];
         }
-        
-        peripheralManager = [BWPeripheralManager sharedInstance];
-        peripheralManager.delegate = self;
         
         //全員に役職とプレイヤー情報を送信する
         //受信確認は役職確認後に受信通知を返してもらう
@@ -50,11 +50,8 @@
                 message = [NSString stringWithFormat:@"%@/",message];
             }
         }
-        [peripheralManager sendNormalMessageEveryClient:message infoDic:infoDic interval:5.0 timeOut:30.0];
+        [sendManager sendMessageForAllCentrals:message];
        
-    } else {
-        centralManager = [BWCentralManager sharedInstance];
-        centralManager.delegate = self;
     }
     
     [self initBackground];
@@ -236,7 +233,8 @@
     if([node.name isEqualToString:@"start"]) {
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //roleCheck:A..A
-            [centralManager sendNormalMessage:[NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]] interval:5.0 timeOut:15.0 firstWait:0.0];
+            NSString *mes = [NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]];
+            [sendManager sendMessageForPeripheral:mes];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -260,7 +258,7 @@
 
 -(void)goFirstNight {
     //ペリフェラルのみ
-    [peripheralManager sendNormalMessageEveryClient:@"firstNight:" infoDic:infoDic interval:2.0 timeOut:30.0];
+    [sendManager sendMessageForAllCentrals:@"firstNight:"];
     
     BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:isPeripheral :infoDic];
@@ -268,37 +266,40 @@
     [self.view presentScene:scene transition:transition];
 }
 
--(void)didReceivedMessage:(NSString *)message {
-    //central
-    //firstNight:
-    if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {
-        BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
-        [scene setCentralOrPeripheral:isPeripheral :infoDic];
-        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
-        [self.view presentScene:scene transition:transition];
+#pragma mark - messageManagerDelegate
+
+- (void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
+    if(![sendManager isPeripheral]) {
+        //central
+        //firstNight:
+        if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {
+            BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
+            [scene setCentralOrPeripheral:isPeripheral :infoDic];
+            SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
+            [self.view presentScene:scene transition:transition];
+        }
+    } else {
+        //peripheral
+        //roleCheck:A..A
+        if([[BWUtility getCommand:message] isEqualToString:@"roleCheck"]) {
+            NSString *identificationId = [BWUtility getCommandContents:message][0];
+            BOOL isAllOK = YES;
+            for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
+                if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
+                    checkList[i] = @YES;
+                }
+                if(![checkList[i]boolValue]) {
+                    isAllOK = NO;
+                }
+            }
+            if(isAllOK) {
+                //全員確認済み 初日よるへ
+                [self goFirstNight];
+            }
+        }
     }
 }
 
--(void)didReceiveMessage:(NSString *)message {
-    //peripheral
-    //roleCheck:A..A
-    if([[BWUtility getCommand:message] isEqualToString:@"roleCheck"]) {
-        NSString *identificationId = [BWUtility getCommandContents:message][0];
-        BOOL isAllOK = YES;
-        for(NSInteger i=0;i<[infoDic[@"players"] count];i++) {
-            if([infoDic[@"players"][i][@"identificationId"] isEqualToString:identificationId]) {
-                checkList[i] = @YES;
-            }
-            if(![checkList[i]boolValue]) {
-                isAllOK = NO;
-            }
-        }
-        if(isAllOK) {
-            //全員確認済み 初日よるへ
-            [self goFirstNight];
-        }
-    }
-}
 
 #pragma mark - tableDelegate
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

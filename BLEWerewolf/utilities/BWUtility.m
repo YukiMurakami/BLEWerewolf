@@ -634,63 +634,17 @@
     return userData[@"name"];
 }
 
-+ (void)setPeripheralIdentificationId:(NSString*)identificationId {
++ (void)saveNowGameIdString:(NSString*)gameIdString {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:identificationId forKey:@"peripheralIdentificationId"];
+    [ud setObject:gameIdString forKey:@"gameIdString"];
 }
 
-+ (NSString*)getPeripheralIdentificationId {
++ (NSString*)getNowGameIdString {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    NSString *id = [ud objectForKey:@"peripheralIdentificationId"];
-    return id;
+    NSString *gameIdString = [ud objectForKey:@"gameIdString"];
+    return gameIdString;
 }
 
-+ (void)setCentralIdentifications:(NSMutableArray*)ids {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:[ids copy] forKey:@"centralIdentificationIds"];
-}
-
-+ (NSMutableArray*)getCentralIdentifications {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    NSArray *array = [ud objectForKey:@"centralIdentificationIds"];
-    return [array mutableCopy];
-}
-
-+ (void)resetPeripheralAndCentralIds {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:@"" forKey:@"peripheralIdentificationId"];
-    [ud setObject:@{} forKey:@"centralIdentificationIds"];
-}
-
-+ (void)setSubPeripheralFlag:(BOOL)flag {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:@(flag) forKey:@"isSubPeripheral"];
-}
-
-+ (BOOL)isSubPeripheral {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    return [[ud objectForKey:@"isSubPeripheral"] boolValue];
-}
-
-+ (void)setSubPeripheralTranferFlag:(BOOL)flag {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:@(flag) forKey:@"subPeripheralTransferFlag"];
-}
-
-+ (BOOL)isSubPeripheralTransfer {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    return [[ud objectForKey:@"subPeripheralTransferFlag"] boolValue];
-}
-
-+ (void)setSignalId:(NSInteger)signalId {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:@(signalId) forKey:@"signalId"];
-}
-
-+ (NSInteger)getSignalId {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    return [[ud objectForKey:@"signalId"]integerValue];
-}
 
 
 #pragma mark - string

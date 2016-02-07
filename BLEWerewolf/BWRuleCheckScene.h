@@ -7,14 +7,12 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-#import "BWCentralManager.h"
-#import "BWPeripheralManager.h"
+#import "BWSendMessageManager.h"
 #import "BWButtonNode.h"
 
-@interface BWRuleCheckScene : SKScene <BWCentralManagerDelegate,BWPeripheralManagerDelegate,UITableViewDataSource,UITableViewDelegate,BWButtonNodeDelegate> {
+@interface BWRuleCheckScene : SKScene <BWSendMessageManagerDelegate,UITableViewDataSource,UITableViewDelegate,BWButtonNodeDelegate> {
     SKSpriteNode *backgroundNode;
-    BWCentralManager *centralManager;
-    BWPeripheralManager *peripheralManager;
+    BWSendMessageManager *sendManager;
     
     NSMutableDictionary *infoDic;
     
