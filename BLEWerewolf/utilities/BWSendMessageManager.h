@@ -1,5 +1,5 @@
 //
-//  sendMessageManager.h
+//  BWSendMessageManager.h
 //  NearByMessageChat
 //
 //  Created by Yuki Murakami on 2016/02/07.
@@ -8,14 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol sendMessageManagerDelegate
+@protocol BWSendMessageManagerDelegate
 -(void)didReceiveMessage:(NSString*)message senderId:(NSString*)senderId;
 -(void)didReceiveAdvertiseDevice:(NSString*)deviceId;
 @end
 
-@interface sendMessageManager : NSObject
+@interface BWSendMessageManager : NSObject
 
-@property (nonatomic) id<sendMessageManagerDelegate> delegate;
+@property (nonatomic) id<BWSendMessageManagerDelegate> delegate;
 
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;

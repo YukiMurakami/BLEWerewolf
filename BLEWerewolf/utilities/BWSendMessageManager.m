@@ -1,5 +1,5 @@
 //
-//  sendMessageManager.m
+//  BWSendMessageManager.m
 //  NearByMessageChat
 //
 //  Created by Yuki Murakami on 2016/02/07.
@@ -24,13 +24,13 @@
 
 */
 
-#import "sendMessageManager.h"
+#import "BWSendMessageManager.h"
 #import "BWUtility.h"
 #import <GNSMessages.h>
 
 static NSString * const APIKey = @"AIzaSyDWFBySXYZ_jYsfO67lvzVTmC4LAaCb8JU";
 
-@interface sendMessageManager ()
+@interface BWSendMessageManager ()
 
 @property (nonatomic) GNSPermission *nearbyPermission;
 @property (nonatomic) GNSMessageManager *messageManager;
@@ -46,15 +46,15 @@ static NSString * const APIKey = @"AIzaSyDWFBySXYZ_jYsfO67lvzVTmC4LAaCb8JU";
 
 @end
 
-@implementation sendMessageManager
+@implementation BWSendMessageManager
 
-static sendMessageManager *sharedInstance = nil;
+static BWSendMessageManager *sharedInstance = nil;
 
 #pragma mark - Singleton
 + (instancetype)sharedInstance {
     @synchronized(self) {
         if(!sharedInstance) {
-            sharedInstance = [[sendMessageManager alloc]initSharedInstance];
+            sharedInstance = [[BWSendMessageManager alloc]initSharedInstance];
         }
     }
     return sharedInstance;

@@ -41,7 +41,7 @@
 		B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC39F1C378D3200546FC0 /* LWPickerTableScene.m */; };
 		B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */; };
 		B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */; };
-		B69431291C674AAF001F8763 /* sendMessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B69431281C674AAF001F8763 /* sendMessageManager.m */; };
+		B69431291C674AAF001F8763 /* BWSendMessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B69431281C674AAF001F8763 /* BWSendMessageManager.m */; };
 		B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B69A302D1C36660700B966D5 /* BWUserSettingScene.m */; };
 		B69ED5A61B6B2C2E00A9C355 /* afternoon.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B69ED59E1B6B2C2E00A9C355 /* afternoon.jpg */; };
 		B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = B69ED59F1B6B2C2E00A9C355 /* button.png */; };
@@ -151,8 +151,8 @@
 		B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LWRoleSettingScene.m; sourceTree = "<group>"; };
 		B6863BAE1B809FB3005E049C /* BWMultipleLineLabelNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWMultipleLineLabelNode.h; sourceTree = "<group>"; };
 		B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWMultipleLineLabelNode.m; sourceTree = "<group>"; };
-		B69431271C674AAF001F8763 /* sendMessageManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sendMessageManager.h; sourceTree = "<group>"; };
-		B69431281C674AAF001F8763 /* sendMessageManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = sendMessageManager.m; sourceTree = "<group>"; };
+		B69431271C674AAF001F8763 /* BWSendMessageManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWSendMessageManager.h; sourceTree = "<group>"; };
+		B69431281C674AAF001F8763 /* BWSendMessageManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWSendMessageManager.m; sourceTree = "<group>"; };
 		B69A302C1C36660700B966D5 /* BWUserSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWUserSettingScene.h; sourceTree = "<group>"; };
 		B69A302D1C36660700B966D5 /* BWUserSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWUserSettingScene.m; sourceTree = "<group>"; };
 		B69ED59C1B6B289B00A9C355 /* TransferService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransferService.h; sourceTree = "<group>"; };
@@ -337,8 +337,8 @@
 				B60A679F1C38B87900FFD0E5 /* BWMessageViewController.m */,
 				B662D2591C5A2690006E4456 /* LWBonjourManager.h */,
 				B662D25A1C5A2690006E4456 /* LWBonjourManager.m */,
-				B69431271C674AAF001F8763 /* sendMessageManager.h */,
-				B69431281C674AAF001F8763 /* sendMessageManager.m */,
+				B69431271C674AAF001F8763 /* BWSendMessageManager.h */,
+				B69431281C674AAF001F8763 /* BWSendMessageManager.m */,
 			);
 			name = utilities;
 			path = BLEWerewolf/utilities;
@@ -621,7 +621,7 @@
 				B6B57D4B1B6781A900FBFEDB /* BWMainScene.m in Sources */,
 				B6BA9D541C3E659E00F75065 /* BWSenderNode.m in Sources */,
 				B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */,
-				B69431291C674AAF001F8763 /* sendMessageManager.m in Sources */,
+				B69431291C674AAF001F8763 /* BWSendMessageManager.m in Sources */,
 				B67CC39A1C37715D00546FC0 /* BWSettingScene.m in Sources */,
 				B63D90441B60DD35000E366B /* BWViewController.m in Sources */,
 				B6CF75151C2640C70078309A /* NSObject+BlocksWait.m in Sources */,
