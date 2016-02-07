@@ -16,7 +16,6 @@
 		B60A67A91C3A502800FFD0E5 /* time_frame.png in Resources */ = {isa = PBXBuildFile; fileRef = B60A67A81C3A502800FFD0E5 /* time_frame.png */; };
 		B611032D1C509BF7009C82A3 /* ui_plate_blue_a.png in Resources */ = {isa = PBXBuildFile; fileRef = B611032B1C509BF7009C82A3 /* ui_plate_blue_a.png */; };
 		B611032E1C509BF7009C82A3 /* ui_plate_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = B611032C1C509BF7009C82A3 /* ui_plate_blue.png */; };
-		B61103311C50DCBC009C82A3 /* BWTransferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B61103301C50DCBC009C82A3 /* BWTransferManager.m */; };
 		B61103331C512FD3009C82A3 /* card8.png in Resources */ = {isa = PBXBuildFile; fileRef = B61103321C512FD3009C82A3 /* card8.png */; };
 		B61103381C5609F3009C82A3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B61103371C5609F3009C82A3 /* AVFoundation.framework */; };
 		B614DD8E1C37F953006BB3C8 /* back_card.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B614DD8D1C37F953006BB3C8 /* back_card.jpg */; };
@@ -42,6 +41,7 @@
 		B67CC3A21C378D3200546FC0 /* LWPickerTableScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC39F1C378D3200546FC0 /* LWPickerTableScene.m */; };
 		B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */; };
 		B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */; };
+		B69431291C674AAF001F8763 /* sendMessageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B69431281C674AAF001F8763 /* sendMessageManager.m */; };
 		B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B69A302D1C36660700B966D5 /* BWUserSettingScene.m */; };
 		B69ED5A61B6B2C2E00A9C355 /* afternoon.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B69ED59E1B6B2C2E00A9C355 /* afternoon.jpg */; };
 		B69ED5A71B6B2C2E00A9C355 /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = B69ED59F1B6B2C2E00A9C355 /* button.png */; };
@@ -52,9 +52,7 @@
 		B69ED5AC1B6B2C2E00A9C355 /* card4.png in Resources */ = {isa = PBXBuildFile; fileRef = B69ED5A41B6B2C2E00A9C355 /* card4.png */; };
 		B69ED5AD1B6B2C2E00A9C355 /* card5.png in Resources */ = {isa = PBXBuildFile; fileRef = B69ED5A51B6B2C2E00A9C355 /* card5.png */; };
 		B69ED5B01B6B2C6800A9C355 /* BWUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = B69ED5AF1B6B2C6800A9C355 /* BWUtility.m */; };
-		B69ED5B31B6B48CF00A9C355 /* BWPeripheralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B69ED5B21B6B48CF00A9C355 /* BWPeripheralManager.m */; };
 		B69ED5B61B6B4B8100A9C355 /* BWGameSettingScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B69ED5B51B6B4B8100A9C355 /* BWGameSettingScene.m */; };
-		B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B57D471B6774A600FBFEDB /* BWCentralManager.m */; };
 		B6B57D4B1B6781A900FBFEDB /* BWMainScene.m in Sources */ = {isa = PBXBuildFile; fileRef = B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */; };
 		B6BA9D541C3E659E00F75065 /* BWSenderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = B6BA9D531C3E659E00F75065 /* BWSenderNode.m */; };
 		B6CF75151C2640C70078309A /* NSObject+BlocksWait.m in Sources */ = {isa = PBXBuildFile; fileRef = B6CF75141C2640C70078309A /* NSObject+BlocksWait.m */; };
@@ -111,8 +109,6 @@
 		B60A67A81C3A502800FFD0E5 /* time_frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = time_frame.png; sourceTree = "<group>"; };
 		B611032B1C509BF7009C82A3 /* ui_plate_blue_a.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate_blue_a.png; sourceTree = "<group>"; };
 		B611032C1C509BF7009C82A3 /* ui_plate_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ui_plate_blue.png; sourceTree = "<group>"; };
-		B611032F1C50DCBC009C82A3 /* BWTransferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWTransferManager.h; sourceTree = "<group>"; };
-		B61103301C50DCBC009C82A3 /* BWTransferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWTransferManager.m; sourceTree = "<group>"; };
 		B61103321C512FD3009C82A3 /* card8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card8.png; sourceTree = "<group>"; };
 		B61103371C5609F3009C82A3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		B614DD8D1C37F953006BB3C8 /* back_card.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = back_card.jpg; sourceTree = "<group>"; };
@@ -155,6 +151,8 @@
 		B67CC3A11C378D3200546FC0 /* LWRoleSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LWRoleSettingScene.m; sourceTree = "<group>"; };
 		B6863BAE1B809FB3005E049C /* BWMultipleLineLabelNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWMultipleLineLabelNode.h; sourceTree = "<group>"; };
 		B6863BAF1B809FB3005E049C /* BWMultipleLineLabelNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWMultipleLineLabelNode.m; sourceTree = "<group>"; };
+		B69431271C674AAF001F8763 /* sendMessageManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sendMessageManager.h; sourceTree = "<group>"; };
+		B69431281C674AAF001F8763 /* sendMessageManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = sendMessageManager.m; sourceTree = "<group>"; };
 		B69A302C1C36660700B966D5 /* BWUserSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWUserSettingScene.h; sourceTree = "<group>"; };
 		B69A302D1C36660700B966D5 /* BWUserSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWUserSettingScene.m; sourceTree = "<group>"; };
 		B69ED59C1B6B289B00A9C355 /* TransferService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransferService.h; sourceTree = "<group>"; };
@@ -168,12 +166,8 @@
 		B69ED5A51B6B2C2E00A9C355 /* card5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = card5.png; sourceTree = "<group>"; };
 		B69ED5AE1B6B2C6800A9C355 /* BWUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWUtility.h; sourceTree = "<group>"; };
 		B69ED5AF1B6B2C6800A9C355 /* BWUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWUtility.m; sourceTree = "<group>"; };
-		B69ED5B11B6B48CF00A9C355 /* BWPeripheralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWPeripheralManager.h; sourceTree = "<group>"; };
-		B69ED5B21B6B48CF00A9C355 /* BWPeripheralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWPeripheralManager.m; sourceTree = "<group>"; };
 		B69ED5B41B6B4B8100A9C355 /* BWGameSettingScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWGameSettingScene.h; sourceTree = "<group>"; };
 		B69ED5B51B6B4B8100A9C355 /* BWGameSettingScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWGameSettingScene.m; sourceTree = "<group>"; };
-		B6B57D461B6774A600FBFEDB /* BWCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWCentralManager.h; sourceTree = "<group>"; };
-		B6B57D471B6774A600FBFEDB /* BWCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWCentralManager.m; sourceTree = "<group>"; };
 		B6B57D491B6781A900FBFEDB /* BWMainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWMainScene.h; sourceTree = "<group>"; };
 		B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BWMainScene.m; sourceTree = "<group>"; };
 		B6BA9D521C3E659E00F75065 /* BWSenderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BWSenderNode.h; sourceTree = "<group>"; };
@@ -311,8 +305,6 @@
 				B6B57D4A1B6781A900FBFEDB /* BWMainScene.m */,
 				B67CC38F1C36D3D300546FC0 /* BWWaitConnectionScene.h */,
 				B67CC3901C36D3D300546FC0 /* BWWaitConnectionScene.m */,
-				B6B57D461B6774A600FBFEDB /* BWCentralManager.h */,
-				B6B57D471B6774A600FBFEDB /* BWCentralManager.m */,
 			);
 			name = Central;
 			path = BLEWerewolf/Central;
@@ -345,6 +337,8 @@
 				B60A679F1C38B87900FFD0E5 /* BWMessageViewController.m */,
 				B662D2591C5A2690006E4456 /* LWBonjourManager.h */,
 				B662D25A1C5A2690006E4456 /* LWBonjourManager.m */,
+				B69431271C674AAF001F8763 /* sendMessageManager.h */,
+				B69431281C674AAF001F8763 /* sendMessageManager.m */,
 			);
 			name = utilities;
 			path = BLEWerewolf/utilities;
@@ -374,10 +368,6 @@
 		B69ED5B71B6B4B8E00A9C355 /* Peripheral */ = {
 			isa = PBXGroup;
 			children = (
-				B69ED5B11B6B48CF00A9C355 /* BWPeripheralManager.h */,
-				B69ED5B21B6B48CF00A9C355 /* BWPeripheralManager.m */,
-				B611032F1C50DCBC009C82A3 /* BWTransferManager.h */,
-				B61103301C50DCBC009C82A3 /* BWTransferManager.m */,
 				B67CC3981C37715D00546FC0 /* BWSettingScene.h */,
 				B67CC3991C37715D00546FC0 /* BWSettingScene.m */,
 				B67CC39B1C3789C700546FC0 /* LWRuleSettingScene.h */,
@@ -631,6 +621,7 @@
 				B6B57D4B1B6781A900FBFEDB /* BWMainScene.m in Sources */,
 				B6BA9D541C3E659E00F75065 /* BWSenderNode.m in Sources */,
 				B6863BB01B809FB3005E049C /* BWMultipleLineLabelNode.m in Sources */,
+				B69431291C674AAF001F8763 /* sendMessageManager.m in Sources */,
 				B67CC39A1C37715D00546FC0 /* BWSettingScene.m in Sources */,
 				B63D90441B60DD35000E366B /* BWViewController.m in Sources */,
 				B6CF75151C2640C70078309A /* NSObject+BlocksWait.m in Sources */,
@@ -644,8 +635,6 @@
 				B63D90631B60DDCA000E366B /* BWTopScene.m in Sources */,
 				B60A679D1C38B0FC00FFD0E5 /* BWTimer.m in Sources */,
 				B69A302E1C36660700B966D5 /* BWUserSettingScene.m in Sources */,
-				B61103311C50DCBC009C82A3 /* BWTransferManager.m in Sources */,
-				B69ED5B31B6B48CF00A9C355 /* BWPeripheralManager.m in Sources */,
 				B63D90411B60DD35000E366B /* BWAppDelegate.m in Sources */,
 				B67CC3A31C378D3200546FC0 /* LWRoleSettingScene.m in Sources */,
 				B60A67A01C38B87900FFD0E5 /* BWMessageViewController.m in Sources */,
@@ -653,7 +642,6 @@
 				B60A67A71C38C92900FFD0E5 /* UIColor+BWAddtions.m in Sources */,
 				B614DD911C380D34006BB3C8 /* BWRoleRotateScene.m in Sources */,
 				B6D1039F1C421B200007D6AB /* BWButtonNode.m in Sources */,
-				B6B57D481B6774A600FBFEDB /* BWCentralManager.m in Sources */,
 				B67CC3971C37657400546FC0 /* BWRuleCheckScene.m in Sources */,
 				B6D103AF1C427A460007D6AB /* BWRuleButtonNode.m in Sources */,
 				B60A679A1C38ACED00FFD0E5 /* BWNightScene.m in Sources */,
