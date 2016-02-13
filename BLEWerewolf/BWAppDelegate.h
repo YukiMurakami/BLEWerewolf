@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BWViewController.h"
 
 @interface BWAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
+- (BWViewController*)getRootViewController;
 
 @end
 

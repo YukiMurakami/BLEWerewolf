@@ -18,7 +18,7 @@
  送り出すメッセージはその都度idをインクリメントする
  
  
- publishは配列にして５０個ほどは保存しておく（一斉送信など同時に複数のメッセージを送信する場合に必要）
+ publishは配列にして３０個ほどは保存しておく（一斉送信など同時に複数のメッセージを送信する場合に必要）
  
  
 
@@ -29,6 +29,9 @@
 #import "NSObject+BlocksWait.h"
 #import <GNSMessages.h>
 
+#import "BWViewController.h"
+#import "BWAppDelegate.h"
+
 const NSInteger saveNumberPublications = 30;
 
 static NSString * const APIKey = @"AIzaSyDWFBySXYZ_jYsfO67lvzVTmC4LAaCb8JU";
@@ -38,7 +41,10 @@ static NSString * const APIKey = @"AIzaSyDWFBySXYZ_jYsfO67lvzVTmC4LAaCb8JU";
 @property (nonatomic) GNSPermission *nearbyPermission;
 @property (nonatomic) GNSMessageManager *messageManager;
 @property (nonatomic) NSMutableArray  *publications;
-@property (nonatomic) id<GNSSubscription> subscription;
+@property (nonatomic) id<GNSSubscription> mySubscription;
+@property (nonatomic) id<GNSSubscription> centralsSubscription;
+@property (nonatomic) GNSStrategy *myStrategy;
+@property (nonatomic) GNSStrategy *centralsStrategy;
 @property (nonatomic) NSString *identificationId;
 @property (nonatomic) NSInteger signalId;
 @property (nonatomic) NSMutableArray *receivedSignalIds;
@@ -65,7 +71,8 @@ static BWSendMessageManager *sharedInstance = nil;
 
 + (void)resetSharedInstance {
     [sharedInstance.publications removeAllObjects];
-    sharedInstance.subscription = nil;
+    sharedInstance.mySubscription = nil;
+    sharedInstance.centralsSubscription = nil;
     sharedInstance = nil;
 }
 
@@ -105,13 +112,35 @@ static BWSendMessageManager *sharedInstance = nil;
                 };
             }];
         
-        self.subscription = [self.messageManager
-            subscriptionWithMessageFoundHandler:^(GNSMessage *message) {
-                NSString *mes = [[NSString alloc]initWithData:message.content encoding:NSUTF8StringEncoding];
-                [self receiveMessage:mes];
-            } messageLostHandler:^(GNSMessage *message) {
+        self.myStrategy = [GNSStrategy strategyWithParamsBlock:^(GNSStrategyParams *params) {
+            params.discoveryMediums = kGNSDiscoveryMediumsAudio;
+            params.discoveryMode = kGNSDiscoveryModeScan;
+        }];
+        self.centralsStrategy = [GNSStrategy strategyWithParamsBlock:^(GNSStrategyParams *params) {
+            params.discoveryMediums = kGNSDiscoveryMediumsAudio;
+            params.discoveryMode = kGNSDiscoveryModeScan;
+        }];
+        
+        self.mySubscription = [self.messageManager
+                                      subscriptionWithParams:[GNSSubscriptionParams paramsWithMessageType:self.identificationId strategy:self.myStrategy]
+                                      messageFoundHandler:^(GNSMessage *message) {
+                                          NSString *mes = [[NSString alloc]initWithData:message.content encoding:NSUTF8StringEncoding];
+                                          [self receiveMessage:mes];
+                                      } messageLostHandler:^(GNSMessage *message) {
             
-            }];
+                                      }];
+        
+        
+        self.centralsSubscription = [self.messageManager
+                               subscriptionWithParams:[GNSSubscriptionParams paramsWithMessageType:@"centrals" strategy:self.centralsStrategy]
+                               messageFoundHandler:^(GNSMessage *message) {
+                                   NSString *mes = [[NSString alloc]initWithData:message.content encoding:NSUTF8StringEncoding];
+                                   [self receiveMessage:mes];
+                               } messageLostHandler:^(GNSMessage *message) {
+                                   
+                               }];
+        
+        
     }
     return self;
 }
@@ -141,6 +170,8 @@ static BWSendMessageManager *sharedInstance = nil;
             NSString *peripheralName = array[3];
             
             [self.delegate didReceiveAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId,@"peripheralName":peripheralName}];
+            
+            
         }
     }
     
@@ -155,24 +186,28 @@ static BWSendMessageManager *sharedInstance = nil;
         for(NSInteger i=5;i<array.count;i++) {
             message = [NSString stringWithFormat:@"%@:%@",message,array[i]];
         }
-        if([receiverId isEqualToString:self.identificationId]) {//自分あてかどうか確認
-            BOOL canReceive = NO;
-            if(self.isPeripheral) {
-                //ペリフェラルは担当セントラルからのメッセージのみ受信
-                //ただしparticipateRequestだけは無条件で受信
+        
+        BOOL canReceive = NO;
+        
+        if(self.isPeripheral) {
+            //ペリフェラルは担当セントラルからのメッセージのみ受信
+            //ただしparticipateRequestだけは無条件で受信
+            if([receiverId isEqualToString:self.identificationId]) {//自分あてかどうか確認
                 if([self.centralIds containsObject:senderId] || [array[4] isEqualToString:@"participateRequest"]) {
                     canReceive = YES;
                 }
-            } else {
-                //セントラルは自分のペリフェラルからのメッセージのみ受信
+            }
+        } else {
+            //セントラルは自分のペリフェラルからのメッセージのみ受信
+            if([receiverId isEqualToString:self.identificationId] || [receiverId isEqualToString:@"centrals"]) {//自分あてかどうか確認 centralsならすべて受信（セントラルへのブロードキャスト）
                 if([senderId isEqualToString:self.peripheralId]) {
                     canReceive = YES;
                 }
             }
-            if(![self.receivedSignalIds containsObject:@(signalId)] && canReceive) {
-                [self.delegate didReceiveMessage:message senderId:senderId];
-                [self.receivedSignalIds addObject:@(signalId)];
-            }
+        }
+        if(![self.receivedSignalIds containsObject:@(signalId)] && canReceive) {
+            [self.delegate didReceiveMessage:message senderId:senderId];
+            [self.receivedSignalIds addObject:@(signalId)];
         }
     }
 }
@@ -191,10 +226,10 @@ static BWSendMessageManager *sharedInstance = nil;
     [self.centralIds removeAllObjects];
 }
 
-- (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString {
+- (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString {//only peripheral
     //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
     NSString *mes = [NSString stringWithFormat:@"advertiseMyDevice:%@:%@:%@",gameIdString,self.identificationId,[BWUtility getUserName]];
-    GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding]];
+    GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding] type:@"centrals"];
     [self.publications addObject: [self.messageManager publicationWithMessage:pubMessage]];
     
     if(self.publications.count > saveNumberPublications) {
@@ -207,18 +242,30 @@ static BWSendMessageManager *sharedInstance = nil;
 }
 
 - (void)sendMessageForAllCentrals:(NSString*)message {
+    /*
     for(NSInteger i=0;i<self.centralIds.count;i++) {
         [NSObject performBlock:^{
             [self sendMessageWithAddressId:message toId:self.centralIds[i]];
         } afterDelay:0.05*i];
     }
+     */
+    [self sendMessageWithAddressId:message toId:@"centrals"];
 }
 
-- (void)sendMessageWithAddressId:(NSString*)message toId:(NSString*)toId {
+- (void)sendMessageWithAddressId:(NSString*)message toId:(NSString*)toId {// periphral or central
     //"mes:<signalId>:<yourId>:<myId>:<message>"
     NSString *mes = [NSString stringWithFormat:@"mes:%@:%@:%@:%@",@(self.signalId++),toId,self.identificationId,message];
-    GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding]];
-    [self.publications addObject: [self.messageManager publicationWithMessage:pubMessage]];
+    GNSMessage *pubMessage = [GNSMessage messageWithContent:[mes dataUsingEncoding:NSUTF8StringEncoding] type:toId];
+    
+    GNSPublicationParams *params = [GNSPublicationParams paramsWithMessage:pubMessage strategy:self.myStrategy];
+    
+    if([toId isEqualToString:@"centrals"]) {
+        params = [GNSPublicationParams paramsWithMessage:pubMessage strategy:self.centralsStrategy];
+    }
+    
+    id<GNSPublication> publication = [self.messageManager publicationWithParams:params];
+    
+    [self.publications addObject: publication];
     
     if(self.publications.count > saveNumberPublications) {
         [self.publications removeObjectAtIndex:0];

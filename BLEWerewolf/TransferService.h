@@ -8,10 +8,6 @@
 
 #pragma once
 
-#define TRANSFER_SERVICE_UUID           @"9C67274B-A925-4B56-B3E7-A7E02D8CCB71"
-#define TRANSFER_CHARACTERISTIC_UUID    @"D4C3A985-1A0D-448D-900E-7A6AA521AC07"
-
-
 
 typedef NS_ENUM(NSInteger,SignalKind) {
     SignalKindGlobal,
@@ -27,12 +23,15 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 (A) "advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
  ・セントラルはこの信号を受信し、自分のperipheralIDとして保持
  ・セントラルはペリフェラルを保持したら自分のIDを送信する（ペリフェラルはこのメッセージのみは無条件で受信し、セントラルIDとして保持しておく。今後は自分の担当セントラルのメッセージしか受信しない）
+メッセージタイプは"centrals"
  
 (B) "mes:<signalId>:<yourId>:<myId>:<message>" yourIDに対してメッセージを送信する
  ・送られるメッセージはすべて個別idを付与して送る（2重受信の防止)
  ・送り出すメッセージはその都度idをインクリメントする
+ ・yourIdが"centrals"だった場合は、セントラルはすべて受信
 基本的にはこの２つ
 タイムアウトとか受信応答とかは今回は保留（５０個目のメッセージを送信するときから、はじめのメモリが解放され、このときに通信が終わる）
+メッセージは"<yourId>" or "centrals"
  
 
 基本的にブロードキャスト的な送信を行う（全体に宛先を書いたメッセージを送信し、受信側（セントラル）で取捨選択を行う）

@@ -8,6 +8,7 @@
 
 #import "BWAppDelegate.h"
 #import "BWUtility.h"
+#import "BWViewController.h"
 
 @interface BWAppDelegate ()
 
@@ -48,6 +49,10 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (BWViewController*)getRootViewController {
+    return (BWViewController*)self.window.rootViewController;
 }
 
 @end
