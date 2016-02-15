@@ -1,0 +1,20 @@
+{
+  "name": "cmapp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "errorhandler": "^1.4.3",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "jade": "^1.11.0",
+    "method-override": "^2.3.5",
+    "morgan": "^1.6.1",
+    "multer": "^1.1.0",
+    "serve-favicon": "^2.3.0",
+    "socket.io": "0.9.14"
+  }
+}
