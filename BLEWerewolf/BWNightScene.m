@@ -168,8 +168,8 @@ const NSInteger minuteSeconds = 20;
     
     winner = WinnerNone;
     
-    sendManager = [BWSendMessageManager sharedInstance];
-    sendManager.delegate = self;
+    socketManager = [BWSocketManager sharedInstance];
+    socketManager.delegate = self;
     
     if(isPeripheral) {
         [self resetCheckList];
@@ -407,13 +407,13 @@ const NSInteger minuteSeconds = 20;
                 //ゲーム終了を通知「gameEnd:W」
                 winner = [self checkWinner];
                 NSString *mes = [NSString stringWithFormat:@"gameEnd:%d",(int)winner];
-                [sendManager sendMessageForAllCentrals:mes];
+                [socketManager sendMessageForAllCentrals:mes];
                 [self gameEnd];
                 return;
             }
             
             //２日目以降は夜開始を通知「nightStart:」
-            [sendManager sendMessageForAllCentrals:@"nightStart:"];
+            [socketManager sendMessageForAllCentrals:@"nightStart:"];
             [self resetCheckList];
         }
     }
@@ -442,13 +442,13 @@ const NSInteger minuteSeconds = 20;
             //ゲーム終了を通知「gameEnd:W」
             winner = [self checkWinner];
             NSString *mes = [NSString stringWithFormat:@"gameEnd:%d",(int)winner];
-            [sendManager sendMessageForAllCentrals:mes];
+            [socketManager sendMessageForAllCentrals:mes];
             [self gameEnd];
             return;
         }
         
         //全員の犠牲者受信完了を通知「victimCheckFinish:」
-        [sendManager sendMessageForAllCentrals:@"victimCheckFinish:"];
+        [socketManager sendMessageForAllCentrals:@"victimCheckFinish:"];
         
     }
 }
@@ -491,7 +491,7 @@ const NSInteger minuteSeconds = 20;
         //セントラルは夜時間終了を通知「nightFinish:A..A」
         NSString *mes = [NSString stringWithFormat:@"nightFinish:%@",[BWUtility getIdentificationString]];
        
-        [sendManager sendMessageForPeripheral:mes];
+        [socketManager sendMessageForPeripheral:mes];
         //ペリフェラルからの朝通知を待つ
     }
 }
@@ -548,7 +548,7 @@ const NSInteger minuteSeconds = 20;
         
         //朝開始＋犠牲者通知「afternoonStart:2,4」数値は犠牲者のプレイヤーID
         NSString *mes = [NSString stringWithFormat:@"afternoonStart:%@",[victimArray componentsJoinedByString:@","]];
-        [sendManager sendMessageForAllCentrals:mes];
+        [socketManager sendMessageForAllCentrals:mes];
     }
     
     //犠牲者を表示　＋　確認ボタン これを全員が押したら昼に移動
@@ -568,7 +568,7 @@ const NSInteger minuteSeconds = 20;
     [backgroundNode addChild:checkButton];
     
     
-    if([sendManager isPeripheral]) {
+    if([socketManager isPeripheral]) {
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",[NSString stringWithFormat:@"%d日目の朝になりました。昨晩の犠牲者は%@でした。",(int)day,victimString]]];
     }
 }
@@ -656,7 +656,7 @@ const NSInteger minuteSeconds = 20;
             NSInteger count = [counter[voterId]integerValue];
             message = [NSString stringWithFormat:@"%@/%d,%d,%d",message,(int)voterId,(int)votederId,(int)count];
         }
-        [sendManager sendMessageForAllCentrals:message];
+        [socketManager sendMessageForAllCentrals:message];
     }
     
     
@@ -679,7 +679,7 @@ const NSInteger minuteSeconds = 20;
     [backgroundNode addChild:checkButton];
     
     
-    if([sendManager isPeripheral]) {
+    if([socketManager isPeripheral]) {
         NSString *message = @"";
         for(NSInteger i=0;i<votingArray.count;i++) {
             message = [NSString stringWithFormat:@"%@\r\n%@",message,[BWUtility getVoteResultFormatString:votingArray[i] infoDic:infoDic]];
@@ -706,7 +706,7 @@ const NSInteger minuteSeconds = 20;
                 mes = [NSString stringWithFormat:@"%@/",mes];
             }
         }
-        [sendManager sendMessageForAllCentrals:mes];
+        [socketManager sendMessageForAllCentrals:mes];
         
         [self resetCheckList];
     }
@@ -739,7 +739,7 @@ const NSInteger minuteSeconds = 20;
         checkButton.hidden = NO;
     }
     
-    if([sendManager isPeripheral]) {
+    if([socketManager isPeripheral]) {
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",mes]];
     }
 }
@@ -776,7 +776,7 @@ const NSInteger minuteSeconds = 20;
     checkButton = [BWUtility makeButton:@"終了する" size:buttonSize name:@"end" position:CGPointMake(0,-self.size.height/2+margin+buttonSize.height/2)];
     [backgroundNode addChild:checkButton];
     
-    if([sendManager isPeripheral]) {
+    if([socketManager isPeripheral]) {
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/%@",mes]];
     }
 }
@@ -871,7 +871,7 @@ const NSInteger minuteSeconds = 20;
             //セントラルはかくにん通知を送る
             //犠牲者確認通知「checkVictim:A..A」
             NSString *mes = [NSString stringWithFormat:@"checkVictim:%@",[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
             
         }
     }
@@ -893,7 +893,7 @@ const NSInteger minuteSeconds = 20;
                     //再投票
                     voteCount++;
                     votingArray = [NSMutableArray array];
-                    [sendManager sendMessageForAllCentrals:@"nightStart:"];
+                    [socketManager sendMessageForAllCentrals:@"nightStart:"];
                     [self finishAfternoon];
                 } else {
                     if(afternoonVictimArray.count <= 0) {
@@ -908,7 +908,7 @@ const NSInteger minuteSeconds = 20;
             //セントラルはかくにん通知を送る
             //投票結果確認通知「checkVoting:A..A」
             NSString *mes = [NSString stringWithFormat:@"checkVoting:%@",[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
     
         }
     }
@@ -933,13 +933,13 @@ const NSInteger minuteSeconds = 20;
             //セントラルはかくにん通知を送る
             //・夜直前の道連れ確認通知「afternoonVictimCheck:C..C」
             NSString *mes = [NSString stringWithFormat:@"afternoonVictimCheck:%@",[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
         }
     }
     
     if([node.name isEqualToString:@"end"]) {
      
-        [BWSendMessageManager resetSharedInstance];
+        [BWSocketManager resetSharedInstance];
         
         [timer stopTimer];
         timer.delegate = nil;
@@ -1000,7 +1000,7 @@ const NSInteger minuteSeconds = 20;
     if(!isPeripheral) {
         //セントラルは命令をペリフェラルに送信
         NSString *message = [NSString stringWithFormat:@"action:%d/%d/%d",(int)tableRoleId,(int)[BWUtility getMyPlayerId:infoDic],(int)targetIndex];
-        [sendManager sendMessageForPeripheral:message];
+        [socketManager sendMessageForPeripheral:message];
     } else {
         //ペリフェラルは即実行
         [self processRoleAction:tableRoleId actionPlayerId:[BWUtility getMyPlayerId:infoDic] targetPlayerId:targetIndex];
@@ -1070,13 +1070,13 @@ const NSInteger minuteSeconds = 20;
         NSArray *messages = [self divideMessage:message];
         for(NSInteger i=0;i<messages.count;i++) {
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@/%@",[messageViewController getGmId],identificationId,messages[i]];
-            [sendManager sendMessageWithAddressId:mes toId:identificationId];
+            [socketManager sendMessageWithAddressId:mes toId:identificationId];
             
         }
     }
     
     //ログを送信
-    if([sendManager isPeripheral]) {
+    if([socketManager isPeripheral]) {
         NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
         NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
         [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"%d/-/GM/-/%@",(int)roleId,message]];
@@ -1123,7 +1123,7 @@ const NSInteger minuteSeconds = 20;
 #pragma mark - messageManagerDelegate
 
 - (void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
-    if(![sendManager isPeripheral]) {
+    if(![socketManager isPeripheral]) {
         //central
         //ペリフェラルから受け取ったメッセージから、自分と同じグループチャットがあったら反映
         //ただし自分自信はすでに反映されているのでむし
@@ -1249,7 +1249,7 @@ const NSInteger minuteSeconds = 20;
             }
             
             //ログを送信
-            if([sendManager isPeripheral]) {
+            if([socketManager isPeripheral]) {
                 NSInteger playerId = [BWUtility getPlayerId:infoDic id:identificationId];
                 NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
                 NSString *name = infoDic[@"players"][playerId][@"name"];
@@ -1259,7 +1259,7 @@ const NSInteger minuteSeconds = 20;
             NSArray *shouldSendIds = [self getSameChatroomMemberId:identificationId];
             for(NSInteger i=0;i<shouldSendIds.count;i++) {
                 NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",identificationId,text];
-                [sendManager sendMessageWithAddressId:mes toId:shouldSendIds[i]];
+                [socketManager sendMessageWithAddressId:mes toId:shouldSendIds[i]];
             }
             
             if([messageViewController isMember:identificationId] && ![identificationId isEqualToString:[BWUtility getIdentificationString]]) {
@@ -1322,7 +1322,7 @@ const NSInteger minuteSeconds = 20;
                     //再投票
                     votingArray = [NSMutableArray array];
                     voteCount++;
-                    [sendManager sendMessageForAllCentrals:@"nightStart:"];
+                    [socketManager sendMessageForAllCentrals:@"nightStart:"];
                   
                     [self finishAfternoon];
                 } else {
@@ -1361,12 +1361,12 @@ const NSInteger minuteSeconds = 20;
             NSString *mes = [NSString stringWithFormat:@"chatreceive:%@/%@",[BWUtility getIdentificationString],array[j]];
             NSArray *shouldSendIds = [self getSameChatroomMemberId:[BWUtility getIdentificationString]];
             for(NSInteger i=0;i<shouldSendIds.count;i++) {
-                [sendManager sendMessageWithAddressId:mes toId:shouldSendIds[i]];
+                [socketManager sendMessageWithAddressId:mes toId:shouldSendIds[i]];
                
             }
             
             //ログを送信
-            if([sendManager isPeripheral]) {
+            if([socketManager isPeripheral]) {
                 NSInteger playerId = [BWUtility getMyPlayerId:infoDic];
                 NSInteger roleId = [infoDic[@"players"][playerId][@"roleId"]integerValue];
                 NSString *name = infoDic[@"players"][playerId][@"name"];
@@ -1376,7 +1376,7 @@ const NSInteger minuteSeconds = 20;
         } else {
             //まずはペリフェラルに知らせる
             NSString *mes = [NSString stringWithFormat:@"chatsend:%@/%@",[BWUtility getIdentificationString],array[j]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
 
         }
     }

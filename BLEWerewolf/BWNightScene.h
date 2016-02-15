@@ -8,13 +8,13 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-#import "BWSendMessageManager.h"
+#import "BWSocketManager.h"
 #import "BWMessageViewController.h"
 #import "BWTimer.h"
 
-@interface BWNightScene : SKScene <BWSendMessageManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface BWNightScene : SKScene <BWSocketManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate,UITableViewDataSource,UITableViewDelegate> {
     SKSpriteNode *backgroundNode;
-    BWSendMessageManager *sendManager;
+    BWSocketManager *socketManager;
     
     NSMutableDictionary *infoDic;
     

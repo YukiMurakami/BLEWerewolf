@@ -16,7 +16,7 @@
 @implementation BWMainScene {
     SKSpriteNode *backgroundNode;
 
-    BWSendMessageManager *sendManager;
+    BWSocketManager *socketManager;
     
     BWGorgeousTableView *table;
     NSMutableArray *gameIdArray;
@@ -27,9 +27,9 @@
     
     [self initBackground];
     
-    sendManager = [BWSendMessageManager sharedInstance];
-    [sendManager setIsPeripheralParams:NO];
-    sendManager.delegate = self;
+    socketManager = [BWSocketManager sharedInstance];
+    [socketManager setIsPeripheralParams:NO];
+    socketManager.delegate = self;
     
     gameIdArray = [NSMutableArray array];
     
@@ -94,12 +94,12 @@
     
     [BWUtility saveNowGameIdString:touchedGameId];
     //ここでgameId,peripheralIdを確定させる
-    [sendManager setPeripheralId:peripheralIdentificationId];
+    [socketManager setPeripheralId:peripheralIdentificationId];
     
     //・ゲーム部屋に参加要求「participateRequest:NNNNNN/C..C/S...S/P..P/F」NNNNNNは６桁のゲームID、C..Cは16桁の端末識別文字列（初回起動時に自動生成）S...Sはユーザ名,P..Pは接続先ペリフェラルID,Fは普通のセントラルなら0,サブサーバなら1
     //今はサブサーバはなし
     NSString *sendMessage = [NSString stringWithFormat:@"participateRequest:%@/%@/%@/%@/0",touchedGameId,[BWUtility getIdentificationString],[BWUtility getUserName],peripheralIdentificationId];
-    [sendManager sendMessageForPeripheral:sendMessage];
+    [socketManager sendMessageForPeripheral:sendMessage];
         
     BWWaitConnectionScene *scene = [BWWaitConnectionScene sceneWithSize:self.size];
     SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];

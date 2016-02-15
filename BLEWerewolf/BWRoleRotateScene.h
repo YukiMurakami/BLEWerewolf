@@ -7,11 +7,11 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-#import "BWSendMessageManager.h"
+#import "BWSocketManager.h"
 
-@interface BWRoleRotateScene : SKScene <BWSendMessageManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface BWRoleRotateScene : SKScene <BWSocketManagerDelegate,UITableViewDataSource,UITableViewDelegate> {
     SKSpriteNode *backgroundNode;
-    BWSendMessageManager *sendManager;
+    BWSocketManager *socketManager;
     
     NSMutableDictionary *infoDic;
     

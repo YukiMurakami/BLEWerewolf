@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger,UserType) {
 };
 
 @interface BWGameSettingScene () {
-    BWSendMessageManager *sendManager;
+    BWSocketManager *socketManager;
     
     NSInteger gameId;
     
@@ -48,9 +48,9 @@ typedef NS_ENUM(NSInteger,UserType) {
     
     gameId = _gameId;
     
-    sendManager = [BWSendMessageManager sharedInstance];
-    sendManager.delegate = self;
-    [sendManager setIsPeripheralParams:YES];
+    socketManager = [BWSocketManager sharedInstance];
+    socketManager.delegate = self;
+    [socketManager setIsPeripheralParams:YES];
     
     
     registeredPlayersArray = [NSMutableArray array];
@@ -84,7 +84,7 @@ typedef NS_ENUM(NSInteger,UserType) {
 -(void)startAdvertisingGameRoom {
     //advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
     NSString *gameIdString = [NSString stringWithFormat:@"%06d",(int)gameId];
-    [sendManager startAdvertiseGameRoomInfo:gameIdString];
+    [socketManager startAdvertiseGameRoomInfo:gameIdString];
     [BWUtility saveNowGameIdString:gameIdString];
 }
 
@@ -191,9 +191,9 @@ typedef NS_ENUM(NSInteger,UserType) {
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
             [checkList setObject:@NO forKey:registeredPlayersArray[i][@"identificationId"]];
         }
-        [sendManager resetCentralIds];
+        [socketManager resetCentralIds];
         for(NSInteger i=1;i<registeredPlayersArray.count;i++) {
-            [sendManager addCentralIdsObject:registeredPlayersArray[i][@"identificationId"]];
+            [socketManager addCentralIdsObject:registeredPlayersArray[i][@"identificationId"]];
         }
         //ここで接続しているセントラルを確定させる
         
@@ -217,7 +217,7 @@ typedef NS_ENUM(NSInteger,UserType) {
     }
     
     for(NSInteger i=0;i<messagesAndIdentificationIds.count;i++) {
-        [sendManager sendMessageWithAddressId:messagesAndIdentificationIds[i][@"message"] toId:messagesAndIdentificationIds[i][@"identificationId"]];
+        [socketManager sendMessageWithAddressId:messagesAndIdentificationIds[i][@"message"] toId:messagesAndIdentificationIds[i][@"identificationId"]];
     }
 }
 
@@ -247,7 +247,7 @@ typedef NS_ENUM(NSInteger,UserType) {
                 if(isNew) {
                     //participateAllow:A..A
                     NSString *mes = [NSString stringWithFormat:@"participateAllow:%@",centralId];
-                    [sendManager sendMessageWithAddressId:mes toId:centralId];
+                    [socketManager sendMessageWithAddressId:mes toId:centralId];
                     
                     UserType type = UserTypeServerMember;
                     
@@ -261,7 +261,7 @@ typedef NS_ENUM(NSInteger,UserType) {
                     [tableView.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:registeredPlayersArray.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
                     [self initBackground];
                     
-                    [sendManager addCentralIdsObject:centralId];
+                    [socketManager addCentralIdsObject:centralId];
 
                 }
             }

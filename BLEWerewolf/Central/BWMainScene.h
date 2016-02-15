@@ -8,8 +8,8 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-#import "BWSendMessageManager.h"
+#import "BWSocketManager.h"
 
-@interface BWMainScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWSendMessageManagerDelegate>
+@interface BWMainScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWSocketManagerDelegate>
 
 @end

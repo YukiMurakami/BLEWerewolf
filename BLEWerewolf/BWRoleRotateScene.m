@@ -30,8 +30,8 @@
     
     tablePlayerArray = [NSMutableArray array];
     
-    sendManager = [BWSendMessageManager sharedInstance];
-    sendManager.delegate = self;
+    socketManager = [BWSocketManager sharedInstance];
+    socketManager.delegate = self;
     
     if(isPeripheral) {
         checkList = [NSMutableArray array];
@@ -50,7 +50,7 @@
                 message = [NSString stringWithFormat:@"%@/",message];
             }
         }
-        [sendManager sendMessageForAllCentrals:message];
+        [socketManager sendMessageForAllCentrals:message];
        
     }
     
@@ -234,7 +234,7 @@
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //roleCheck:A..A
             NSString *mes = [NSString stringWithFormat:@"roleCheck:%@",[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -258,7 +258,7 @@
 
 -(void)goFirstNight {
     //ペリフェラルのみ
-    [sendManager sendMessageForAllCentrals:@"firstNight:"];
+    [socketManager sendMessageForAllCentrals:@"firstNight:"];
     
     BWNightScene *scene = [BWNightScene sceneWithSize:self.size];
     [scene setCentralOrPeripheral:isPeripheral :infoDic];
@@ -269,7 +269,7 @@
 #pragma mark - messageManagerDelegate
 
 - (void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
-    if(![sendManager isPeripheral]) {
+    if(![socketManager isPeripheral]) {
         //central
         //firstNight:
         if([[BWUtility getCommand:message] isEqualToString:@"firstNight"]) {

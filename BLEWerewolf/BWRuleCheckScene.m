@@ -40,8 +40,8 @@
         }
     }
     
-    sendManager = [BWSendMessageManager sharedInstance];
-    sendManager.delegate = self;
+    socketManager = [BWSocketManager sharedInstance];
+    socketManager.delegate = self;
 }
 
 -(void)initBackground {
@@ -109,7 +109,7 @@
         ruleString = [NSString stringWithFormat:@"%@%@,",ruleString,ruleDic[@"canContinuousGuard"]];
         ruleString = [NSString stringWithFormat:@"%@%@",ruleString,ruleDic[@"isLacking"]];
         
-        [sendManager sendMessageForAllCentrals:ruleString];
+        [socketManager sendMessageForAllCentrals:ruleString];
     }
 }
 
@@ -118,7 +118,7 @@
         if(!isPeripheral) {//セントラルならペリフェラルに送信
             //settingCheck:A..A
             NSString *mes = [NSString stringWithFormat:@"settingCheck:%@",[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
         } else {//ペリフェラルなら内部的に直接値を変更する
             NSString *identificationId = [BWUtility getIdentificationString];
             BOOL isAllOK = YES;
@@ -205,7 +205,7 @@
 #pragma  mark - MessageManagerDelegate
 
 -(void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
-    if(![sendManager isPeripheral]) {
+    if(![socketManager isPeripheral]) {
         //central
         //gamestart:0,0/1,0/.../8,1
         //セントラル側では役職IDを格納しておく（配役とルールとプレイヤーはすでに取得済み）

@@ -24,8 +24,8 @@
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
     
-    sendManager = [BWSendMessageManager sharedInstance];
-    sendManager.delegate = self;
+    socketManager = [BWSocketManager sharedInstance];
+    socketManager.delegate = self;
     
     printMessage = @"接続中、、、";
     
@@ -54,7 +54,7 @@
             
             //ゲーム部屋から退出通知（タイムアウトなど）「participateCancel:NNNNNN/C..C」
             NSString *message = [NSString stringWithFormat:@"participateCandel:%@/%@",[BWUtility getNowGameIdString],[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:message];
+            [socketManager sendMessageForPeripheral:message];
             
             BWMainScene *scene = [[BWMainScene alloc]initWithSize:self.size];
             SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.5];
@@ -172,7 +172,7 @@
             printMessage = @"ルール設定待ち";
             //・参加者情報受信完了通知「memberCheck:C..C」
             NSString *mes = [NSString stringWithFormat:@"memberCheck:%@",[BWUtility getIdentificationString]];
-            [sendManager sendMessageForPeripheral:mes];
+            [socketManager sendMessageForPeripheral:mes];
             [self initBackground];
         }
     }

@@ -1,21 +1,23 @@
 //
-//  BWSendMessageManager.h
-//  NearByMessageChat
+//  BWSocketManager.h
+//  BLEWerewolf
 //
-//  Created by Yuki Murakami on 2016/02/07.
+//  Created by Yuki Murakami on 2016/02/15.
 //  Copyright © 2016年 yuki. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
+#import "SocketIO.h"
 
-@protocol BWSendMessageManagerDelegate
+
+@protocol BWSocketManagerDelegate
 -(void)didReceiveMessage:(NSString*)message senderId:(NSString*)senderId;
 -(void)didReceiveAdvertiseGameroomInfo:(NSDictionary*)gameroomInfo;
 @end
 
-@interface BWSendMessageManager : NSObject
+@interface BWSocketManager : NSObject <SocketIODelegate>
 
-@property (nonatomic) id<BWSendMessageManagerDelegate> delegate;
+@property (nonatomic) id<BWSocketManagerDelegate> delegate;
 @property (nonatomic) BOOL isPeripheral;
 
 + (instancetype)sharedInstance;
@@ -33,6 +35,9 @@
 - (void)setPeripheralId:(NSString *)peripheralId;
 - (BOOL)addCentralIdsObject:(NSString*)centralId;
 - (void)resetCentralIds;
+
+- (void)connect;
+- (void)disconnect;
 
 
 @end

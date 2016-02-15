@@ -7,12 +7,12 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
-#import "BWSendMessageManager.h"
+#import "BWSocketManager.h"
 
 #import "BWGorgeousTableView.h"
 #import "BWButtonNode.h"
 
-@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWButtonNodeDelegate,BWSendMessageManagerDelegate>
+@interface BWGameSettingScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWButtonNodeDelegate,BWSocketManagerDelegate>
 
 -(id)initWithSize:(CGSize)size gameId:(NSInteger)_gameId ;
 
