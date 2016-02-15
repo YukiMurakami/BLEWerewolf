@@ -11,12 +11,15 @@
 #import "BWWaitConnectionScene.h"
 #import "BWGorgeousTableView.h"
 #import "BWGameSettingScene.h"
+#import "BWTopScene.h"
 
 
 @implementation BWMainScene {
     SKSpriteNode *backgroundNode;
 
     BWSocketManager *socketManager;
+    
+    BWButtonNode *buttonNode;
     
     BWGorgeousTableView *table;
     NSMutableArray *gameIdArray;
@@ -44,13 +47,19 @@
     
     CGFloat margin = self.size.width*0.1;
 
+    CGSize buttonSize = CGSizeMake(self.size.width*0.6, self.size.width*0.6/5);
+    buttonNode = [[BWButtonNode alloc]init];
+    [buttonNode makeButtonWithSize:buttonSize name:@"back" title:@"戻る" boldRate:0.8];
+    buttonNode.position = CGPointMake(0, -self.size.height/2 + buttonSize.height/2 + margin);
+    buttonNode.delegate = self;
+    [backgroundNode addChild:buttonNode];
     
     SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width - margin*2, (self.size.width-margin*2)/4) title:@"ゲーム部屋一覧"];
     titleNode.position = CGPointMake(0, self.size.height/2 - titleNode.size.height/2 - margin);
     [backgroundNode addChild:titleNode];
     
     
-    table = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin,titleNode.size.height + margin*2,self.size.width-margin*2,self.size.height-margin*3-titleNode.size.height)];
+    table = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin,titleNode.size.height + margin*2,self.size.width-margin*2,self.size.height-margin*3-titleNode.size.height - buttonSize.height - margin)];
     [table setViewDesign:self];
     table.tableView.rowHeight = table.frame.size.height/6;
 }
@@ -63,6 +72,14 @@
     
     [self.view addSubview:table];
     [table.tableView reloadData];
+}
+
+- (void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
+    if([name isEqualToString:@"back"]) {
+        BWTopScene *scene = [BWTopScene sceneWithSize:self.size];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:1.0];
+        [self.view presentScene:scene transition:transition];
+    }
 }
 
 #pragma mark - tableDelegate

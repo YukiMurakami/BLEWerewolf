@@ -9,7 +9,8 @@
 #import <SpriteKit/SpriteKit.h>
 
 #import "BWSocketManager.h"
+#import "BWButtonNode.h"
 
-@interface BWMainScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWSocketManagerDelegate>
+@interface BWMainScene : SKScene <UITableViewDelegate,UITableViewDataSource,BWSocketManagerDelegate,BWButtonNodeDelegate>
 
 @end
