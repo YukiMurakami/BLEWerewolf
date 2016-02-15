@@ -26,6 +26,7 @@
 - (BOOL)isPeripheral;
 
 - (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString;//ゲームIDの送信用 ペリフェラル→セントラル
+- (void)stopAdvertiseGameRoomInfo;
 
 - (void)sendMessageForPeripheral:(NSString*)message;//セントラル→ペリフェラル
 - (void)sendMessageForAllCentrals:(NSString*)message;//ペリフェラル→全セントラル
@@ -38,6 +39,8 @@
 
 - (void)connect;
 - (void)disconnect;
+
+- (BOOL)isAdvertising;
 
 
 @end

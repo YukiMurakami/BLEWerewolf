@@ -30,7 +30,10 @@
 NSString const *IPAddress = @"133.11.238.87";
 NSInteger const port = 3000;
 
-@interface BWSocketManager ()
+@interface BWSocketManager () {
+    SKSpriteNode *repeatNode;
+    BOOL isAdvertising;
+}
 
 @property (strong, nonatomic) SocketIO *socketIO;
 
@@ -83,6 +86,12 @@ static BWSocketManager *sharedInstance = nil;
         
         self.socketIO = [[SocketIO alloc] initWithDelegate:self];
         [self connect];
+        
+        repeatNode = [[SKSpriteNode alloc]init];
+        BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        BWViewController *vc = (BWViewController*)appDelegate.window.rootViewController;
+        [vc.sceneForSenderNodes addChild:repeatNode];
+        isAdvertising = NO;
     }
     return self;
 }
@@ -164,6 +173,10 @@ static BWSocketManager *sharedInstance = nil;
 
 #pragma mark - public methods
 
+- (BOOL)isAdvertising {
+    return isAdvertising;
+}
+
 - (BOOL)addCentralIdsObject:(NSString*)centralId {
     if(![self.centralIds containsObject:centralId]) {
         [self.centralIds addObject:centralId];
@@ -177,10 +190,22 @@ static BWSocketManager *sharedInstance = nil;
 }
 
 - (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString {//only peripheral
-    //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
-    NSString *mes = [NSString stringWithFormat:@"advertiseMyDevice:%@:%@:%@",gameIdString,self.identificationId,[BWUtility getUserName]];
-    
-    [self.socketIO sendEvent:@"message:send" withData:@{@"message" : mes}];
+    if(isAdvertising) return;
+    isAdvertising = YES;
+    SKAction *wait = [SKAction waitForDuration:2.0];
+    SKAction *send = [SKAction runBlock:^{
+        //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
+        NSString *mes = [NSString stringWithFormat:@"advertiseMyDevice:%@:%@:%@",gameIdString,self.identificationId,[BWUtility getUserName]];
+        
+        [self.socketIO sendEvent:@"message:send" withData:@{@"message" : mes}];
+    }];
+    SKAction *repeat = [SKAction repeatActionForever:[SKAction sequence:@[send,wait]]];
+    [repeatNode runAction:repeat];
+}
+
+- (void)stopAdvertiseGameRoomInfo {
+    isAdvertising = NO;
+    [repeatNode removeAllActions];
 }
 
 - (void)sendMessageForPeripheral:(NSString*)message {

@@ -283,6 +283,8 @@ typedef NS_ENUM(NSInteger,UserType) {
             }
         }
         if(isAllOK) {
+            [socketManager stopAdvertiseGameRoomInfo];
+            
             BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
             [scene sendPlayerInfo:registeredPlayersArray];
             SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];
