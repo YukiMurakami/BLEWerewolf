@@ -21,6 +21,7 @@ typedef NS_ENUM(NSInteger,SignalKind) {
 /*
 通信用プロトコル 2種類
 (A) "advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>" 自分のIDを不特定多数の全員に知らせる (ペリフェラルのみ）
+    "closeMyDevice:<gameId>:<peripheralId>"
  ・セントラルはこの信号を受信し、自分のperipheralIDとして保持
  ・セントラルはペリフェラルを保持したら自分のIDを送信する（ペリフェラルはこのメッセージのみは無条件で受信し、セントラルIDとして保持しておく。今後は自分の担当セントラルのメッセージしか受信しない）
 メッセージタイプは"centrals"

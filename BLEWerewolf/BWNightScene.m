@@ -756,6 +756,8 @@ const NSInteger minuteSeconds = 20;
     [messageViewController eraseKeyboard];
     messageViewController.view.hidden = YES;
     
+    timer.delegate = nil;
+    
     CGSize size = CGSizeMake(self.size.width*0.6, self.size.width*0.6*0.8);
     NSString *mes = @"";
     if(winner == WinnerVillager) {

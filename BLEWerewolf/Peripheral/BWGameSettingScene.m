@@ -11,6 +11,7 @@
 #import "NSObject+BlocksWait.h"
 #import "BWSettingScene.h"
 #import "BWWaitConnectionScene.h"
+#import "BWTopScene.h"
 
 
 #import "LWBonjourManager.h"
@@ -33,6 +34,7 @@ typedef NS_ENUM(NSInteger,UserType) {
     NSMutableArray *registeredPlayersArray;//自分のセントラル参加者
     
     BWButtonNode *bwbuttonNode;
+    BWButtonNode *backButtonNode;
 
     NSMutableDictionary *checkList;
     
@@ -63,8 +65,6 @@ typedef NS_ENUM(NSInteger,UserType) {
         [NSObject performBlock:^{
             [[LWBonjourManager sharedManager] sendData:[NSString stringWithFormat:@"-1/-/GM/-/通信テストOK"]];
         } afterDelay:3.0];
-        
-        
     
     
     checkList = [NSMutableDictionary dictionary];
@@ -107,15 +107,19 @@ typedef NS_ENUM(NSInteger,UserType) {
     
     [backgroundNode addChild:numberNode];
     
-    CGFloat margin = self.size.height * 0.05;
     
-    
+    CGFloat margin = self.size.width*0.1;
     bwbuttonNode = [[BWButtonNode alloc]init];
-    [bwbuttonNode makeButtonWithSize:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"next" title:@"参加締め切り" boldRate:1.0];
-    bwbuttonNode.position = CGPointMake(0, -self.size.height/2+margin+self.size.width*0.2*0.7/2);
+    [bwbuttonNode makeButtonWithSize:CGSizeMake(self.size.width*0.5,self.size.width*0.7*0.2) name:@"next" title:@"参加締め切り" boldRate:1.0];
+    bwbuttonNode.position = CGPointMake(self.size.width*0.15, -self.size.height/2+margin+self.size.width*0.2*0.7/2);
     bwbuttonNode.delegate = self;
     [backgroundNode addChild:bwbuttonNode];
     
+    backButtonNode = [[BWButtonNode alloc]init];
+    [backButtonNode makeButtonWithSize:CGSizeMake(self.size.width*0.2, self.size.width*0.7*0.2) name:@"back" title:@"戻る" boldRate:1.0];
+    backButtonNode.position = CGPointMake(-self.size.width*0.3, bwbuttonNode.position.y);
+    backButtonNode.delegate = self;
+    [backgroundNode addChild:backButtonNode];
     
     if(!tableView) {
         tableView = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(margin, titleNode.size.height+numberNode.size.height+margin*2.2, self.size.width-margin*2, self.size.height - (titleNode.size.height+numberNode.size.height+margin*2.2 + margin*2+bwbuttonNode.size.height))];
@@ -145,7 +149,6 @@ typedef NS_ENUM(NSInteger,UserType) {
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     
     //TODO::メインサーバ用の表示にする
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
@@ -200,6 +203,13 @@ typedef NS_ENUM(NSInteger,UserType) {
         
         //セントラルに締め切りを通知する
         [self sendPlayerInfos];
+    }
+    
+    if([name isEqualToString:@"back"]) {
+        [[BWSocketManager sharedInstance] stopAdvertiseGameRoomInfo:[NSString stringWithFormat:@"%06d",(int)gameId]];
+        BWTopScene *scene = [BWTopScene sceneWithSize:self.size];
+        SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:1.0];
+        [self.view presentScene:scene transition:transition];
     }
 }
 
@@ -265,7 +275,6 @@ typedef NS_ENUM(NSInteger,UserType) {
 
                 }
             }
-            
         }
     }
     
@@ -283,7 +292,7 @@ typedef NS_ENUM(NSInteger,UserType) {
             }
         }
         if(isAllOK) {
-            [socketManager stopAdvertiseGameRoomInfo];
+            [socketManager stopAdvertiseGameRoomInfo :[NSString stringWithFormat:@"%06ld",(long)gameId]];
             
             BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
             [scene sendPlayerInfo:registeredPlayersArray];

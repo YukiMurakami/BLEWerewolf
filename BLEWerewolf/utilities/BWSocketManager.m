@@ -124,8 +124,15 @@ static BWSocketManager *sharedInstance = nil;
             NSString *peripheralName = array[3];
             
             [self.delegate didReceiveAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId,@"peripheralName":peripheralName}];
+        }
+        
+        //"closeMyDevice:<gameId>:<peripheralId>"
+        if([[BWUtility getCommand:mes] isEqualToString:@"closeMyDevice"]) {
+            NSArray *array = [mes componentsSeparatedByString:@":"];
+            NSString *gameId = array[1];
+            NSString *peripheralId = array[2];
             
-            
+            [self.delegate didReceiveStopAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId}];
         }
     }
     
@@ -206,9 +213,19 @@ static BWSocketManager *sharedInstance = nil;
     [repeatNode runAction:repeat];
 }
 
-- (void)stopAdvertiseGameRoomInfo {
+- (void)stopAdvertiseGameRoomInfo:(NSString*)gameIdString {
     isAdvertising = NO;
     [repeatNode removeAllActions];
+    
+    SKAction *wait = [SKAction waitForDuration:1.0];
+    SKAction *send = [SKAction runBlock:^{
+        //"closeMyDevice:<gameId>:<peripheralId>"
+        NSString *mes = [NSString stringWithFormat:@"closeMyDevice:%@:%@",gameIdString,self.identificationId];
+        
+        [self.socketIO sendEvent:@"message:send" withData:@{@"message" : mes}];
+    }];
+    SKAction *repeat = [SKAction repeatAction:[SKAction sequence:@[send,wait]] count:3];
+    [repeatNode runAction:repeat];
 }
 
 - (void)sendMessageForPeripheral:(NSString*)message {

@@ -13,6 +13,7 @@
 @protocol BWSocketManagerDelegate
 -(void)didReceiveMessage:(NSString*)message senderId:(NSString*)senderId;
 -(void)didReceiveAdvertiseGameroomInfo:(NSDictionary*)gameroomInfo;
+-(void)didReceiveStopAdvertiseGameroomInfo:(NSDictionary*)gameroomInfo;
 @end
 
 @interface BWSocketManager : NSObject <SocketIODelegate>
@@ -26,7 +27,7 @@
 - (BOOL)isPeripheral;
 
 - (void)startAdvertiseGameRoomInfo:(NSString*)gameIdString;//ゲームIDの送信用 ペリフェラル→セントラル
-- (void)stopAdvertiseGameRoomInfo;
+- (void)stopAdvertiseGameRoomInfo:(NSString*)gameIdString;
 
 - (void)sendMessageForPeripheral:(NSString*)message;//セントラル→ペリフェラル
 - (void)sendMessageForAllCentrals:(NSString*)message;//ペリフェラル→全セントラル

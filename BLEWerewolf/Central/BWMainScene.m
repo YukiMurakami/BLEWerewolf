@@ -129,4 +129,21 @@
     }
 }
 
+- (void)didReceiveStopAdvertiseGameroomInfo:(NSDictionary *)gameroomInfo {
+    NSString *gameId = gameroomInfo[@"gameId"];
+    NSString *peripheralId = gameroomInfo[@"peripheralId"];
+    
+    NSInteger index = -1;
+    for(NSInteger i=0;i<gameIdArray.count;i++) {
+        if([[gameIdArray[i][@"gameId"] substringToIndex:6] isEqualToString:gameId]) {
+            index = i;
+            break;
+        }
+    }
+    if(index != -1) {
+        [gameIdArray removeObjectAtIndex:index];
+        [table.tableView reloadData];
+    }
+}
+
 @end
