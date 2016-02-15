@@ -77,6 +77,7 @@ typedef NS_ENUM(NSInteger,Winner) {
 //ユーザデータを設定していたかどうか
 + (BOOL)wasSetting;
 + (NSString*)getUserName;
++ (NSString*)getUserHostIP;
 + (void)saveNowGameIdString:(NSString*)gameIdString;
 + (NSString*)getNowGameIdString;
 

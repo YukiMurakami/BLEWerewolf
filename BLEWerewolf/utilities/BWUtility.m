@@ -634,6 +634,13 @@
     return userData[@"name"];
 }
 
++ (NSString*)getUserHostIP {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *userData = [ud objectForKey:@"userData"];
+    if(!userData || ![[userData allKeys] containsObject:@"hostAddress"]) return @"0.0.0.0";
+    return userData[@"hostAddress"];
+}
+
 + (void)saveNowGameIdString:(NSString*)gameIdString {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud setObject:gameIdString forKey:@"gameIdString"];

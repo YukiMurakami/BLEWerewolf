@@ -38,6 +38,7 @@
 - (void)resetCentralIds;
 
 - (void)connect;
+- (void)changeIPAddress;
 - (void)disconnect;
 
 - (BOOL)isAdvertising;

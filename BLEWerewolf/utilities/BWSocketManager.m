@@ -27,7 +27,6 @@
 
 #import "SocketIOPacket.h"
 
-NSString const *IPAddress = @"133.11.238.87";
 NSInteger const port = 3000;
 
 @interface BWSocketManager () {
@@ -67,8 +66,12 @@ static BWSocketManager *sharedInstance = nil;
 - (void)connect
 {
     if(!self.socketIO.isConnected && !self.socketIO.isConnecting) {
-        [self.socketIO connectToHost:IPAddress onPort:port];
+        [self.socketIO connectToHost:[BWUtility getUserHostIP] onPort:port];
     }
+}
+
+- (void)changeIPAddress {
+    [self.socketIO connectToHost:[BWUtility getUserHostIP] onPort:port];
 }
 
 - (void)disconnect

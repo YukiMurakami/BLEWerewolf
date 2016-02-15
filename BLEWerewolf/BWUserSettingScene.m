@@ -9,8 +9,11 @@
 #import "BWTopScene.h"
 #import "BWUserSettingScene.h"
 #import "BWUtility.h"
+#import "BWSocketManager.h"
 
-@implementation BWUserSettingScene
+@implementation BWUserSettingScene {
+    BOOL isRename;
+}
 
 -(id)initWithSize:(CGSize)size {
     self = [super initWithSize:size];
@@ -27,31 +30,32 @@
     backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self addChild:backgroundNode];
     
-    SKLabelNode *identificationStringNode = [[SKLabelNode alloc]init];
-    identificationStringNode.text = [NSString stringWithFormat:@"ID:%@",[BWUtility getIdentificationString]];
-    identificationStringNode.fontSize = 30.0;
-    identificationStringNode.fontColor = [UIColor blackColor];
-    identificationStringNode.position = CGPointMake(0, self.size.height/2 - 30.0 - self.size.height*0.05);
-    [backgroundNode addChild:identificationStringNode];
-    
-    NSString *userName = @"no_name";
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary *userData = [ud objectForKey:@"userData"];
-    if(userData) {
-        userName = userData[@"name"];
+    NSArray *infos = @[@{@"string":[NSString stringWithFormat:@"ID:%@",[BWUtility getIdentificationString]],@"fontSize":@(30),@"y":@(self.size.height/2 - (30.0 + self.size.height*0.05))},
+                       @{@"string":[BWUtility getUserName],@"fontSize":@(50),@"y":@(self.size.height/2 - (30.0 + self.size.height*0.05)*2)},
+                       @{@"string":[BWUtility getUserHostIP],@"fontSize":@(30),@"y":@(self.size.height/2 - (30.0 + self.size.height*0.05)*3)},
+                       ];
+    for(NSInteger i=0;i<infos.count;i++) {
+        SKLabelNode *node = [[SKLabelNode alloc]init];
+        node.text = infos[i][@"string"];
+        node.fontSize = [infos[i][@"fontSize"]doubleValue];
+        node.fontName = @"HiraKakuPro-W6";
+        node.fontColor = [UIColor blackColor];
+        node.position = CGPointMake(0, [infos[i][@"y"]doubleValue]);
+        [backgroundNode addChild:node];
     }
-    SKLabelNode *nameStringNode = [[SKLabelNode alloc]init];
-    nameStringNode.text = userName;
-    nameStringNode.fontColor = [UIColor blackColor];
-    nameStringNode.fontSize = 50.0;
-    nameStringNode.position = CGPointMake(0, self.size.height/2 - (30.0 + self.size.height*0.05)*2);
-    [backgroundNode addChild:nameStringNode];
     
-    SKSpriteNode *buttonNode2 = [BWUtility makeButton:@"名前変更" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"rename" position:CGPointMake(0, -self.size.height/2 + self.size.width*0.7*0.2*4)];
-    [backgroundNode addChild:buttonNode2];
     
-    SKSpriteNode *buttonNode = [BWUtility makeButton:@"戻る" size:CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2) name:@"back" position:CGPointMake(0, -self.size.height/2 + self.size.width*0.7*0.2*2)];
-    [backgroundNode addChild:buttonNode];
+    NSArray *buttonInfos = @[@{@"title":@"名前変更",@"name":@"rename",@"y":@(-self.size.height/2 + self.size.width*0.7*0.2*6)},
+                             @{@"title":@"IP変更",@"name":@"host",@"y":@(-self.size.height/2 + self.size.width*0.7*0.2*4)},
+                             @{@"title":@"戻る",@"name":@"back",@"y":@(-self.size.height/2 + self.size.width*0.7*0.2*2)}
+                             ];
+    CGSize buttonSize = CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2);
+    for(NSInteger i=0;i<buttonInfos.count;i++) {
+        SKSpriteNode *button = [BWUtility makeButton:buttonInfos[i][@"title"] size:buttonSize name:buttonInfos[i][@"name"] position:CGPointMake(0, [buttonInfos[i][@"y"]doubleValue])];
+        [backgroundNode addChild:button];
+    }
+    
+    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -65,7 +69,12 @@
         [self.view presentScene:scene transition:transition];
     }
     
-    if([node.name isEqualToString:@"rename"]) {
+    if([node.name isEqualToString:@"rename"] || [node.name isEqualToString:@"host"]) {
+        if([node.name isEqualToString:@"rename"]) {
+            isRename = YES;
+        } else {
+            isRename = NO;
+        }
         [self prompt];
     }
     
@@ -79,6 +88,10 @@
     @autoreleasepool {
         NSString *title = @"ユーザ名前変更";
         NSString *message = @"新しい名前を入力してください。";
+        if(!isRename) {
+            title = @"接続先ホスト変更";
+            message = @"新しい接続先IPアドレス(n.n.n.n)を入力してください。";
+        }
         NSString *buttonTitle = @"変更";
         
         UIAlertController * alertController =
@@ -118,13 +131,24 @@
                     // ここに UI の更新やデータベースへの追記などを実施するコードを記述する
                     NSLog(@"ここに UI の更新やデータベースへの追記などを実施するコードを記述する");
                     //名前変更
-                    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-                    NSMutableDictionary *userData = [[ud objectForKey:@"userData"]mutableCopy];
-                    if(!userData) {
-                        userData = [NSMutableDictionary dictionary];
+                    if(isRename) {
+                        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                        NSMutableDictionary *userData = [[ud objectForKey:@"userData"]mutableCopy];
+                        if(!userData) {
+                            userData = [NSMutableDictionary dictionary];
+                        }
+                        [userData setObject:textField.text forKey:@"name"];
+                        [ud setObject:userData forKey:@"userData"];
+                    } else {
+                        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                        NSMutableDictionary *userData = [[ud objectForKey:@"userData"]mutableCopy];
+                        if(!userData) {
+                            userData = [NSMutableDictionary dictionary];
+                        }
+                        [userData setObject:textField.text forKey:@"hostAddress"];
+                        [ud setObject:userData forKey:@"userData"];
+                        [[BWSocketManager sharedInstance] changeIPAddress];
                     }
-                    [userData setObject:textField.text forKey:@"name"];
-                    [ud setObject:userData forKey:@"userData"];
                     [self initBackground];
                 };
                 dispatch_async(dispatch_get_main_queue(), mainBlock);
