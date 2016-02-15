@@ -11,6 +11,7 @@
 #import "BWUtility.h"
 #import "BWSocketManager.h"
 
+
 @implementation BWUserSettingScene {
     BOOL isRename;
 }
@@ -49,36 +50,35 @@
                              @{@"title":@"IP変更",@"name":@"host",@"y":@(-self.size.height/2 + self.size.width*0.7*0.2*4)},
                              @{@"title":@"戻る",@"name":@"back",@"y":@(-self.size.height/2 + self.size.width*0.7*0.2*2)}
                              ];
+    
     CGSize buttonSize = CGSizeMake(self.size.width*0.7,self.size.width*0.7*0.2);
     for(NSInteger i=0;i<buttonInfos.count;i++) {
-        SKSpriteNode *button = [BWUtility makeButton:buttonInfos[i][@"title"] size:buttonSize name:buttonInfos[i][@"name"] position:CGPointMake(0, [buttonInfos[i][@"y"]doubleValue])];
-        [backgroundNode addChild:button];
+        BWButtonNode *node = [[BWButtonNode alloc]init];
+        node.delegate = self;
+        [node makeButtonWithSize:buttonSize name:buttonInfos[i][@"name"] title:buttonInfos[i][@"title"] boldRate:0.7];
+        node.position = CGPointMake(0, [buttonInfos[i][@"y"]doubleValue]);
+        [backgroundNode addChild:node];
     }
-    
-    
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInNode:self];
-    SKNode *node = [self nodeAtPoint:location];
-    
-    if([node.name isEqualToString:@"back"]) {
+- (void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
+    if([name isEqualToString:@"back"]) {
         BWTopScene *scene = [BWTopScene sceneWithSize:self.size];
         SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:1.0];
         [self.view presentScene:scene transition:transition];
     }
     
-    if([node.name isEqualToString:@"rename"] || [node.name isEqualToString:@"host"]) {
-        if([node.name isEqualToString:@"rename"]) {
+    if([name isEqualToString:@"rename"] || [name isEqualToString:@"host"]) {
+        if([name isEqualToString:@"rename"]) {
             isRename = YES;
         } else {
             isRename = NO;
         }
         [self prompt];
     }
-    
 }
+
+
 
 -(void)prompt
 {

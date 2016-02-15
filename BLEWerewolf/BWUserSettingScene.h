@@ -7,8 +7,9 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
+#import "BWButtonNode.h"
 
-@interface BWUserSettingScene : SKScene {
+@interface BWUserSettingScene : SKScene <BWButtonNodeDelegate> {
     SKSpriteNode *backgroundNode;
 }
 
