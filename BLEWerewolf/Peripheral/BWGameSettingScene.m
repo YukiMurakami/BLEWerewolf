@@ -294,6 +294,8 @@ typedef NS_ENUM(NSInteger,UserType) {
         if(isAllOK) {
             [socketManager stopAdvertiseGameRoomInfo :[NSString stringWithFormat:@"%06ld",(long)gameId]];
             
+            socketManager.isConnectedGame = YES;
+            
             BWSettingScene *scene = [BWSettingScene sceneWithSize:self.size];
             [scene sendPlayerInfo:registeredPlayersArray];
             SKTransition *transition = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:1.0];

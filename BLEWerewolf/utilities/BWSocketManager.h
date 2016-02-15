@@ -20,6 +20,7 @@
 
 @property (nonatomic) id<BWSocketManagerDelegate> delegate;
 @property (nonatomic) BOOL isPeripheral;
+@property (nonatomic) BOOL isConnectedGame;
 
 + (instancetype)sharedInstance;
 + (void)resetSharedInstance;

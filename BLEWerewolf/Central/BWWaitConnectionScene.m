@@ -29,6 +29,8 @@
     
     printMessage = @"接続中、、、";
     
+    [BWSocketManager sharedInstance].isConnectedGame = YES;
+    
     timeoutCount = 0;
     
     [self initBackground];
@@ -96,6 +98,8 @@
 - (void)didReceiveAdvertiseGameroomInfo:(NSDictionary *)gameroomInfo {
     
 }
+
+
 
 - (void)didReceiveMessage:(NSString *)message senderId:(NSString *)senderId {
     //participateAllow:A..A

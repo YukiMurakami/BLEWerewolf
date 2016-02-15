@@ -32,6 +32,7 @@ NSInteger const port = 3000;
 @interface BWSocketManager () {
     SKSpriteNode *repeatNode;
     BOOL isAdvertising;
+
 }
 
 @property (strong, nonatomic) SocketIO *socketIO;
@@ -90,6 +91,8 @@ static BWSocketManager *sharedInstance = nil;
         self.socketIO = [[SocketIO alloc] initWithDelegate:self];
         [self connect];
         
+        self.isConnectedGame = NO;
+        
         repeatNode = [[SKSpriteNode alloc]init];
         BWAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
         BWViewController *vc = (BWViewController*)appDelegate.window.rootViewController;
@@ -116,23 +119,26 @@ static BWSocketManager *sharedInstance = nil;
     
     if(!self.isPeripheral) {
         //デバイスのアドバータイズなら受け取る
-        //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>"
-        if([[BWUtility getCommand:mes] isEqualToString:@"advertiseMyDevice"]) {
-            NSArray *array = [mes componentsSeparatedByString:@":"];
-            NSString *gameId = array[1];
-            NSString *peripheralId = array[2];
-            NSString *peripheralName = array[3];
+        //ただしすでにゲームに接続されている場合は無視する
+        if(!self.isConnectedGame) {
+            //"advertiseMyDevice:<gameId>:<peripheralId>:<peripheralName>"
+            if([[BWUtility getCommand:mes] isEqualToString:@"advertiseMyDevice"]) {
+                NSArray *array = [mes componentsSeparatedByString:@":"];
+                NSString *gameId = array[1];
+                NSString *peripheralId = array[2];
+                NSString *peripheralName = array[3];
+                
+                [self.delegate didReceiveAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId,@"peripheralName":peripheralName}];
+            }
             
-            [self.delegate didReceiveAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId,@"peripheralName":peripheralName}];
-        }
-        
-        //"closeMyDevice:<gameId>:<peripheralId>"
-        if([[BWUtility getCommand:mes] isEqualToString:@"closeMyDevice"]) {
-            NSArray *array = [mes componentsSeparatedByString:@":"];
-            NSString *gameId = array[1];
-            NSString *peripheralId = array[2];
-            
-            [self.delegate didReceiveStopAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId}];
+            //"closeMyDevice:<gameId>:<peripheralId>"
+            if([[BWUtility getCommand:mes] isEqualToString:@"closeMyDevice"]) {
+                NSArray *array = [mes componentsSeparatedByString:@":"];
+                NSString *gameId = array[1];
+                NSString *peripheralId = array[2];
+                
+                [self.delegate didReceiveStopAdvertiseGameroomInfo:@{@"gameId":gameId,@"peripheralId":peripheralId}];
+            }
         }
     }
     
