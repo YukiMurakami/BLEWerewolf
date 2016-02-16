@@ -178,7 +178,6 @@ typedef NS_ENUM(NSInteger,UserType) {
     //TODO::メインサーバ用の処理を行う
     UserType type = [registeredPlayersArray[indexPath.row][@"type"]integerValue];
     if(type == UserTypeServerMember) {
-        [registeredPlayersArray removeObject:registeredPlayersArray[indexPath.row]];
         [registeredPlayersArray removeObjectAtIndex:indexPath.row];
         [_tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
         [self initBackground];
