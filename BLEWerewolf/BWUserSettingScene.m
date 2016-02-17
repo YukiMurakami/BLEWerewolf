@@ -31,18 +31,19 @@
     backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self addChild:backgroundNode];
     
-    NSArray *infos = @[@{@"string":[NSString stringWithFormat:@"ID:%@",[BWUtility getIdentificationString]],@"fontSize":@(30),@"y":@(self.size.height/2 - (30.0 + self.size.height*0.05))},
-                       @{@"string":[BWUtility getUserName],@"fontSize":@(50),@"y":@(self.size.height/2 - (30.0 + self.size.height*0.05)*2)},
-                       @{@"string":[BWUtility getUserHostIP],@"fontSize":@(30),@"y":@(self.size.height/2 - (30.0 + self.size.height*0.05)*3)},
+    NSArray *infos = @[@{@"string":[NSString stringWithFormat:@"ID:%@",[BWUtility getIdentificationString]],@"fontSize":@(50)},
+                       @{@"string":[BWUtility getUserName],@"fontSize":@(50)},
+                       @{@"string":[BWUtility getUserHostIP],@"fontSize":@(50),},
                        ];
     for(NSInteger i=0;i<infos.count;i++) {
-        SKLabelNode *node = [[SKLabelNode alloc]init];
-        node.text = infos[i][@"string"];
-        node.fontSize = [infos[i][@"fontSize"]doubleValue];
-        node.fontName = @"HiraKakuPro-W6";
-        node.fontColor = [UIColor blackColor];
-        node.position = CGPointMake(0, [infos[i][@"y"]doubleValue]);
-        [backgroundNode addChild:node];
+        SKSpriteNode *titleNode = [BWUtility makeTitleNodeWithBoldrate:1.0 size:CGSizeMake(self.size.width*0.8, self.size.width*0.8/200*[infos[i][@"fontSize"]doubleValue]) title:infos[i][@"string"]];
+        double y = self.size.height/2 - [infos[i][@"fontSize"]doubleValue]/2 - self.size.height*0.05*2;
+        for(NSInteger j=0;j<i;j++) {
+            y -= [infos[j][@"fontSize"]doubleValue]/2 + [infos[j+1][@"fontSize"]doubleValue]/2;
+            y -= self.size.height*0.05;
+        }
+        titleNode.position = CGPointMake(0, y);
+        [backgroundNode addChild:titleNode];
     }
     
     
@@ -101,6 +102,11 @@
         
         void (^configurationHandler)(UITextField *) = ^(UITextField * textField) {
             textField.placeholder = @"Player name";
+            if(isRename) {
+                textField.text = [BWUtility getUserName];
+            } else {
+                textField.text = [BWUtility getUserHostIP];
+            }
             // ここで UITextField の text が変更したときの通知を受信する設定を実施
             NSLog(@"ここで UITextField の text が変更したときの通知を受信する設定を実施");
             [[NSNotificationCenter defaultCenter]
