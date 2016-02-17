@@ -900,6 +900,16 @@ const NSInteger minuteSeconds = 20;
             }
             table.hidden = NO;
             [table.tableView reloadData];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSIndexPath* indexPath;
+                if([infoDic[@"voting"] count] > 0) {
+                    indexPath = [NSIndexPath indexPathForRow:infoDic[@"voting"][(NSInteger)[infoDic[@"voting"] count]] inSection:[infoDic[@"voting"] count]];
+                } else {
+                    indexPath = [NSIndexPath indexPathForRow: [[infoDic[@"rules"] allKeys] count] inSection:0];
+                }
+                [table.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            });
         }
         if(mode == TableModeNormal) {
             tableMode = TableModeNormal;
