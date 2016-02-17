@@ -904,7 +904,7 @@ const NSInteger minuteSeconds = 20;
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSIndexPath* indexPath;
                 if([infoDic[@"voting"] count] > 0) {
-                    indexPath = [NSIndexPath indexPathForRow:infoDic[@"voting"][(NSInteger)[infoDic[@"voting"] count]] inSection:[infoDic[@"voting"] count]];
+                    indexPath = [NSIndexPath indexPathForRow:[infoDic[@"voting"][(NSInteger)[infoDic[@"voting"] count]-1][@"detail"] count]-1 inSection:[infoDic[@"voting"] count]];
                 } else {
                     indexPath = [NSIndexPath indexPathForRow: [[infoDic[@"rules"] allKeys] count] inSection:0];
                 }
@@ -1509,7 +1509,7 @@ const NSInteger minuteSeconds = 20;
         if(section == 0) {//最初はルール
             return 1 + [[infoDic[@"rules"] allKeys] count];
         } else {
-            return [infoDic[@"voting"][section-1]integerValue];
+            return [infoDic[@"voting"][section-1][@"detail"] count];
         }
     }
     return tableArray.count;
@@ -1592,9 +1592,10 @@ const NSInteger minuteSeconds = 20;
         if(indexPath.section != 0) {
             BWVoteCell *cell = [tableView dequeueReusableCellWithIdentifier:@"votecell"];
             
-            NSString *voterString = infoDic[@"players"][[votingArray[indexPath.row][@"voter"]integerValue]][@"name"];
-            NSString *votedString = infoDic[@"players"][[votingArray[indexPath.row][@"voteder"]integerValue]][@"name"];
-            NSInteger count = [votingArray[indexPath.row][@"count"]integerValue];
+            NSMutableArray *votingList = infoDic[@"voting"][indexPath.section-1][@"detail"];
+            NSString *voterString = infoDic[@"players"][[votingList[indexPath.row][@"voter"]integerValue]][@"name"];
+            NSString *votedString = infoDic[@"players"][[votingList[indexPath.row][@"voteder"]integerValue]][@"name"];
+            NSInteger count = [votingList[indexPath.row][@"count"]integerValue];
             
             if(!cell) {
                 cell = (BWVoteCell*)[[BWVoteCell alloc]init];
@@ -1698,6 +1699,7 @@ const NSInteger minuteSeconds = 20;
             int voteExcutionerId = [infoDic[@"voting"][section-1][@"excutionerId"]intValue];
             label.text = [NSString stringWithFormat:@"%d日目(%d回目 処刑:%@さん)",voteDay,count,infoDic[@"players"][voteExcutionerId][@"name"]];
         }
+        label.backgroundColor = [UIColor groupTableViewBackgroundColor];
         return label;
     }
     
