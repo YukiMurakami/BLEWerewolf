@@ -70,7 +70,7 @@ const NSInteger minuteSeconds = 20;
     NSInteger tableRoleId;
     
     
-    UIView *coverView;
+    SKView *coverView;
     UIView *afternoonView;
     
     SKView *deadPeripheralCoverView;
@@ -82,6 +82,9 @@ const NSInteger minuteSeconds = 20;
     NSInteger voteMaxCount;
     
     NSInteger lastNightGuardIndex;//連続護衛禁止用の変数 セントラル側で管理しておく
+    
+    BWButtonNode *historyButton;
+    BWButtonNode *backCoverButton;
 }
 
 -(id)initWithSize:(CGSize)size {
@@ -182,19 +185,51 @@ const NSInteger minuteSeconds = 20;
     voteMaxCount = 4;
     lastNightGuardIndex = -1;
     
+    [infoDic setObject:[NSMutableArray array] forKey:@"voting"];
+    
+    
+    coverView = [[SKView alloc]initWithFrame:CGRectMake(0, 0, self.size.width, self.size.height)];
+    coverView.backgroundColor = [UIColor blackColor];
+    coverView.alpha = 0.8;
+    
+    SKScene *coverScene = [SKScene sceneWithSize:coverView.frame.size];
+    [coverView presentScene:coverScene];
+    
+    
     CGFloat margin = self.size.height*0.02;
     CGFloat statusHeight = 22;
     CGFloat timerHeight = self.size.height*0.1;
+    
+    
+    CGSize historyButtonSize = CGSizeMake(self.size.width*0.3, self.size.height*0.1);
+    historyButton = [[BWButtonNode alloc]init];
+    [historyButton makeButtonWithSize:historyButtonSize name:@"history" title:@"履歴" boldRate:0.5];
+    historyButton.position = CGPointMake(-self.size.width*0.35 + margin, -self.size.height*0.45 + margin);
+    historyButton.delegate = self;
+    historyButton.zPosition = 1.0;
+    
+    
+    backCoverButton = [[BWButtonNode alloc]init];
+    [backCoverButton makeButtonWithSize:historyButtonSize name:@"backCover" title:@"戻る" boldRate:0.5];
+    backCoverButton.position = CGPointMake(self.size.width/2, -self.size.height*0.45 + margin + self.size.height/2);
+    backCoverButton.delegate = self;
+    [coverScene addChild:backCoverButton];
+    
+    
     messageViewController = [BWMessageViewController sharedInstance:infoDic];
-    messageViewController.view.frame = CGRectMake(margin, margin*2+timerHeight+statusHeight, self.size.width - margin*2, self.size.height - margin*3 - timerHeight - statusHeight);
+    messageViewController.view.frame = CGRectMake(margin, margin*2+timerHeight+statusHeight, self.size.width - margin*2, self.size.height - margin*4 - timerHeight - statusHeight - historyButton.size.height);
     messageViewController.delegate = self;
+    
     
     timer = [[BWTimer alloc]init];
     [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*minuteSeconds];
     timer.delegate = self;
     
-    CGFloat tableMargin = self.size.height*0.05;
-    table = [[BWGorgeousTableView alloc]initWithFrame:CGRectMake(tableMargin, tableMargin + statusHeight, self.size.width-tableMargin*2,self.size.height - (statusHeight+tableMargin*3+self.size.height*0.1))];
+    
+    
+    
+    
+    table = [[BWGorgeousTableView alloc]initWithFrame:messageViewController.view.frame];
     [table setViewDesign:self];
     
     table.tableView.rowHeight = table.frame.size.height/6;
@@ -233,6 +268,9 @@ const NSInteger minuteSeconds = 20;
     [timer removeFromParent];
     timer.zPosition = 1.0;
     [backgroundNode addChild:timer];
+    
+    
+    [backgroundNode addChild:historyButton];
     
     
     NSInteger roleId = [BWUtility getMyRoleId:infoDic];
@@ -303,6 +341,7 @@ const NSInteger minuteSeconds = 20;
         [voteCheckNode removeFromParent];
         if(!isPeripheral || [infoDic[@"players"][[BWUtility getMyPlayerId:infoDic]][@"isLive"]boolValue]) {
             messageViewController.view.hidden = NO;
+            historyButton.hidden = NO;
         }
         [waitLabelNode removeFromParent];
         [timer setSeconds:[infoDic[@"rules"][@"nightTimer"]integerValue]*minuteSeconds];
@@ -427,6 +466,8 @@ const NSInteger minuteSeconds = 20;
     excutionerId = -1;
     afternoonVictimArray = [NSMutableArray array];
     
+    historyButton.hidden = NO;
+    
     //backgroundNode.texture = [SKTexture textureWithImageNamed:@"afternoon.jpg"];
     [self backgroundMorphing:[SKTexture textureWithImageNamed:@"afternoon.jpg"] time:1.0];
     explain.texture = [SKTexture textureWithImageNamed:@"back_card.jpg"];
@@ -469,8 +510,11 @@ const NSInteger minuteSeconds = 20;
     //夜終了
     phase = PhaseNightFinish;
     messageViewController.view.hidden = YES;
+    historyButton.hidden = YES;
     table.hidden = YES;
-    [coverView removeFromSuperview];
+
+    [self setCoverViewWithAddFlag:NO tableMode:TableModeNormal];
+    
     [messageViewController eraseKeyboard];
     if(actionButtonNode.parent) {
         [actionButtonNode removeFromParent];
@@ -575,6 +619,9 @@ const NSInteger minuteSeconds = 20;
 
 -(void)finishAfternoon {
     //昼終了
+    [self setCoverViewWithAddFlag:NO tableMode:TableModeNormal];
+    historyButton.hidden = YES;
+    
     didAction = NO;
     phase = PhaseAfternoonFinish;
     //全員処刑投票用のテーブルを表示する
@@ -663,6 +710,9 @@ const NSInteger minuteSeconds = 20;
     
     //投票結果表示　＋　確認ボタン表示 + 投票結果の保存
     //TODO::投票結果の保存
+    NSDictionary *voteResult = @{@"day":@(day),@"voteCount":@(voteCount),@"excutionerId":@(excutionerId),@"detail":votingArray};
+    [infoDic[@"voting"] addObject:voteResult];
+    
     tableMode = TableModeVoteResult;
     table.tableView.rowHeight = table.frame.size.width/1446*244;
     table.tableView.allowsSelection = NO;
@@ -837,21 +887,54 @@ const NSInteger minuteSeconds = 20;
     }
 }
 
+-(void)setCoverViewWithAddFlag:(BOOL)isAdd tableMode:(TableMode)mode{
+    if(isAdd) {
+        if(mode == TableModeHistory) {
+            tableMode = TableModeHistory;
+            [self.view addSubview:coverView];
+            historyButton.userInteractionEnabled = NO;
+            table.tableView.rowHeight = table.frame.size.width/1446*244;
+            table.tableView.allowsSelection = NO;
+            if(!table.superview) {
+                [self.view addSubview:table];
+            }
+            table.hidden = NO;
+            [table.tableView reloadData];
+        }
+        if(mode == TableModeNormal) {
+            tableMode = TableModeNormal;
+            [self.view addSubview:coverView];
+            historyButton.userInteractionEnabled = NO;
+            [self setTableData:[BWUtility getMyRoleId:infoDic]];
+            if(!table.superview) {
+                [self.view addSubview:table];
+            }
+            table.hidden = NO;
+            [table.tableView reloadData];
+        }
+    } else {
+        [table removeFromSuperview];
+        [coverView removeFromSuperview];
+        historyButton.userInteractionEnabled = YES;
+    }
+}
+
+-(void)buttonNode:(SKSpriteNode *)buttonNode didPushedWithName:(NSString *)name {
+    if([name isEqualToString:@"history"]) {
+        [self setCoverViewWithAddFlag:YES tableMode:TableModeHistory];
+    }
+    if([name isEqualToString:@"backCover"]) {
+        [self setCoverViewWithAddFlag:NO tableMode:TableModeHistory];
+    }
+}
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [touches anyObject];
     CGPoint location = [touch locationInNode:self];
     SKNode *node = [self nodeAtPoint:location];
     
     if([node.name isEqualToString:@"action"]) {
-        coverView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.size.width, self.size.height)];
-        coverView.backgroundColor = [UIColor blackColor];
-        coverView.alpha = 0.8;
-        [self.view addSubview:coverView];
-        [self setTableData:[BWUtility getMyRoleId:infoDic]];
-        if(!table.superview) {
-            [self.view addSubview:table];
-        }
-        table.hidden = NO;
+        [self setCoverViewWithAddFlag:YES tableMode:TableModeNormal];
     }
     
     if([node.name isEqualToString:@"victimCheck"]) {
@@ -991,8 +1074,7 @@ const NSInteger minuteSeconds = 20;
 }
 
 -(void)doRoleAction {
-    [table removeFromSuperview];
-    [coverView removeFromSuperview];
+    [self setCoverViewWithAddFlag:NO tableMode:TableModeNormal];
     
     if(tableRoleId == RoleBodyguard) {
         //ボディーガードは今日の護衛先を記憶しておく
@@ -1413,7 +1495,21 @@ const NSInteger minuteSeconds = 20;
     if(tableMode == TableModeVoteResult) {
         return votingArray.count;
     }
+    if(tableMode == TableModeHistory) {
+        if(section == 0) {//最初はルール
+            return 1 + [[infoDic[@"rules"] allKeys] count];
+        } else {
+            return [infoDic[@"voting"][section-1]integerValue];
+        }
+    }
     return tableArray.count;
+}
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    if(tableMode == TableModeHistory) {
+        return 1 + [infoDic[@"voting"] count];
+    }
+    return 1;
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1434,6 +1530,72 @@ const NSInteger minuteSeconds = 20;
         cell.voteder.text = votedString;
         cell.counter.text = [NSString stringWithFormat:@"%d票",(int)count];
         return cell;
+    }
+    
+    if(tableMode == TableModeHistory) {
+        if(indexPath.section == 0) {
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+            if (!cell) {
+                cell = [BWGorgeousTableView makePlateCellWithReuseIdentifier:@"cell" colorId:0];
+            }
+            NSString *title = @"";
+            NSString *detailTitle = @"";
+            if(indexPath.row == 0) {
+                title = @"配役";
+                detailTitle = [BWUtility getRoleSetString:infoDic[@"roles"]];
+            }
+            if(indexPath.row == 1) {
+                title = @"昼時間";
+                detailTitle = [NSString stringWithFormat:@"%@分",infoDic[@"rules"][@"timer"]];
+            }
+            if(indexPath.row == 2) {
+                title = @"夜時間";
+                detailTitle = [NSString stringWithFormat:@"%@分",infoDic[@"rules"][@"nightTimer"]];
+            }
+            if(indexPath.row == 3) {
+                title = @"初日占い";
+                detailTitle = [[BWUtility getFortuneButtonString:[infoDic[@"rules"][@"fortuneMode"]integerValue]] substringFromIndex:5];
+            }
+            if(indexPath.row == 4) {
+                title = @"連続護衛";
+                BOOL canGuard = [infoDic[@"rules"][@"canContinuousGuard"]boolValue];
+                if(canGuard) {
+                    detailTitle = @"あり";
+                } else {
+                    detailTitle = @"なし";
+                }
+            }
+            if(indexPath.row == 5) {
+                title = @"役かけ";
+                BOOL isLack = [infoDic[@"rules"][@"isLacking"]boolValue];
+                if(isLack) {
+                    detailTitle = @"あり";
+                } else {
+                    detailTitle = @"なし";
+                }
+            }
+            
+            cell.textLabel.text = [NSString stringWithFormat:@"%@   %@",title,detailTitle];
+            return cell;
+        }
+        
+        if(indexPath.section != 0) {
+            BWVoteCell *cell = [tableView dequeueReusableCellWithIdentifier:@"votecell"];
+            
+            NSString *voterString = infoDic[@"players"][[votingArray[indexPath.row][@"voter"]integerValue]][@"name"];
+            NSString *votedString = infoDic[@"players"][[votingArray[indexPath.row][@"voteder"]integerValue]][@"name"];
+            NSInteger count = [votingArray[indexPath.row][@"count"]integerValue];
+            
+            if(!cell) {
+                cell = (BWVoteCell*)[[BWVoteCell alloc]init];
+                
+                [cell setVoterString:voterString votedString:votedString count:count cellSize:CGSizeMake(table.tableView.frame.size.width, table.tableView.frame.size.width/1446*244)];
+            }
+            cell.voter.text = voterString;
+            cell.voteder.text = votedString;
+            cell.counter.text = [NSString stringWithFormat:@"%d票",(int)count];
+            return cell;
+        }
     }
     
     UITableViewCell *cell;
@@ -1513,6 +1675,19 @@ const NSInteger minuteSeconds = 20;
         label.numberOfLines = 2;
         label.textAlignment = NSTextAlignmentCenter;
         label.backgroundColor = [UIColor groupTableViewBackgroundColor];
+        return label;
+    }
+    
+    if(tableMode == TableModeHistory) {
+        label.textColor = [UIColor blackColor];
+        if(section == 0) {
+            label.text = @"ルール";
+        } else {
+            int voteDay = [infoDic[@"voting"][section-1][@"day"]intValue];
+            int count = [infoDic[@"voting"][section-1][@"voteCount"]intValue];
+            int voteExcutionerId = [infoDic[@"voting"][section-1][@"excutionerId"]intValue];
+            label.text = [NSString stringWithFormat:@"%d日目(%d回目 処刑:%@さん)",voteDay,count,infoDic[@"players"][voteExcutionerId][@"name"]];
+        }
         return label;
     }
     

@@ -11,8 +11,9 @@
 #import "BWSocketManager.h"
 #import "BWMessageViewController.h"
 #import "BWTimer.h"
+#import "BWButtonNode.h"
 
-@interface BWNightScene : SKScene <BWSocketManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface BWNightScene : SKScene <BWSocketManagerDelegate,BWMessageViewControllerDelegate,BWTimerDelegate,UITableViewDataSource,UITableViewDelegate,BWButtonNodeDelegate> {
     SKSpriteNode *backgroundNode;
     BWSocketManager *socketManager;
     
